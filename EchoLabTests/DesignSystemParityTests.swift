@@ -145,6 +145,8 @@ struct DesignSystemParityTests {
       (.downloadingAudio, 1, [.current, .pending, .pending, .pending]),
       (.probing, 1, [.current, .pending, .pending, .pending]),
       (.fetchingCaptions, 2, [.completed, .current, .pending, .pending]),
+      (.preparingSpeechModel, 2, [.completed, .current, .pending, .pending]),
+      (.checkingTiming, 3, [.completed, .completed, .current, .pending]),
       (.preparingTranscript, 3, [.completed, .completed, .current, .pending]),
       (.publishing, 4, [.completed, .completed, .completed, .current]),
     ]
@@ -159,6 +161,73 @@ struct DesignSystemParityTests {
 
     for terminal in [ProductionImportPhase.ready, .failed, .cancelled] {
       #expect(ProductionImportPresentationMapper.progress(for: job(terminal)) == nil)
+    }
+  }
+
+  @Test func transcriptionSubProgressAdvancesTheBarWithinTheTranscriptStep() throws {
+    // The transcript step is index 2 of 4; sub-progress fills the bar from the
+    // step's start (0.5) toward its completion (0.75) instead of sitting frozen.
+    let start = try #require(
+      ProductionImportPresentationMapper.progress(for: job(.preparingTranscript), subProgress: 0))
+    #expect(start.fractionCompleted == 0.5)
+    let mid = try #require(
+      ProductionImportPresentationMapper.progress(for: job(.preparingTranscript), subProgress: 0.5))
+    #expect(mid.fractionCompleted == 0.625)
+    let full = try #require(
+      ProductionImportPresentationMapper.progress(for: job(.preparingTranscript), subProgress: 1))
+    #expect(full.fractionCompleted == 0.75)
+    // The step indicator stays "current" throughout; only the bar moves.
+    #expect(mid.steps.map(\.state) == [.completed, .completed, .current, .pending])
+  }
+
+  @Test func transcriptionSubProgressIsClampedAndNilFallsBackToStepTicks() throws {
+    let clampedLow = try #require(
+      ProductionImportPresentationMapper.progress(
+        for: job(.preparingTranscript), subProgress: -3))
+    #expect(clampedLow.fractionCompleted == 0.5)
+    let clampedHigh = try #require(
+      ProductionImportPresentationMapper.progress(
+        for: job(.preparingTranscript), subProgress: 4))
+    #expect(clampedHigh.fractionCompleted == 0.75)
+    // Without sub-progress the mapper keeps the original per-step fraction.
+    let noSub = try #require(
+      ProductionImportPresentationMapper.progress(for: job(.preparingTranscript)))
+    #expect(noSub.fractionCompleted == 0.75)
+  }
+
+  @Test func resolvedIPAFallsBackToTheOtherAccentAndMarksIt() {
+    let both = LessonWord(id: "w0", text: "world", ipaUK: "wɜːld", ipaUS: "wɝld")
+    #expect(both.resolvedIPA(for: .uk) == ResolvedIPA(text: "wɜːld", fallbackAccent: nil))
+    #expect(both.resolvedIPA(for: .us) == ResolvedIPA(text: "wɝld", fallbackAccent: nil))
+
+    // Proper noun absent from the British dictionary but present in US.
+    let ukMissing = LessonWord(id: "w1", text: "Howard", ipaUK: nil, ipaUS: "ˈhaʊɚd")
+    #expect(ukMissing.resolvedIPA(for: .uk) == ResolvedIPA(text: "ˈhaʊɚd", fallbackAccent: .us))
+    #expect(ukMissing.resolvedIPA(for: .us) == ResolvedIPA(text: "ˈhaʊɚd", fallbackAccent: nil))
+
+    // Empty string counts as missing, not as a pronunciation.
+    let emptyUK = LessonWord(id: "w2", text: "Ashley", ipaUK: "", ipaUS: "ˈæʃli")
+    #expect(emptyUK.resolvedIPA(for: .uk) == ResolvedIPA(text: "ˈæʃli", fallbackAccent: .us))
+
+    // Absent from both dictionaries: nothing to show.
+    let neither = LessonWord(id: "w3", text: "Chuzzlewit", ipaUK: nil, ipaUS: nil)
+    #expect(neither.resolvedIPA(for: .uk) == nil)
+    #expect(neither.resolvedIPA(for: .us) == nil)
+  }
+
+  @Test func ipaNotationIsConsistentAndPunctuationHasNoPronunciationRow() {
+    for raw in ["həˈləʊ", "/həˈləʊ/", " [həˈləʊ] ", "//həˈləʊ//"] {
+      #expect(IPAFormatting.display(raw) == "/həˈləʊ/")
+    }
+    #expect(IPAFormatting.display(" / / ") == nil)
+    for punctuation in [".", ",", "?!", "…", "—", "“", " ” "] {
+      #expect(!IPAFormatting.isPronounceable(punctuation))
+      let shown = NSHostingView(rootView: EchoWordToken(word: punctuation, ipa: nil) {})
+      let hidden = NSHostingView(rootView: EchoWordToken(word: punctuation, ipa: nil, showIPA: false) {})
+      #expect(shown.fittingSize == hidden.fittingSize)
+    }
+    for word in ["Hello,", "don't", "2026"] {
+      #expect(IPAFormatting.isPronounceable(word))
     }
   }
 

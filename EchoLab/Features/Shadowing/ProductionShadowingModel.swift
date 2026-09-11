@@ -13,11 +13,30 @@ final class ProductionShadowingModel {
   let controller: ProductionPracticeController
   private var practiceOptions = Preferences()
   private var ipaBackfillAttempted: Set<UUID> = []
-  private var wordTimingBackfillAttempted: Set<UUID> = []
+  var showingSpeechPreparation = false
+  private(set) var isPreparingWordTiming = false
+  private(set) var speechPreparationError: EchoCopy?
+  private var wordTimingTask: Task<Void, Never>?
+  private var wordTimingRequestID: UUID?
 
   private(set) var lesson: LibraryLessonSummary?
   private(set) var targets: [ProductionPracticeTarget] = []
-  private(set) var preparedSentences: [ProductionPreparedSentence] = []
+  private(set) var preparedSentences: [ProductionPreparedSentence] = [] {
+    didSet { cachedLessonSentences = nil }
+  }
+  /// Decoding IPA/translation JSON per word is expensive, so the mapped
+  /// sentences are memoized here and rebuilt only when `preparedSentences`
+  /// changes — never on every SwiftUI render. `@ObservationIgnored` keeps the
+  /// cache write out of the observation graph (no re-render loop).
+  @ObservationIgnored private var cachedLessonSentences: [LessonSentence]?
+  var lessonSentences: [LessonSentence] {
+    if let cachedLessonSentences { return cachedLessonSentences }
+    let computed = preparedSentences.enumerated().map {
+      $0.element.lessonSentence(number: $0.offset + 1)
+    }
+    cachedLessonSentences = computed
+    return computed
+  }
   private(set) var takes: [ProductionStoredTake] = []
   var selectedTarget: ProductionPracticeTarget?
   private(set) var isLoading = false
@@ -38,6 +57,9 @@ final class ProductionShadowingModel {
     self.translationPreparer = translationPreparer
     self.ipaPreparer = ipaPreparer
     self.wordTimingPreparer = wordTimingPreparer
+    controller.onSingleListenCompleted = { [weak self] revisionID, repeating in
+      self?.advanceAfterSingleListen(revisionID: revisionID, repeating: repeating)
+    }
   }
 
   func open(_ lesson: LibraryLessonSummary, preferences: Preferences) {
@@ -50,7 +72,7 @@ final class ProductionShadowingModel {
     error = nil
     waveformSamples = nil
     waveformError = nil
-    wordTimingBackfillAttempted.remove(lesson.id)
+    dismissSpeechPreparation()
     Task { await load() }
   }
 
@@ -74,18 +96,6 @@ final class ProductionShadowingModel {
           self.error = EchoCopy("storage.detail", arguments: [.raw(error.localizedDescription)])
         }
       }
-      if let wordTimingPreparer, !wordTimingBackfillAttempted.contains(lesson.id),
-        needsWordTimingBackfill(loaded)
-      {
-        wordTimingBackfillAttempted.insert(lesson.id)
-        do {
-          if try await wordTimingPreparer.prepare(sentences: loaded) {
-            loaded = try await service.preparedSentences(lessonID: lesson.id)
-          }
-        } catch {
-          self.error = EchoCopy("storage.detail", arguments: [.raw(error.localizedDescription)])
-        }
-      }
       preparedSentences = loaded
       targets = loaded.map(\.target)
       takes = try await service.takes(lessonID: lesson.id)
@@ -101,6 +111,73 @@ final class ProductionShadowingModel {
       }
     } catch {
       self.error = EchoCopy("storage.detail", arguments: [.raw(error.localizedDescription)])
+    }
+  }
+
+  var canPrepareWordTiming: Bool {
+    wordTimingPreparer != nil && needsWordTimingBackfill(preparedSentences)
+      && !isLoading && !controller.phase.isCapture && controller.phase != .saving
+      && controller.phase != .saveFailed
+  }
+
+  func presentSpeechPreparation() {
+    guard canPrepareWordTiming else { return }
+    pause()
+    speechPreparationError = nil
+    showingSpeechPreparation = true
+  }
+
+  func dismissSpeechPreparation() {
+    wordTimingTask?.cancel()
+    wordTimingTask = nil
+    wordTimingRequestID = nil
+    isPreparingWordTiming = false
+    showingSpeechPreparation = false
+    speechPreparationError = nil
+  }
+
+  /// Only the explicit Continue action may request Speech consent or run backfill.
+  func startWordTimingPreparation() {
+    guard showingSpeechPreparation, !isPreparingWordTiming,
+      let wordTimingPreparer, let lessonID = lesson?.id else { return }
+    let sentences = preparedSentences
+    let localeIdentifier = practiceOptions.accent == .uk ? "en-GB" : "en-US"
+    let requestID = UUID()
+    wordTimingRequestID = requestID
+    isPreparingWordTiming = true
+    speechPreparationError = nil
+    wordTimingTask = Task { [weak self] in
+      do {
+        let changed = try await wordTimingPreparer.prepare(sentences: sentences, localeIdentifier: localeIdentifier)
+        try Task.checkCancellation()
+        guard let self, self.lesson?.id == lessonID, self.wordTimingRequestID == requestID else { return }
+        if changed { await self.load() }
+        guard self.wordTimingRequestID == requestID else { return }
+        self.isPreparingWordTiming = false
+        self.wordTimingTask = nil
+        if changed {
+          self.showingSpeechPreparation = false
+        } else {
+          self.speechPreparationError = EchoCopy("speech.preparation.no_changes")
+        }
+      } catch {
+        guard let self, self.wordTimingRequestID == requestID else { return }
+        self.isPreparingWordTiming = false
+        self.wordTimingTask = nil
+        if error is CancellationError { return }
+        if error is SpeechAnalyzerPreparationError {
+          self.speechPreparationError = EchoCopy("speech.preparation.unavailable")
+          return
+        }
+        switch error as? AppleSpeechCaptionError {
+        case .permissionDenied: self.speechPreparationError = EchoCopy("speech.preparation.denied")
+        case .onDeviceRecognitionUnavailable, .recognizerUnavailable:
+          self.speechPreparationError = EchoCopy("speech.preparation.unavailable")
+        case .timedOut: self.speechPreparationError = EchoCopy("speech.preparation.timeout")
+        default:
+          self.speechPreparationError = EchoCopy("speech.preparation.failed", arguments: [.raw(error.localizedDescription)])
+        }
+      }
     }
   }
 
@@ -230,7 +307,7 @@ final class ProductionShadowingModel {
       return nil
     } catch {
       self.error = EchoCopy("storage.detail", arguments: [.raw(error.localizedDescription)])
-      return error.localizedDescription
+      return "timing.save.failed"
     }
   }
 
@@ -314,6 +391,19 @@ final class ProductionShadowingModel {
     select(targets[index + delta])
   }
 
+  private func advanceAfterSingleListen(revisionID: UUID, repeating: Bool) {
+    guard practiceOptions.repeats == 1, selectedTarget?.segmentRevisionID == revisionID,
+      let index = targets.firstIndex(where: { $0.segmentRevisionID == revisionID }),
+      targets.indices.contains(index + 1)
+    else { return }
+    let next = targets[index + 1]
+    select(next)
+    guard selectedTarget?.segmentRevisionID == next.segmentRevisionID, controller.phase == .idle else {
+      return
+    }
+    controller.listen(repeating: repeating)
+  }
+
   func canSelectRelative(_ delta: Int) -> Bool {
     guard let selectedTarget,
       let index = targets.firstIndex(where: {
@@ -339,11 +429,16 @@ final class ProductionShadowingModel {
     }
   }
 
+  /// A token needs IPA backfill only when it has *no* pronunciation for either
+  /// accent — meaning it was never looked up. A token with one accent present
+  /// but the other missing is a genuine dictionary gap (e.g. a proper noun
+  /// absent from the British RP dictionary); backfilling cannot fill it, so
+  /// requiring both accents here would re-run the whole pass on every open.
   private func needsIPABackfill(_ sentences: [ProductionPreparedSentence]) -> Bool {
     sentences.contains { sentence in
       sentence.tokens.contains { token in
         sentence.ipa(for: token, accent: .uk) == nil
-          || sentence.ipa(for: token, accent: .us) == nil
+          && sentence.ipa(for: token, accent: .us) == nil
       }
     }
   }
@@ -351,7 +446,8 @@ final class ProductionShadowingModel {
   private func needsWordTimingBackfill(_ sentences: [ProductionPreparedSentence]) -> Bool {
     sentences.contains { sentence in
       sentence.tokens.contains { token in
-        token.startFrame == nil || token.endFrame == nil || token.needsTimingReview
+        IPAFormatting.isPronounceable(token.text)
+          && (token.startFrame == nil || token.endFrame == nil || token.needsTimingReview)
       }
     }
   }

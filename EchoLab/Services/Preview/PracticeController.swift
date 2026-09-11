@@ -171,6 +171,15 @@ final class PracticeController {
     } else {
       phase = .paused
       ticker?.cancel()
+      if roundPreferences.repeats == 1, scope == .sentence,
+        let lesson = store.selectedLesson,
+        let index = lesson.sentences.firstIndex(where: { $0.id == target?.id }),
+        lesson.sentences.indices.contains(index + 1)
+      {
+        let repeating = repeatEnabled
+        store.selectSentence(lesson.sentences[index + 1].id)
+        playSentence(repeating: repeating)
+      }
     }
   }
   private func beginCountdown() {

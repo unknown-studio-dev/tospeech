@@ -41,6 +41,9 @@ struct ProductionShadowingView: View {
         EchoButton("Tiến bộ", symbol: "chart.line.uptrend.xyaxis", size: .regular) {
           store.navigate(.progress)
         }
+        EchoButton("speech.preparation.action", symbol: "waveform", size: .regular) {
+          model.presentSpeechPreparation()
+        }.disabled(!model.canPrepareWordTiming)
         EchoButton("Chỉnh timing", symbol: "slider.horizontal.3", size: .regular) {
           present(.timing(nil))
         }.disabled(model.selectedTarget == nil)
@@ -175,6 +178,11 @@ struct ProductionShadowingView: View {
           symbol: "headphones")
       }
     }
+    .sheet(isPresented: $model.showingSpeechPreparation, onDismiss: model.dismissSpeechPreparation) {
+      SpeechPreparationSheet(
+        isPreparing: model.isPreparingWordTiming, error: model.speechPreparationError,
+        onContinue: model.startWordTimingPreparation, onClose: model.dismissSpeechPreparation)
+    }
     .task {
       wordPreviewSpeed = store.preferences.speed
       model.applyPreferences(store.preferences)
@@ -226,9 +234,7 @@ struct ProductionShadowingView: View {
 
   private var presentationLesson: Lesson? {
     guard let source = model.lesson else { return nil }
-    let sentences = model.preparedSentences.enumerated().map {
-      $0.element.lessonSentence(number: $0.offset + 1)
-    }
+    let sentences = model.lessonSentences
     let duration = source.duration
       ?? sentences.map(\.span.end).max()
       ?? 0
@@ -331,13 +337,8 @@ struct ProductionShadowingView: View {
 
   private func playingWordID(in sentence: ProductionPreparedSentence) -> String? {
     guard model.controller.phase == .listening else { return nil }
-    let frame = Int((model.controller.sourcePosition * Double(sentence.target.sampleRate)).rounded())
-    return sentence.tokens.first(where: { token in
-      guard !token.needsTimingReview, let start = token.startFrame, let end = token.endFrame else {
-        return false
-      }
-      return frame >= start && frame < end
-    })?.id
+    guard let frame = Int(exactly: (model.controller.sourcePosition * Double(sentence.target.sampleRate)).rounded()) else { return nil }
+    return ProductionWordTiming.playingWordID(at: frame, tokens: sentence.tokens, in: sentence.target)
   }
 
   private func showWord(_ id: String, in sentence: ProductionPreparedSentence) {
@@ -363,5 +364,31 @@ struct ProductionShadowingView: View {
     videoFollower.follow(
       sourceSeconds: model.controller.sourcePosition,
       isNativeAudioPlaying: store.preferences.video && model.controller.phase == .listening)
+  }
+}
+
+/// Optional repair of legacy timing using the same SpeechTranscriber as import.
+struct SpeechPreparationSheet: View {
+  var isPreparing: Bool
+  var error: EchoCopy?
+  var onContinue: () -> Void
+  var onClose: () -> Void
+
+  var body: some View {
+    EchoSheet(title: "speech.preparation.title", subtitle: "speech.preparation.subtitle", width: 560, close: onClose) {
+      VStack(alignment: .leading, spacing: 20) {
+        Image(systemName: "waveform").font(EchoFont.body(size: 36)).foregroundStyle(EchoTheme.muted)
+        EchoLocalizedText("speech.preparation.explanation")
+          .font(EchoFont.body(size: 14)).lineSpacing(5)
+        if isPreparing { EchoLoading(title: "speech.preparation.busy") }
+        if let error { EchoNotice(copy: error, error: true) }
+        HStack {
+          EchoButton(isPreparing ? "Cancel" : "speech.preparation.skip", action: onClose)
+          Spacer()
+          EchoButton(error == nil ? "Continue" : "Retry", kind: .primary, action: onContinue)
+            .disabled(isPreparing)
+        }
+      }
+    }
   }
 }

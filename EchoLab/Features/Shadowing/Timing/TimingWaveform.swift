@@ -35,11 +35,13 @@ struct TimingWaveform: View {
           HStack(spacing: 8) {
             Image(systemName: "waveform.badge.exclamationmark")
               .foregroundStyle(EchoTheme.caution)
-            Text(loadError).font(EchoFont.body(size: 11)).foregroundStyle(EchoTheme.secondaryText)
+            EchoLocalizedText("timing.waveform.failed").font(EchoFont.body(size: 11))
+              .foregroundStyle(EchoTheme.secondaryText)
               .lineLimit(2)
+              .help(Text(verbatim: loadError))
             Spacer()
             if let onRetry { EchoButton("Retry", symbol: "arrow.clockwise", action: onRetry) }
-          }.padding(.horizontal, 14)
+          }.padding(.horizontal, 14).background(EchoTheme.canvas).zIndex(1)
         } else {
           HStack(spacing: 8) {
             if loading { EchoSpinner() }
@@ -100,7 +102,7 @@ struct TimingWaveform: View {
           if isAllowed(next) { update(next) }
         }
       )
-      .accessibilityLabel(isStart ? "Start timing handle" : "End timing handle")
+      .echoAccessibilityLabel(isStart ? "Start timing handle" : "End timing handle")
       .accessibilityValue(EchoFormat.time(isStart ? span.start : span.end))
       .accessibilityAdjustableAction { direction in
         let delta = direction == .increment ? 0.01 : -0.01

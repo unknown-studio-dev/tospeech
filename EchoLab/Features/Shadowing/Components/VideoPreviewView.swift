@@ -29,7 +29,9 @@ struct VideoPreviewView: View {
         if !store.preferences.video || [.offline, .unavailable].contains(effectiveState) {
           productionThumbnail
         } else if let productionFollower {
-          YouTubeVideoFollowerView(follower: productionFollower)
+          YouTubeVideoFollowerView(
+            follower: productionFollower, commandGeneration: productionFollower.commandGeneration)
+            .id(productionFollower.pageID)
         } else if isProductionMode {
           productionThumbnail
         } else {

@@ -9,6 +9,11 @@ enum EchoWordState: String, CaseIterable, Identifiable {
 struct EchoWordToken: View {
   var word: String
   var ipa: String?
+  /// When the shown IPA comes from the other accent (the requested one had no
+  /// entry), this holds that accent's label (e.g. "US"); the token dims the
+  /// pronunciation and appends the marker so it is never mistaken for the
+  /// requested accent.
+  var ipaFallbackLabel: String? = nil
   var state: EchoWordState = .normal
   var showIPA = true
   var compact = false
@@ -31,11 +36,19 @@ struct EchoWordToken: View {
         .foregroundStyle(
           !enabled && !preservesReadingContrastWhenDisabled
             ? EchoTheme.disabledText : state == .playing ? EchoTheme.accent : EchoTheme.text)
-        if showIPA {
+        if showIPA && IPAFormatting.isPronounceable(word) {
           Group {
-            if let ipa { Text(verbatim: ipa) } else { EchoLocalizedText("Chưa có IPA") }
+            if let ipa = IPAFormatting.display(ipa) {
+              if let ipaFallbackLabel {
+                Text(verbatim: "\(ipa) (\(ipaFallbackLabel))")
+              } else {
+                Text(verbatim: ipa)
+              }
+            } else {
+              EchoLocalizedText("Chưa có IPA")
+            }
           }.font(EchoFont.body(size: (compact ? 13 : ipaSize) * readingScale))
-            .foregroundStyle(state == .playing ? EchoTheme.accent : EchoTheme.secondaryText)
+            .foregroundStyle(ipaTextColor)
         }
       }.fixedSize().padding(EchoMetrics.wordPadding)
         .frame(width: specimenWidth)
@@ -66,6 +79,12 @@ struct EchoWordToken: View {
         state == .needsTiming ? "Cần chỉnh timing · Nghe trong ngữ cảnh" : "Nghe từ trong audio gốc"
       )
   }
+  private var ipaTextColor: Color {
+    if state == .playing { return EchoTheme.accent }
+    // Dim the fallback pronunciation so it reads as an approximation.
+    if ipaFallbackLabel != nil { return EchoTheme.disabledText }
+    return EchoTheme.secondaryText
+  }
   private var background: Color {
     if state == .playing { return EchoTheme.selection }
     if state == .selected || (hovered && enabled) { return EchoTheme.raised }
@@ -73,7 +92,8 @@ struct EchoWordToken: View {
   }
   private var accessibilityStatus: String {
     switch state {
-    case .normal: ipa == nil ? "Chưa có IPA" : ""
+    case .normal:
+      IPAFormatting.isPronounceable(word) && IPAFormatting.display(ipa) == nil ? "Chưa có IPA" : ""
     case .selected: "Đã chọn"
     case .playing: "Đang nghe"
     case .needsTiming: "Cần chỉnh timing"

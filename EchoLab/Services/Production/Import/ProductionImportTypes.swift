@@ -10,6 +10,8 @@ enum ProductionImportPhase: String, Codable, CaseIterable, Sendable {
   case downloadingAudio
   case probing
   case fetchingCaptions
+  case preparingSpeechModel
+  case checkingTiming
   case preparingTranscript
   case publishing
   case ready
@@ -97,6 +99,7 @@ struct LibraryLessonSummary: Identifiable, Equatable, Sendable {
   /// This is true only when a current immutable segment revision exists.
   let isPracticeReady: Bool
   let preparedSentenceCount: Int
+  var wordTimingReviewCount: Int = 0
   let createdAt: Date
 }
 
@@ -124,6 +127,7 @@ enum ProductionImportError: Error, Equatable, LocalizedError, Sendable {
   case staleGeneration(expected: Int)
   case recoveryRequired(String)
   case persistence(String)
+  case modelNotInstalled
 
   var errorDescription: String? {
     switch self {
@@ -137,6 +141,8 @@ enum ProductionImportError: Error, Equatable, LocalizedError, Sendable {
     case .staleGeneration: "This lesson changed while the import was running."
     case .recoveryRequired(let detail): "Import recovery is required: \(detail)"
     case .persistence(let detail): "Local import data could not be saved: \(detail)"
+    case .modelNotInstalled:
+      "A transcription model is required. Download one in Settings before importing."
     }
   }
 
@@ -145,6 +151,24 @@ enum ProductionImportError: Error, Equatable, LocalizedError, Sendable {
   /// the Library banner.
   var presentationDescription: String {
     let technical = localizedDescription.lowercased()
+    if technical.contains("selected engine returned no usable word transcript") {
+      return "transcription.import.empty"
+    }
+    if technical.contains("already prepared. use retry") {
+      return "transcription.retry.prepared"
+    }
+    if technical.contains("a transcription model is required") {
+      return "Download a transcription model in Settings, then import again."
+    }
+    if technical.contains("whisper returned no word transcript") {
+      return "Whisper did not produce usable words. Check the audio or choose another installed Whisper model."
+    }
+    if technical.contains("apple speechtranscriber returned no transcript") {
+      return "Apple Speech did not recognize speech in this audio. Check the audio and English language package."
+    }
+    if technical.contains("no sentence within the source audio timeline") {
+      return "The recognized timing is outside the audio. No playable sentence could be prepared."
+    }
     if technical.contains("http error 429") || technical.contains("too many requests") {
       return "YouTube is temporarily limiting downloads. Wait a little, then try again."
     }
@@ -166,6 +190,8 @@ enum ProductionImportError: Error, Equatable, LocalizedError, Sendable {
       return "EchoLab could not prepare this lesson. Try again or import an audio file."
     case .persistence:
       return "EchoLab could not save the import locally. Check free storage, then try again."
+    case .modelNotInstalled:
+      return "Download a transcription model in Settings, then import again."
     }
   }
 }

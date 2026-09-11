@@ -8,9 +8,11 @@ enum AppleSpeechCaptionError: Error, Equatable, LocalizedError, Sendable {
   case recognizerUnavailable
   case noTranscription
   case recognitionFailed(String)
+  case timedOut
 
   var errorDescription: String? {
     switch self {
+    case .timedOut: "Apple Speech timed out. Please try again."
     case .permissionDenied: "Speech recognition permission is required to prepare this lesson."
     case .onDeviceRecognitionUnavailable:
       "English on-device speech recognition is not installed on this Mac."
@@ -39,7 +41,7 @@ enum AppleSpeechCaptionTranscriber {
   static func transcribe(
     audioURL: URL, locale: Locale = Locale(identifier: "en_US")
   ) async throws -> [CaptionCue] {
-    let authorization = await authorizationStatus()
+    let authorization = try await authorizationStatus()
     guard authorization == .authorized else { throw AppleSpeechCaptionError.permissionDenied }
     guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.isAvailable else {
       throw AppleSpeechCaptionError.recognizerUnavailable
@@ -51,36 +53,42 @@ enum AppleSpeechCaptionTranscriber {
     let request = SFSpeechURLRecognitionRequest(url: audioURL)
     request.requiresOnDeviceRecognition = true
     request.shouldReportPartialResults = false
-    let transcription = try await recognize(with: recognizer, request: request)
-    let sentenceCues = sentenceCues(from: transcription)
+    let sentenceCues = try await recognize(with: recognizer, request: request)
     guard !sentenceCues.isEmpty else { throw AppleSpeechCaptionError.noTranscription }
     return sentenceCues
   }
 
-  private static func authorizationStatus() async -> SFSpeechRecognizerAuthorizationStatus {
-    let existing = SFSpeechRecognizer.authorizationStatus()
-    guard existing == .notDetermined else { return existing }
-    return await withCheckedContinuation { continuation in
-      SFSpeechRecognizer.requestAuthorization { continuation.resume(returning: $0) }
+  static func authorizationStatus(
+    current: SFSpeechRecognizerAuthorizationStatus = SFSpeechRecognizer.authorizationStatus(),
+    request: (@escaping @Sendable (SFSpeechRecognizerAuthorizationStatus) -> Void) -> Void = {
+      SFSpeechRecognizer.requestAuthorization($0)
+    }
+  ) async throws -> SFSpeechRecognizerAuthorizationStatus {
+    guard current == .notDetermined else { return current }
+    return try await SpeechCallbackOperation<SFSpeechRecognizerAuthorizationStatus>().value { completion in
+      // Explicitly Sendable: TCC invokes this on a background queue, not MainActor.
+      request { @Sendable status in completion(.success(status)) }
+      return nil
     }
   }
 
   private static func recognize(
     with recognizer: SFSpeechRecognizer, request: SFSpeechURLRecognitionRequest
-  ) async throws -> SFTranscription {
-    try await withCheckedThrowingContinuation { continuation in
-      _ = recognizer.recognitionTask(with: request) { result, error in
+  ) async throws -> [CaptionCue] {
+    try await SpeechCallbackOperation<[CaptionCue]>().value(timeout: .seconds(120)) { completion in
+      let task = recognizer.recognitionTask(with: request) { @Sendable result, error in
         if let error {
-          continuation.resume(
-            throwing: AppleSpeechCaptionError.recognitionFailed(error.localizedDescription))
+          completion(.failure(AppleSpeechCaptionError.recognitionFailed(error.localizedDescription)))
         } else if let result, result.isFinal {
-          continuation.resume(returning: result.bestTranscription)
+          completion(.success(sentenceCues(from: result.bestTranscription)))
         }
       }
+      // Keep the task alive until a terminal result, cancellation or timeout.
+      return { task.cancel() }
     }
   }
 
-  private static func sentenceCues(from transcription: SFTranscription) -> [CaptionCue] {
+  nonisolated private static func sentenceCues(from transcription: SFTranscription) -> [CaptionCue] {
     let fullText = transcription.formattedString
     let segments = transcription.segments
     guard !fullText.isEmpty, !segments.isEmpty else { return [] }
@@ -126,23 +134,47 @@ enum AppleSpeechCaptionTranscriber {
 @MainActor
 final class AppleSpeechWordTimingPreparer {
   private let service: ProductionPracticeService
+  private let transcribe: @MainActor (URL) async throws -> [CaptionCue]
+  private let audioTranscriber: (any AudioTranscriptTranscribing)?
 
-  init(service: ProductionPracticeService) { self.service = service }
+  init(
+    service: ProductionPracticeService,
+    audioTranscriber: (any AudioTranscriptTranscribing)? = nil,
+    transcribe: @escaping @MainActor (URL) async throws -> [CaptionCue] = {
+      try await AppleSpeechCaptionTranscriber.transcribe(audioURL: $0)
+    }
+  ) {
+    self.service = service
+    self.transcribe = transcribe
+    self.audioTranscriber = audioTranscriber
+  }
 
   @discardableResult
-  func prepare(sentences: [ProductionPreparedSentence]) async throws -> Bool {
+  func prepare(sentences: [ProductionPreparedSentence], localeIdentifier: String = "en-GB") async throws -> Bool {
     guard let first = sentences.first,
       sentences.contains(where: { sentence in
         sentence.tokens.contains { token in
-          token.startFrame == nil || token.endFrame == nil || token.needsTimingReview
+          IPAFormatting.isPronounceable(token.text)
+            && (token.startFrame == nil || token.endFrame == nil || token.needsTimingReview)
         }
       })
     else { return false }
 
-    let speechCues = try await AppleSpeechCaptionTranscriber.transcribe(
-      audioURL: first.target.audioURL)
+    let speechCues: [CaptionCue]
+    let provenance: TranscriptionProvenance?
+    if let audioTranscriber {
+      let result = try await audioTranscriber.transcribe(
+        audioURL: first.target.audioURL, localeIdentifier: localeIdentifier, onProgress: { _ in })
+      speechCues = NaturalSentenceSegmenter.segment(result.words)
+      provenance = result.provenance
+    } else {
+      speechCues = try await transcribe(first.target.audioURL)
+      provenance = nil
+    }
+    try Task.checkCancellation()
     var published = false
     for sentence in sentences {
+      try Task.checkCancellation()
       let sampleRate = sentence.target.sampleRate
       let cueStart = Double(sentence.target.startFrame) / Double(sampleRate)
       let cueEnd = Double(sentence.target.endFrame) / Double(sampleRate)
@@ -165,7 +197,7 @@ final class AppleSpeechWordTimingPreparer {
           needsTimingReview: false)
       }
       guard changed else { continue }
-      let complete = tokens.allSatisfy { token in
+      let complete = tokens.filter { IPAFormatting.isPronounceable($0.text) }.allSatisfy { token in
         guard let start = token.startFrame, let end = token.endFrame else { return false }
         return start >= sentence.target.startFrame && end > start && end <= sentence.target.endFrame
           && !token.needsTimingReview
@@ -176,9 +208,56 @@ final class AppleSpeechWordTimingPreparer {
           expectedRevisionID: sentence.target.segmentRevisionID,
           startFrame: sentence.target.startFrame, endFrame: sentence.target.endFrame,
           tokens: tokens,
-          resolvesTimingReview: complete && sentence.baseline.timingReviewReason == nil))
+          resolvesTimingReview: complete && sentence.baseline.timingReviewReason == nil,
+          timingTranscription: provenance))
       published = true
     }
     return published
+  }
+}
+
+/// Serializes arbitrary framework callbacks, cancellation and timeout on MainActor.
+/// Only the first terminal event can resume the continuation.
+@MainActor
+final class SpeechCallbackOperation<Value: Sendable> {
+  private var continuation: CheckedContinuation<Value, any Error>?
+  private var cancelWork: (@MainActor () -> Void)?
+  private var deadline: Task<Void, Never>?
+  private var finished = false
+
+  func value(
+    timeout: Duration? = nil,
+    start: (@escaping @Sendable (Result<Value, any Error>) -> Void) -> (@MainActor () -> Void)?
+  ) async throws -> Value {
+    try await withTaskCancellationHandler {
+      try Task.checkCancellation()
+      return try await withCheckedThrowingContinuation { continuation in
+        self.continuation = continuation
+        cancelWork = start { @Sendable result in
+          Task { @MainActor in self.finish(result) }
+        }
+        if let timeout {
+          deadline = Task { @MainActor in
+            do { try await Task.sleep(for: timeout) } catch { return }
+            finish(.failure(AppleSpeechCaptionError.timedOut))
+          }
+        }
+      }
+    } onCancel: {
+      Task { @MainActor in self.finish(.failure(CancellationError())) }
+    }
+  }
+
+  private func finish(_ result: Result<Value, any Error>) {
+    guard !finished else { return }
+    finished = true
+    let continuation = continuation
+    self.continuation = nil
+    deadline?.cancel()
+    deadline = nil
+    let cancel = cancelWork
+    cancelWork = nil
+    cancel?()
+    continuation?.resume(with: result)
   }
 }

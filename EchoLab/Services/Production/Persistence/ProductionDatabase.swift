@@ -23,6 +23,14 @@ enum ProductionDatabaseError: Error, Equatable, LocalizedError {
   }
 }
 
+struct EngineReleaseRecord: Equatable, Sendable {
+  let id: UUID
+  let engineKey: String
+  let version: String
+  let status: String
+  let relativePath: String?
+}
+
 actor ProductionDatabase {
   static let currentSchemaVersion = 1
 
@@ -120,6 +128,16 @@ actor ProductionDatabase {
     return try decodeLesson(statement)
   }
 
+  func lesson(provider: String, externalID: String) throws -> StoredLesson? {
+    let statement = try prepare("SELECT id FROM lessons WHERE provider = ? AND external_id = ?")
+    defer { sqlite3_finalize(statement) }
+    bind(provider, to: 1, in: statement)
+    bind(externalID, to: 2, in: statement)
+    guard sqlite3_step(statement) == SQLITE_ROW,
+      let text = columnText(statement, 0), let id = UUID(uuidString: text) else { return nil }
+    return try lesson(id: id)
+  }
+
   func lessonCount() throws -> Int {
     try scalarInt("SELECT COUNT(*) FROM lessons")
   }
@@ -160,7 +178,11 @@ actor ProductionDatabase {
                WHERE s.lesson_id = l.id
              ),
              (SELECT COUNT(*) FROM segments s WHERE s.lesson_id = l.id),
-             l.provider, l.external_id, l.source_url
+             l.provider, l.external_id, l.source_url,
+             (SELECT COUNT(*) FROM segments s
+              JOIN segment_revisions r ON r.id = s.current_revision_id
+              WHERE s.lesson_id = l.id AND
+                COALESCE(json_extract(r.baseline_json, '$.wordTimingNeedsReview'), 1) = 1)
       FROM lessons l
       LEFT JOIN media_assets a ON a.id = l.current_audio_asset_id AND a.status = 'ready'
       LEFT JOIN media_assets t ON t.lesson_id = l.id AND t.role = 'thumbnail' AND t.status = 'ready'
@@ -191,6 +213,7 @@ actor ProductionDatabase {
             sourceURL: columnText(statement, 13).flatMap(URL.init(string:))),
           isPracticeReady: sqlite3_column_int64(statement, 9) == 1,
           preparedSentenceCount: Int(sqlite3_column_int64(statement, 10)),
+          wordTimingReviewCount: Int(sqlite3_column_int64(statement, 14)),
           createdAt: Date(timeIntervalSince1970: sqlite3_column_double(statement, 5))))
     }
     return summaries
@@ -268,10 +291,17 @@ actor ProductionDatabase {
     }
   }
 
-  func beginImportRetry(id: UUID, expectedGeneration: Int, at date: Date = Date()) throws -> UUID {
+  func beginImportRetry(id: UUID, expectedGeneration: Int, at date: Date = Date(), replacementInputJSON: String? = nil) throws -> UUID {
     let runToken = UUID()
     try Self.execute(on: requiredHandle, sql: "BEGIN IMMEDIATE")
     do {
+      // Revoke every old run token in the same transaction as the new attempt.
+      // An old cancellation/completion must never overwrite the retry's state.
+      let revoke = try prepare("UPDATE job_attempts SET status = 'cancelled', finished_at = ? WHERE job_id = ? AND status = 'running'")
+      defer { sqlite3_finalize(revoke) }
+      sqlite3_bind_double(revoke, 1, date.timeIntervalSince1970)
+      bind(id.uuidString, to: 2, in: revoke)
+      try stepDone(revoke)
       let attemptNumber = try scalarInt(
         "SELECT COALESCE(MAX(attempt), 0) + 1 FROM job_attempts WHERE job_id = '\(id.uuidString)'")
       let statement = try prepare(
@@ -285,7 +315,7 @@ actor ProductionDatabase {
       sqlite3_bind_double(statement, 5, date.timeIntervalSince1970)
       try stepDone(statement)
       let job = try prepare(
-        "UPDATE jobs SET status = 'running', updated_at = ? WHERE id = ? AND expected_generation = ? AND EXISTS (SELECT 1 FROM lessons WHERE id = json_extract(input_json, '$.lessonID') AND generation = ? AND lifecycle != 'deleting')"
+        "UPDATE jobs SET status = 'running', checkpoint_json = json_set(checkpoint_json, '$.phase', 'resolving', '$.detail', NULL), updated_at = ? WHERE id = ? AND expected_generation = ? AND EXISTS (SELECT 1 FROM lessons WHERE id = json_extract(input_json, '$.lessonID') AND generation = ? AND lifecycle != 'deleting')"
       )
       defer { sqlite3_finalize(job) }
       sqlite3_bind_double(job, 1, date.timeIntervalSince1970)
@@ -295,6 +325,15 @@ actor ProductionDatabase {
       try stepDone(job)
       guard sqlite3_changes(requiredHandle) == 1 else {
         throw ProductionDatabaseError.staleLessonGeneration(expected: expectedGeneration)
+      }
+      if let replacementInputJSON {
+        let replacement = try prepare("UPDATE jobs SET input_json = ? WHERE id = ? AND json_extract(input_json, '$.lessonID') = json_extract(?, '$.lessonID')")
+        defer { sqlite3_finalize(replacement) }
+        bind(replacementInputJSON, to: 1, in: replacement)
+        bind(id.uuidString, to: 2, in: replacement)
+        bind(replacementInputJSON, to: 3, in: replacement)
+        try stepDone(replacement)
+        guard sqlite3_changes(requiredHandle) == 1 else { throw ProductionDatabaseError.constraint("Retry cannot change the lesson identity") }
       }
       let lesson = try prepare(
         "UPDATE lessons SET lifecycle = 'preparing', updated_at = ? WHERE id = (SELECT json_extract(input_json, '$.lessonID') FROM jobs WHERE id = ?) AND generation = ?"
@@ -546,11 +585,12 @@ actor ProductionDatabase {
             VALUES (?, ?, ?, ?, ?, 1, ?, ?)
             """)
           bind(UUID().uuidString, to: 1, in: annotationStatement)
-          bind(annotation.kind.rawValue, to: 2, in: annotationStatement)
-          bind(annotation.lookupKey, to: 3, in: annotationStatement)
-          bind(annotation.source, to: 4, in: annotationStatement)
-          bind(annotation.automaticValue, to: 5, in: annotationStatement)
-          sqlite3_bind_double(annotationStatement, 6, date.timeIntervalSince1970)
+          bind(revisionID.uuidString, to: 2, in: annotationStatement)
+          bind(annotation.kind.rawValue, to: 3, in: annotationStatement)
+          bind(annotation.lookupKey, to: 4, in: annotationStatement)
+          bind(annotation.source, to: 5, in: annotationStatement)
+          bind(annotation.automaticValue, to: 6, in: annotationStatement)
+          sqlite3_bind_double(annotationStatement, 7, date.timeIntervalSince1970)
           try stepDone(annotationStatement)
           sqlite3_finalize(annotationStatement)
         }
@@ -704,7 +744,8 @@ actor ProductionDatabase {
     let statement = try prepare(
       """
       SELECT l.generation, s.id, r.id, a.id, a.relative_path, a.sample_rate,
-             r.start_frame, r.end_frame, r.text, a.frame_count
+             r.start_frame, r.end_frame, r.text, a.frame_count, r.overrides_json,
+             LEAD(r.start_frame) OVER (PARTITION BY a.id ORDER BY r.start_frame, s.ordinal)
       FROM lessons l
       JOIN segments s ON s.lesson_id = l.id
       JOIN segment_revisions r ON r.id = s.current_revision_id
@@ -725,7 +766,7 @@ actor ProductionDatabase {
         let audioURL = Self.safeManagedURL(relativePath, under: paths.root),
         let text = columnText(statement, 8)
       else { throw ProductionDatabaseError.execute("Prepared practice target row is invalid") }
-      let target = ProductionPracticeTarget(
+      var target = ProductionPracticeTarget(
         lessonID: lessonID, lessonGeneration: Int(sqlite3_column_int64(statement, 0)),
         segmentID: segmentID, segmentRevisionID: revisionID, audioAssetID: assetID,
         audioURL: audioURL, sampleRate: Int(sqlite3_column_int64(statement, 5)),
@@ -736,6 +777,12 @@ actor ProductionDatabase {
       guard target.endFrame <= Int(sqlite3_column_int64(statement, 9)) else {
         throw ProductionDatabaseError.constraint("Practice target exceeds source audio")
       }
+      target.sourcePlaybackEndFrame = SentencePlaybackBoundary.endFrame(
+        sentenceEnd: target.endFrame, sampleRate: target.sampleRate,
+        audioFrameCount: Int(sqlite3_column_int64(statement, 9)),
+        nextSentenceStart: sqlite3_column_type(statement, 11) == SQLITE_NULL
+          ? nil : Int(sqlite3_column_int64(statement, 11)),
+        hasTimingOverride: sqlite3_column_type(statement, 10) != SQLITE_NULL)
       targets.append(target)
     }
     return targets
@@ -954,7 +1001,7 @@ actor ProductionDatabase {
         throw ProductionDatabaseError.constraint("Timing edits cannot change transcript words")
       }
 
-      let hasCompleteWordTiming = draft.tokens.allSatisfy { token in
+      let hasCompleteWordTiming = draft.tokens.filter { IPAFormatting.isPronounceable($0.text) }.allSatisfy { token in
         guard let start = token.startFrame, let end = token.endFrame else { return false }
         return start >= draft.startFrame && end > start && end <= draft.endFrame
       }
@@ -968,7 +1015,7 @@ actor ProductionDatabase {
       let newBaseline = baseline.applying(
         startFrame: draft.startFrame, endFrame: draft.endFrame,
         wordTimingNeedsReview: !hasCompleteWordTiming,
-        resolvesTimingReview: draft.resolvesTimingReview)
+        resolvesTimingReview: draft.resolvesTimingReview, timingTranscription: draft.timingTranscription)
       let revision = try prepare(
         """
         INSERT INTO segment_revisions (
@@ -1226,6 +1273,103 @@ actor ProductionDatabase {
     bind(id.uuidString, to: 1, in: statement)
     try stepDone(statement)
   }
+  @discardableResult
+  func registerEngineRelease(
+    engineKey: String, version: String, capabilityJSON: String, at date: Date = Date()
+  ) throws -> UUID {
+    guard !engineKey.isEmpty, !version.isEmpty else {
+      throw ProductionDatabaseError.constraint("engine key and version are required")
+    }
+    try Self.execute(on: requiredHandle, sql: "BEGIN IMMEDIATE")
+    do {
+      let existing = try prepare(
+        "SELECT id FROM engine_releases WHERE engine_key = ? AND version = ?")
+      defer { sqlite3_finalize(existing) }
+      bind(engineKey, to: 1, in: existing)
+      bind(version, to: 2, in: existing)
+      if sqlite3_step(existing) == SQLITE_ROW, let text = columnText(existing, 0),
+        let id = UUID(uuidString: text)
+      {
+        try Self.execute(on: requiredHandle, sql: "COMMIT")
+        return id
+      }
+      let id = UUID()
+      let insert = try prepare(
+        """
+        INSERT INTO engine_releases (id, engine_key, version, model_checksum, capability_json, created_at)
+        VALUES (?, ?, ?, NULL, ?, ?)
+        """)
+      defer { sqlite3_finalize(insert) }
+      bind(id.uuidString, to: 1, in: insert)
+      bind(engineKey, to: 2, in: insert)
+      bind(version, to: 3, in: insert)
+      bind(capabilityJSON, to: 4, in: insert)
+      sqlite3_bind_double(insert, 5, date.timeIntervalSince1970)
+      try stepDone(insert)
+      try Self.execute(on: requiredHandle, sql: "COMMIT")
+      return id
+    } catch {
+      try? Self.execute(on: requiredHandle, sql: "ROLLBACK")
+      throw error
+    }
+  }
+
+  func setEngineInstallationStatus(
+    releaseID: UUID, status: String, relativePath: String? = nil, errorJSON: String? = nil,
+    at date: Date = Date()
+  ) throws {
+    let statement = try prepare(
+      """
+      INSERT INTO engine_installations (engine_release_id, status, relative_path, installed_at, last_error_json)
+      VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(engine_release_id) DO UPDATE SET
+        status = excluded.status,
+        relative_path = excluded.relative_path,
+        installed_at = excluded.installed_at,
+        last_error_json = excluded.last_error_json
+      """)
+    defer { sqlite3_finalize(statement) }
+    bind(releaseID.uuidString, to: 1, in: statement)
+    bind(status, to: 2, in: statement)
+    bind(relativePath, to: 3, in: statement)
+    if status == "installed" {
+      sqlite3_bind_double(statement, 4, date.timeIntervalSince1970)
+    } else {
+      sqlite3_bind_null(statement, 4)
+    }
+    bind(errorJSON, to: 5, in: statement)
+    try stepDone(statement)
+    guard sqlite3_changes(requiredHandle) == 1 else {
+      throw ProductionDatabaseError.constraint("engine installation could not be recorded")
+    }
+  }
+
+  func engineReleases(engineKey: String) throws -> [EngineReleaseRecord] {
+    let statement = try prepare(
+      """
+      SELECT r.id, r.engine_key, r.version,
+             COALESCE(i.status, 'not_installed'), i.relative_path
+      FROM engine_releases r
+      LEFT JOIN engine_installations i ON i.engine_release_id = r.id
+      WHERE r.engine_key = ?
+      ORDER BY r.version
+      """)
+    defer { sqlite3_finalize(statement) }
+    bind(engineKey, to: 1, in: statement)
+    var records: [EngineReleaseRecord] = []
+    while sqlite3_step(statement) == SQLITE_ROW {
+      guard let idText = columnText(statement, 0), let id = UUID(uuidString: idText),
+        let key = columnText(statement, 1), let version = columnText(statement, 2),
+        let status = columnText(statement, 3)
+      else { throw ProductionDatabaseError.execute("Engine release row is invalid") }
+      records.append(
+        EngineReleaseRecord(
+          id: id, engineKey: key, version: version, status: status,
+          relativePath: columnText(statement, 4)))
+    }
+    return records
+  }
+
   private var requiredHandle: OpaquePointer {
     connection.raw
   }

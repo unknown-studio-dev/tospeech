@@ -11,6 +11,13 @@ settings:
     ARCHS: arm64
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGN_STYLE: Manual
+packages:
+  FluidAudio:
+    url: https://github.com/FluidInference/FluidAudio
+    exactVersion: 0.15.7
+  WhisperKit:
+    url: https://github.com/argmaxinc/WhisperKit
+    exactVersion: 1.1.0
 targets:
   EchoLab:
     type: application
@@ -20,6 +27,10 @@ targets:
       - sdk: Speech.framework
       - sdk: Translation.framework
       - sdk: WebKit.framework
+      - package: FluidAudio
+        product: FluidAudio
+      - package: WhisperKit
+        product: WhisperKit
     preBuildScripts:
       - name: Check shared UI component usage
         script: bash "${SRCROOT}/scripts/check-ui-components.sh"

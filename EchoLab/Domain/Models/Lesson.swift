@@ -23,6 +23,43 @@ struct LessonWord: Identifiable, Codable, Equatable, Sendable {
   var span: AudioSpan?
   var needsTimingReview = false
   func ipa(for accent: ReferenceAccent) -> String? { accent == .uk ? ipaUK : ipaUS }
+
+  /// The IPA to show for `accent`, falling back to the other accent when the
+  /// requested one is empty (common for proper nouns absent from the British
+  /// RP dictionary). `fallbackAccent` is non-nil only when a substitution
+  /// happened, so the view can mark it (dimmed + accent label) rather than
+  /// presenting the other accent's pronunciation as if it were the requested one.
+  func resolvedIPA(for accent: ReferenceAccent) -> ResolvedIPA? {
+    if let primary = ipa(for: accent), !primary.isEmpty {
+      return ResolvedIPA(text: primary, fallbackAccent: nil)
+    }
+    let other: ReferenceAccent = accent == .uk ? .us : .uk
+    if let fallback = ipa(for: other), !fallback.isEmpty {
+      return ResolvedIPA(text: fallback, fallbackAccent: other)
+    }
+    return nil
+  }
+}
+
+struct ResolvedIPA: Equatable, Sendable {
+  var text: String
+  /// The accent actually used when it differs from the requested one; `nil`
+  /// when the requested accent supplied the pronunciation.
+  var fallbackAccent: ReferenceAccent?
+}
+
+/// Normalize notation at the display boundary; dictionary/override values stay intact.
+enum IPAFormatting {
+  static func isPronounceable(_ text: String) -> Bool {
+    text.contains { $0.isLetter || $0.isNumber }
+  }
+
+  static func display(_ ipa: String?) -> String? {
+    guard let ipa else { return nil }
+    let content = ipa.trimmingCharacters(
+      in: .whitespacesAndNewlines.union(CharacterSet(charactersIn: "/[]")))
+    return content.isEmpty ? nil : "/\(content)/"
+  }
 }
 
 struct SentenceBaseline: Codable, Equatable, Sendable {

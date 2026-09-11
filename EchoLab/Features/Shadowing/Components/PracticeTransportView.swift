@@ -37,7 +37,7 @@ struct PracticeTransportView: View {
       Button("Keep take", role: .cancel) {} // native-control: confirmation
       Button("Discard take", role: .destructive) { discardPending() } // native-control: confirmation
     } message: {
-      Text(
+      EchoLocalizedText(
         productionModel == nil
           ? "Only the current unsaved preview take will be discarded. Earlier takes stay in history."
           : "Only the current unsaved take will be discarded. Earlier takes stay in history.")
@@ -103,7 +103,7 @@ struct PracticeTransportView: View {
       if phase == .saving { EchoSpinner() }
       VStack(alignment: .leading, spacing: 6) {
         EchoLocalizedText(phase.title).font(EchoFont.body(size: 17, weight: .medium))
-        Text(
+        EchoLocalizedText(
           phase == .saving
             ? (productionModel == nil
               ? "Microphone off · simulated save" : "Microphone off · saving this take")
@@ -237,8 +237,8 @@ struct PracticeTransportView: View {
       }
     }
     .frame(width: compact ? 72 : 100, height: 8)
-    .accessibilityLabel("Microphone input level")
-    .accessibilityValue("\(Int(inputLevel * 100)) percent")
+    .echoAccessibilityLabel("Microphone input level")
+    .accessibilityValue(Text(inputLevel, format: .percent.precision(.fractionLength(0))))
   }
   private var inputLevel: CGFloat {
     guard let model = productionModel else {

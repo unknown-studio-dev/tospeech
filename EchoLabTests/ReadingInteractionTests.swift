@@ -21,6 +21,18 @@ struct ReadingInteractionTests {
     #expect(restored.readingPercent == 100)
     #expect(restored.speed == 1.25)
     #expect(!restored.showIPA)
+    // A snapshot written before transcription-model support still decodes.
+    #expect(object["activeTranscriptionModel"] == nil)
+    #expect(restored.activeTranscriptionModel == nil)
+  }
+
+  @Test func activeTranscriptionModelRoundTrips() throws {
+    var original = Preferences()
+    original.activeTranscriptionModel = WhisperModelVariant.small.rawValue
+    let data = try JSONEncoder().encode(original)
+    let restored = try JSONDecoder().decode(Preferences.self, from: data)
+    #expect(restored.activeTranscriptionModel == "small")
+    #expect(WhisperModelVariant(rawValue: restored.activeTranscriptionModel ?? "") == .small)
   }
 
   @Test func readingPreferenceClampsSnapsAndRoundTrips() throws {

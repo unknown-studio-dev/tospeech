@@ -77,26 +77,67 @@ struct LocalizationTests {
         == "Từ trong audio gốc · 1.20–1.75 giây · 0.75× · mô phỏng")
   }
 
-  @Test func semanticKeysExistInBothCatalogsWithMatchingFormatArguments() throws {
+  @Test func allKeysExistInBothCatalogsWithMatchingFormatArguments() throws {
     let english = try catalog(language: "en")
     let vietnamese = try catalog(language: "vi")
-    let semanticKeys = Set(english.keys).union(vietnamese.keys).filter(isSemanticKey)
-    let missingEnglish = semanticKeys.filter { english[$0] == nil }.sorted()
-    let missingVietnamese = semanticKeys.filter { vietnamese[$0] == nil }.sorted()
-    let mismatchedFormats = semanticKeys.filter { key in
+    let allKeys = Set(english.keys).union(vietnamese.keys)
+    let missingEnglish = allKeys.filter { english[$0] == nil }.sorted()
+    let missingVietnamese = allKeys.filter { vietnamese[$0] == nil }.sorted()
+    let mismatchedFormats = allKeys.filter { key in
       guard let englishValue = english[key], let vietnameseValue = vietnamese[key] else {
         return false
       }
       return formatSignature(englishValue) != formatSignature(vietnameseValue)
     }.sorted()
 
-    #expect(semanticKeys.count >= 54)
+    #expect(allKeys.count >= 800)
     #expect(missingEnglish.isEmpty, "Missing English keys: \(missingEnglish)")
     #expect(missingVietnamese.isEmpty, "Missing Vietnamese keys: \(missingVietnamese)")
     #expect(mismatchedFormats.isEmpty, "Format arguments differ: \(mismatchedFormats)")
   }
 
+  @Test func modalCopyResolvesWithoutCrossLanguageFallback() throws {
+    let english = try catalog(language: "en")
+    let vietnamese = try catalog(language: "vi")
+    let examples: [(String, String, String)] = [
+      ("Thêm video", "Add video", "Thêm video"),
+      ("No audio file selected", "No audio file selected", "Chưa chọn file audio"),
+      ("Microphone permission", "Microphone permission", "Quyền micro"),
+      ("Word Pronunciation", "Word Pronunciation", "Phát âm từ"),
+      ("Preparing waveform from local audio…", "Preparing waveform from local audio…",
+        "Đang tạo dạng sóng từ audio trên máy…"),
+      ("Only the current unsaved take will be discarded. Earlier takes stay in history.",
+        "Only the current unsaved take will be discarded. Earlier takes stay in history.",
+        "Chỉ bỏ bản thu hiện tại chưa lưu. Các bản thu trước vẫn được giữ trong lịch sử."),
+    ]
+    for (key, en, vi) in examples {
+      #expect(english[key] == en)
+      #expect(vietnamese[key] == vi)
+      let copy = EchoCopy(key)
+      #expect(copy.resolve(locale: Locale(identifier: "en")) == en)
+      #expect(copy.resolve(locale: Locale(identifier: "vi")) == vi)
+    }
+  }
 
+
+
+  @Test func importRecoveryCopyIsLocalizedWithoutLeakingDiagnostics() throws {
+    let english = try catalog(language: "en")
+    let vietnamese = try catalog(language: "vi")
+    let errors: [ProductionImportError] = [
+      .invalidYouTubeURL, .inaccessibleLocalAudio, .duplicateIdentity, .cancelled,
+      .modelNotInstalled, .unsupportedMedia("private diagnostic"),
+      .persistence("private diagnostic"), .recoveryRequired("private diagnostic"),
+      .staleGeneration(expected: 2),
+    ]
+    for error in errors {
+      let key = error.presentationDescription
+      #expect(english[key] != nil)
+      #expect(vietnamese[key] != nil)
+      #expect(english[key] != vietnamese[key])
+      #expect(!key.contains("private diagnostic"))
+    }
+  }
 
   private func catalog(language: String) throws -> [String: String] {
     let url = try #require(Bundle.main.url(
@@ -105,14 +146,6 @@ struct LocalizationTests {
     let data = try Data(contentsOf: url)
     return try #require(
       PropertyListSerialization.propertyList(from: data, format: nil) as? [String: String])
-  }
-
-  private func isSemanticKey(_ key: String) -> Bool {
-    let parts = key.split(separator: ".", omittingEmptySubsequences: false)
-    guard parts.count >= 2, let first = parts.first?.first, first.isLowercase else { return false }
-    return parts.allSatisfy { part in
-      !part.isEmpty && part.allSatisfy { $0.isLowercase || $0.isNumber || $0 == "_" }
-    }
   }
 
   private func formatSignature(_ value: String) -> [String] {

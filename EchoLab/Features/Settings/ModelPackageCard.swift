@@ -9,48 +9,19 @@ struct ModelPackageCard: View {
   var requestRemove: () -> Void
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 12) {
-      HStack(spacing: 12) {
-        EchoLocalizedText(package.id.title).font(EchoFont.body(size: 16, weight: .semibold))
-        Spacer()
-        if isActive {
-          Label("Đang dùng", systemImage: "checkmark.circle")
-            .font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.success).fixedSize()
-        }
-      }
-      ViewThatFits(in: .horizontal) {
-        HStack(spacing: 12) {
-          status
-          Spacer(minLength: 0)
-          controls
-        }
-        VStack(alignment: .leading, spacing: 12) {
-          status
-          HStack { Spacer(); controls }
-        }
-      }
-      if package.status == .downloading {
-        EchoLoading(title: "Tiến trình tải (mô phỏng)", fraction: package.progress)
-      }
-      if let error = package.error { EchoNotice(text: error, error: true) }
+    ModelCardView(
+      title: EchoLocalization.string(package.id.title, locale: locale),
+      statusLine: EchoLocalization.string(statusLine, locale: locale),
+      isActive: isActive, activeLabel: EchoLocalization.string("Đang dùng", locale: locale),
+      progressFraction: package.status == .downloading ? package.progress : nil,
+      progressTitle: "Tiến trình tải (mô phỏng)", errorText: package.error
+    ) {
+      EchoButton(
+        expanded ? "Ẩn chi tiết" : "Chi tiết", kind: .ghost, size: .regular, action: toggleDetails)
+      actions
+    } footer: {
       if expanded { PackageDetailsView(package: package) }
     }
-    .padding(.horizontal, 20).padding(.vertical, 16)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(EchoTheme.surface, in: RoundedRectangle(cornerRadius: 12))
-    .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(isActive ? EchoTheme.success : .clear))
-  }
-
-  private var status: some View {
-    EchoLocalizedText(statusLine).font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.secondaryText)
-      .fixedSize(horizontal: false, vertical: true)
-  }
-
-  private var controls: some View {
-    HStack(spacing: 12) {
-      EchoButton(expanded ? "Ẩn chi tiết" : "Chi tiết", kind: .ghost, size: .regular, action: toggleDetails)
-      actions
-    }.fixedSize()
   }
 
   @ViewBuilder private var actions: some View {

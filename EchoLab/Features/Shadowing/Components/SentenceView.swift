@@ -79,8 +79,10 @@ struct SentenceView: View {
       }.frame(height: 32).tint(EchoTheme.text)
       WordFlowLayout(spacing: 0, lineSpacing: 12) {
         ForEach(sentence.words) { word in
+          let resolvedIPA = word.resolvedIPA(for: store.preferences.accent)
           EchoWordToken(
-            word: word.text, ipa: word.ipa(for: store.preferences.accent),
+            word: word.text, ipa: resolvedIPA?.text,
+            ipaFallbackLabel: resolvedIPA?.fallbackAccent?.rawValue,
             state: playingWordID == word.id
               ? .playing
               : selectedWordID == word.id
@@ -110,7 +112,8 @@ struct SentenceView: View {
         }
       }
       if sentence.needsTimingReview {
-        EchoBadge("Needs timing review · unknown words play in context", warning: true)
+        EchoBadge(sentence.words.contains { $0.span == nil }
+          ? "Needs timing review · unknown words play in context" : "timing.observed.sentence_review", warning: true)
       }
       if !compact, let take = runtime?.currentTake, let actions = runtime?.feedbackActions {
         InlineTakeFeedbackRow(take: take, onReview: actions.onReview, runtime: actions)

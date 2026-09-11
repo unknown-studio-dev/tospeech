@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct ProductionLibraryView: View {
+  @Environment(EchoStore.self) private var store
   @Bindable var model: ProductionLibraryModel
   let startPracticing: (LibraryLessonSummary) -> Void
   @State private var search = ""
   @State private var showImport = false
+  @State private var submittedImportJob: ProductionImportJob?
   @State private var lessonToDelete: LibraryLessonSummary?
 
   private var visibleLessons: [LibraryLessonSummary] {
@@ -28,6 +30,8 @@ struct ProductionLibraryView: View {
             Task { await model.cancel(job) }
           } retry: {
             Task { await model.retry(job) }
+          } retryUsingCurrentEngine: {
+            Task { await model.retryUsingSettings(job, preferences: store.preferences) }
           }
         }
         if model.failedDeletionID != nil {
@@ -71,7 +75,19 @@ struct ProductionLibraryView: View {
       }
       .frame(maxWidth: .infinity, alignment: .leading)
     }
-    .sheet(isPresented: $showImport) { ProductionImportSheet(model: model) }
+    .sheet(
+      isPresented: $showImport,
+      onDismiss: {
+        guard let job = submittedImportJob else { return }
+        submittedImportJob = nil
+        model.showImportStatus(for: job)
+      }
+    ) {
+      ProductionImportSheet(model: model) { job in
+        submittedImportJob = job
+        showImport = false
+      }
+    }
     .sheet(item: $lessonToDelete) { lesson in
       DeleteLessonDialog(lessonTitle: lesson.title) {
         ProductionLessonThumbnail(lesson: lesson)

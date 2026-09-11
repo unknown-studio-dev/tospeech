@@ -1,8 +1,11 @@
 import SwiftUI
 import UniformTypeIdentifiers
+import OSLog
 
 struct ProductionImportSheet: View {
+  @Environment(EchoStore.self) private var store
   @Bindable var model: ProductionLibraryModel
+  let onSubmitted: (ProductionImportJob) -> Void
   @Environment(\.dismiss) private var dismiss
   @State private var selection = ProductionImportSelection()
   @State private var title = ""
@@ -11,27 +14,45 @@ struct ProductionImportSheet: View {
   private var youtubeURL: URL? { selection.youtubeURL }
 
   var body: some View {
-    EchoDialog(title: "Thêm video", subtitle: "Chỉ tải audio; không lưu video về máy.", width: 620, height: 380, close: { dismiss() }) {
+    EchoDialog(
+      title: "Thêm video", subtitle: "Chỉ tải audio; không lưu video về máy.", width: 620,
+      height: 380, close: { dismiss() }
+    ) {
       VStack(alignment: .leading, spacing: 16) {
-        EchoTextField(label: "YouTube URL", text: $selection.youtubeInput, placeholder: "https://www.youtube.com/watch?v=…")
-          .onChange(of: selection.youtubeInput) { _, value in selection.updateYouTubeInput(value) }
+        if let error = model.error { EchoNotice(copy: error, error: true) }
+        EchoTextField(
+          label: "YouTube URL", text: $selection.youtubeInput,
+          placeholder: "https://www.youtube.com/watch?v=…"
+        )
+        .onChange(of: selection.youtubeInput) { _, value in selection.updateYouTubeInput(value) }
         HStack {
-          Text(selection.localURL?.lastPathComponent ?? "No audio file selected").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.muted)
+          Group {
+            if let localURL = selection.localURL { Text(verbatim: localURL.lastPathComponent) }
+            else { EchoLocalizedText("No audio file selected") }
+          }.font(
+            EchoFont.body(size: 12)
+          ).foregroundStyle(EchoTheme.muted)
           Spacer()
           EchoButton("Choose file", symbol: "folder", kind: .secondary) { choosingFile = true }
         }
         EchoTextField(label: "Lesson title (optional)", text: $title, placeholder: "Lesson title")
       }
-        if let error = model.error { EchoNotice(copy: error, error: true) }
     } footer: {
       HStack {
         Spacer()
         EchoButton("Hủy", kind: .secondary) { dismiss() }
         EchoButton("Chuẩn bị bài", symbol: "arrow.down.circle", kind: .primary) {
-          let request: ProductionImportRequest? = selection.localURL.map { .localAudio(url: $0, securityScoped: true, titleOverride: title.nonBlank) }
+          let request: ProductionImportRequest? =
+            selection.localURL.map {
+              .localAudio(url: $0, securityScoped: true, titleOverride: title.nonBlank)
+            }
             ?? youtubeURL.map { .youtube(url: $0, titleOverride: title.nonBlank) }
           guard let request else { return }
-          Task { if await model.submit(request) != nil { dismiss() } }
+          Task {
+            if let job = await model.submit(request, localeIdentifier: store.preferences.accent == .uk ? "en-GB" : "en-US", whisperModel: store.preferences.activeTranscriptionModel, transcriptionEngine: store.preferences.transcriptionEngine, transcriptionModelID: TranscriptionSelection.parakeet.modelID, compareWithApple: store.preferences.compareTranscriptWithApple) {
+              onSubmitted(job)
+            }
+          }
         }
         .disabled(selection.localURL == nil && youtubeURL == nil)
       }
@@ -40,7 +61,9 @@ struct ProductionImportSheet: View {
       switch result {
       case .success(let url): selection.chooseLocalFile(url)
       case .failure(let failure):
-        model.error = EchoCopy("storage.detail", arguments: [.raw(failure.localizedDescription)])
+        Logger(subsystem: "com.unknownstudio.EchoLab", category: "ProductionImport")
+          .error("Audio selection failed: \(failure.localizedDescription)")
+        model.error = EchoCopy("import.file.failed")
       }
     }
   }
@@ -67,4 +90,8 @@ struct ProductionImportSelection: Equatable {
   }
 }
 
-private extension String { var nonBlank: String? { trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : self } }
+extension String {
+  fileprivate var nonBlank: String? {
+    trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : self
+  }
+}

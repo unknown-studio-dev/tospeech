@@ -530,3 +530,438 @@
 "review.inspect_in_context" = "Kiểm tra “%@” trong ngữ cảnh";
 "review.compare_saved_source_take" = "So sánh đoạn audio nguồn đã lưu với bản thu trước khi luyện lại.";
 "Hear in context" = "Nghe trong ngữ cảnh";
+
+/* Transcription model settings (production, Plan #3c) */
+"settings.model.title" = "Model nhận dạng (chuẩn bị bài học)";
+"settings.model.subtitle" = "Kích hoạt một model chính để tạo transcript. Phụ đề YouTube và Apple Speech tùy chọn vẫn dùng để đối chiếu.";
+"settings.model.meta" = "%d MB · %@";
+"settings.model.use" = "Dùng";
+"settings.model.in_use" = "Đang dùng";
+"settings.model.download" = "Tải";
+"settings.model.retry" = "Thử lại";
+"settings.model.status.installed" = "Đã tải";
+"settings.model.status.not_installed" = "Chưa tải";
+"settings.model.status.downloading" = "Đang tải %d%%";
+"settings.model.status.failed" = "Lỗi — thử lại";
+"A transcription model is required. Download one in Settings before importing." = "Chưa cài model nhận dạng. Vào Cài đặt để tải trước khi import.";
+"Download a transcription model in Settings, then import again." = "Vào Cài đặt tải model nhận dạng, rồi import lại.";
+"settings.model.activate" = "Kích hoạt";
+"settings.model.downloading_button" = "Đang tải…";
+"settings.model.progress_title" = "Đang tải";
+"settings.model.details.show" = "Chi tiết";
+"settings.model.details.hide" = "Ẩn chi tiết";
+"settings.model.details.ondevice" = "Chạy hoàn toàn trên máy; không gửi audio ra ngoài.";
+"settings.model.details.accents" = "Hỗ trợ cả giọng Anh–Mỹ và Anh–Anh.";
+"settings.model.details.size" = "Dung lượng tải: %d MB";
+"settings.model.remove" = "Xóa model";
+"settings.model.remove_disabled" = "Chọn model khác trước khi xóa model này";
+
+/* Modal audit: explicit entries prevent cross-language bundle fallback. */
+"Chỉ tải audio; không lưu video về máy." = "Chỉ tải audio; không lưu video về máy.";
+"Preparing waveform from local audio…" = "Đang tạo dạng sóng từ audio trên máy…";
+"Microphone permission" = "Quyền micro";
+"The app listens to the complete source first, then records a separate take using the selected microphone." = "Ứng dụng phát hết audio mẫu trước, sau đó ghi một bản thu riêng bằng micro đã chọn.";
+"Microphone access is denied. Open System Settings, then retry, or continue listening." = "Quyền micro đã bị từ chối. Mở Cài đặt hệ thống rồi thử lại, hoặc tiếp tục nghe.";
+"Open System Settings" = "Mở Cài đặt hệ thống";
+"Only the current unsaved take will be discarded. Earlier takes stay in history." = "Chỉ bỏ bản thu hiện tại chưa lưu. Các bản thu trước vẫn được giữ trong lịch sử.";
+"Microphone off · saving this take" = "Mic đã tắt · đang lưu bản thu";
+"The recorded take is retained. Retry or explicitly discard it." = "Bản thu vẫn được giữ lại. Thử lưu lại hoặc chủ động bỏ bản thu.";
+"Cancel recording" = "Hủy thu âm";
+"Microphone recording · source audio is stopped" = "Mic đang thu · audio nguồn đã dừng";
+"Native source audio and microphone recording" = "Phát audio nguồn và thu âm trực tiếp trên máy";
+"Microphone input level" = "Mức âm lượng đầu vào micro";
+"Transcript editing is not available in this timing-only revision." = "Không thể sửa nội dung câu trong phiên bản chỉ chỉnh timing này.";
+"−100 ms" = "−100 ms";
+"+100 ms" = "+100 ms";
+"https://www.youtube.com/watch?v=…" = "https://www.youtube.com/watch?v=…";
+"timing.waveform.failed" = "Không tải được dạng sóng. Hãy thử lại.";
+"timing.save.failed" = "Không lưu được thay đổi timing. Bản chỉnh sửa vẫn được giữ lại; hãy thử lại.";
+"10 vòng" = "10 vòng";
+"3 vòng" = "3 vòng";
+"5 vòng" = "5 vòng";
+"A/B đang mô phỏng giao diện; chưa phát audio gốc hay bản thu thật." = "A/B đang mô phỏng giao diện; chưa phát audio gốc hay bản thu thật.";
+"Anh Anh · UK" = "Anh Anh · UK";
+"Anh Mỹ · US" = "Anh Mỹ · US";
+"Audio gốc" = "Audio gốc";
+"Audio gốc · timeline không đổi" = "Audio gốc · timeline không đổi";
+"Button · tám trạng thái" = "Button · tám trạng thái";
+"Bài luyện của bạn" = "Bài luyện của bạn";
+"Bài luyện mẫu" = "Bài luyện mẫu";
+"Bài luyện, bản thu và cài đặt được lưu cục bộ." = "Bài luyện, bản thu và cài đặt được lưu cục bộ.";
+"Bài luyện, bản thu, kết quả, gói model và cài đặt sẽ trở về dữ liệu mẫu ban đầu." = "Bài luyện, bản thu, kết quả, gói model và cài đặt sẽ trở về dữ liệu mẫu ban đầu.";
+"Bạn vẫn có thể chủ động dừng sớm." = "Bạn vẫn có thể chủ động dừng sớm.";
+"Bạn đã chỉnh mốc câu này. Lưu thay đổi, bỏ phần chỉnh sửa, hoặc tiếp tục biên tập." = "Bạn đã chỉnh mốc câu này. Lưu thay đổi, bỏ phần chỉnh sửa, hoặc tiếp tục biên tập.";
+"Bản dịch" = "Bản dịch";
+"Bản thu và các kết quả đánh giá trước đây vẫn được giữ lại." = "Bản thu và các kết quả đánh giá trước đây vẫn được giữ lại.";
+"Bản thu đã lưu, chưa được chấm. Kiểm tra model trong Cài đặt." = "Bản thu đã lưu, chưa được chấm. Kiểm tra model trong Cài đặt.";
+"Bấm một từ để nghe giọng gốc và xem phát âm." = "Bấm một từ để nghe giọng gốc và xem phát âm.";
+"Bật video" = "Bật video";
+"Bắt đầu vòng" = "Bắt đầu vòng";
+"Bỏ thay đổi" = "Bỏ thay đổi";
+"Chi tiết" = "Chi tiết";
+"Chung" = "Chung";
+"Chuẩn bị bài" = "Chuẩn bị bài";
+"Chuẩn bị bản dịch tiếng Việt" = "Chuẩn bị bản dịch tiếng Việt";
+"Chuẩn bị thu · 3" = "Chuẩn bị thu · 3";
+"Chưa chấm được. Bản thu vẫn được giữ; thử lại khi sẵn sàng." = "Chưa chấm được. Bản thu vẫn được giữ; thử lại khi sẵn sàng.";
+"Chưa chọn" = "Chưa chọn";
+"Chưa có IPA" = "Chưa có IPA";
+"Chưa có bài luyện" = "Chưa có bài luyện";
+"Chưa có bài để chỉnh timing" = "Chưa có bài để chỉnh timing";
+"Chưa có model đánh giá" = "Chưa có model đánh giá";
+"Chưa có timing chính xác · nghe cả ngữ cảnh." = "Chưa có timing chính xác · nghe cả ngữ cảnh.";
+"Chưa khả dụng" = "Chưa khả dụng";
+"Chưa lưu được lượt thu" = "Chưa lưu được lượt thu";
+"Chưa nghe thấy giọng nói. Kiểm tra mic rồi thu lại." = "Chưa nghe thấy giọng nói. Kiểm tra mic rồi thu lại.";
+"Chưa phát hiện tiếng nói" = "Chưa phát hiện tiếng nói";
+"Chưa thể đổi giọng" = "Chưa thể đổi giọng";
+"Chưa xác minh" = "Chưa xác minh";
+"Chưa xác định được ranh giới riêng của từ này." = "Chưa xác định được ranh giới riêng của từ này.";
+"Chưa đo" = "Chưa đo";
+"Chỉ một model hoạt động. Trạng thái dưới đây là dữ liệu mẫu, không phải gói đã kiểm chứng." = "Chỉ một model hoạt động. Trạng thái dưới đây là dữ liệu mẫu, không phải gói đã kiểm chứng.";
+"Chỉ tính sau khi bạn đã bắt đầu nói." = "Chỉ tính sau khi bạn đã bắt đầu nói.";
+"Chỉ tải audio. Video phát online khi bạn bật; không lưu video về máy." = "Chỉ tải audio. Video phát online khi bạn bật; không lưu video về máy.";
+"Chỉ đọc" = "Chỉ đọc";
+"Chỉnh bài luyện" = "Chỉnh bài luyện";
+"Chỉnh nội dung & timing" = "Chỉnh nội dung & timing";
+"Chỉnh timing" = "Chỉnh timing";
+"Chọn model" = "Chọn model";
+"Chọn một câu trước khi lưu." = "Chọn một câu trước khi lưu.";
+"Chọn từ để thử highlight. Mẫu này không phát audio." = "Chọn từ để thử highlight. Mẫu này không phát audio.";
+"Component thật · SF Pro / SF Symbols · dữ liệu minh họa, không phát audio hay mở mic." = "Component thật · SF Pro / SF Symbols · dữ liệu minh họa, không phát audio hay mở mic.";
+"Cuộn để tìm câu" = "Cuộn để tìm câu";
+"Cài đặt" = "Cài đặt";
+"Cài đặt…" = "Cài đặt…";
+"Các chỉnh sửa thủ công được giữ riêng." = "Các chỉnh sửa thủ công được giữ riêng.";
+"Các màn có draft sẽ tự quản lý xác nhận khi đóng." = "Các màn có draft sẽ tự quản lý xác nhận khi đóng.";
+"Cách bạn học" = "Cách bạn học";
+"Câu rõ. Thử nhấn “smallest changes” rõ hơn." = "Câu rõ. Thử nhấn “smallest changes” rõ hơn.";
+"Câu · IPA · dịch" = "Câu · IPA · dịch";
+"Có thể câu bị ngắt sớm. Nghe lại bản thu trước khi luyện tiếp." = "Có thể câu bị ngắt sớm. Nghe lại bản thu trước khi luyện tiếp.";
+"Cần chỉnh timing" = "Cần chỉnh timing";
+"Cần chỉnh timing · Nghe trong ngữ cảnh" = "Cần chỉnh timing · Nghe trong ngữ cảnh";
+"Cỡ chữ" = "Cỡ chữ";
+"Cỡ chữ câu luyện" = "Cỡ chữ câu luyện";
+"D00 · Đối chiếu" = "D00 · Đối chiếu";
+"Dung lượng tải / cài" = "Dung lượng tải / cài";
+"Dung lượng tải, dung lượng cài và RAM được ghi riêng trong Chi tiết. Chưa có số đo thì không ước đoán." = "Dung lượng tải, dung lượng cài và RAM được ghi riêng trong Chi tiết. Chưa có số đo thì không ước đoán.";
+"Dán link YouTube để tạo bài luyện. · UI mô phỏng" = "Dán link YouTube để tạo bài luyện. · UI mô phỏng";
+"Dán link video YouTube đầy đủ." = "Dán link video YouTube đầy đủ.";
+"Dừng & lưu" = "Dừng & lưu";
+"Dừng sau im lặng" = "Dừng sau im lặng";
+"Dữ liệu trên máy" = "Dữ liệu trên máy";
+"EN / VI search" = "EN / VI search";
+"Ghi âm" = "Ghi âm";
+"Ghi âm & models" = "Ghi âm & models";
+"Giao tiếp cơ bản" = "Giao tiếp cơ bản";
+"Giao tiếp tự tin" = "Giao tiếp tự tin";
+"Giả lập lỗi chuẩn bị (preview)" = "Giả lập lỗi chuẩn bị (preview)";
+"Giảm chuyển động" = "Giảm chuyển động";
+"Giảm cỡ chữ 10%" = "Giảm cỡ chữ 10%";
+"Giấy phép / runtime" = "Giấy phép / runtime";
+"Giọng hỗ trợ" = "Giọng hỗ trợ";
+"Giọng quá nhỏ để chấm. Kiểm tra mic rồi thu lại." = "Giọng quá nhỏ để chấm. Kiểm tra mic rồi thu lại.";
+"Giọng tham khảo" = "Giọng tham khảo";
+"Giọng trong video" = "Giọng trong video";
+"Giữ bản thu tạm. Thử lưu lại hoặc xác nhận bỏ bản thu." = "Giữ bản thu tạm. Thử lưu lại hoặc xác nhận bỏ bản thu.";
+"Giữ draft · thử lưu lại" = "Giữ draft · thử lưu lại";
+"Giữ lại" = "Giữ lại";
+"Giữ nguyên vị trí nhãn" = "Giữ nguyên vị trí nhãn";
+"Giữ thay đổi timing?" = "Giữ thay đổi timing?";
+"Hiện IPA" = "Hiện IPA";
+"Hiện bản dịch tiếng Việt" = "Hiện bản dịch tiếng Việt";
+"Hiện video khi mở bài" = "Hiện video khi mở bài";
+"Hiện đang dùng dữ liệu preview." = "Hiện đang dùng dữ liệu preview.";
+"Hover 120 ms · Nội dung 160 ms · Panel 200 ms\nFocus và trạng thái audio cập nhật ngay. Reduce Motion tắt hiệu ứng custom." = "Hover 120 ms · Nội dung 160 ms · Panel 200 ms\nFocus và trạng thái audio cập nhật ngay. Reduce Motion tắt hiệu ứng custom.";
+"Hủy" = "Hủy";
+"Hủy tải" = "Hủy tải";
+"Khi tắt, giữ ảnh thumbnail ở khung 16:9. Audio gốc vẫn phát bình thường." = "Khi tắt, giữ ảnh thumbnail ở khung 16:9. Audio gốc vẫn phát bình thường.";
+"Khoảng cách & chuyển động" = "Khoảng cách & chuyển động";
+"Khôi phục" = "Khôi phục";
+"Khôi phục dữ liệu mẫu" = "Khôi phục dữ liệu mẫu";
+"Khôi phục dữ liệu mẫu?" = "Khôi phục dữ liệu mẫu?";
+"Khôi phục sẽ thay bài luyện, bản thu và kết quả mẫu hiện tại." = "Khôi phục sẽ thay bài luyện, bản thu và kết quả mẫu hiện tại.";
+"Không có tiếng nói" = "Không có tiếng nói";
+"Không lưu được bản thu" = "Không lưu được bản thu";
+"Không phát audio nguồn cùng lúc với mic. Chuyển model không làm mất bản thu hay kết quả cũ." = "Không phát audio nguồn cùng lúc với mic. Chuyển model không làm mất bản thu hay kết quả cũ.";
+"Không sửa timing khi đang thu" = "Không sửa timing khi đang thu";
+"Không tìm thấy câu" = "Không tìm thấy câu";
+"Không tìm thấy câu phù hợp" = "Không tìm thấy câu phù hợp";
+"Không xóa video trên YouTube. Thao tác này không có Hoàn tác." = "Không xóa video trên YouTube. Thao tác này không có Hoàn tác.";
+"Kiểm tra mic" = "Kiểm tra mic";
+"Kiểm tra micro và thu lại. Không quy đổi thành điểm 0." = "Kiểm tra micro và thu lại. Không quy đổi thành điểm 0.";
+"Kiểm tra đầu vào micro và thử thu lại." = "Kiểm tra đầu vào micro và thử thu lại.";
+"Kích hoạt" = "Kích hoạt";
+"Kích thước checkpoint không phải toàn bộ dung lượng app. Chưa xác minh hiệu năng, giấy phép hoặc khả năng tương thích." = "Kích thước checkpoint không phải toàn bộ dung lượng app. Chưa xác minh hiệu năng, giấy phép hoặc khả năng tương thích.";
+"Kết thúc lượt thu trước khi đổi giọng." = "Kết thúc lượt thu trước khi đổi giọng.";
+"Loading · tiến trình · skeleton" = "Loading · tiến trình · skeleton";
+"Logo & màu sắc" = "Logo & màu sắc";
+"Luyện nghe từng câu, từng từ trước khi nói theo." = "Luyện nghe từng câu, từng từ trước khi nói theo.";
+"Luyện phát âm, trọng âm và nhịp điệu của câu." = "Luyện phát âm, trọng âm và nhịp điệu của câu.";
+"Luyện shadowing" = "Luyện shadowing";
+"Luyện tập" = "Luyện tập";
+"Lưu" = "Lưu";
+"Lưu chưa thành công. Thử lại." = "Lưu chưa thành công. Thử lại.";
+"Lưu thử" = "Lưu thử";
+"Lưu timing" = "Lưu timing";
+"Lượt thu vẫn được giữ. Kiểm tra dung lượng trống rồi thử lại." = "Lượt thu vẫn được giữ. Kiểm tra dung lượng trống rồi thử lại.";
+"Lặp một câu" = "Lặp một câu";
+"Lựa chọn & giá trị" = "Lựa chọn & giá trị";
+"Micro chỉ mở khi đến lượt nói." = "Micro chỉ mở khi đến lượt nói.";
+"Model đánh giá" = "Model đánh giá";
+"Mô phỏng lỗi tải" = "Mô phỏng lỗi tải";
+"Mẫu component sheet trong app." = "Mẫu component sheet trong app.";
+"Mẫu giao diện — chưa có thao tác ghi âm thật." = "Mẫu giao diện — chưa có thao tác ghi âm thật.";
+"Mẫu trạng thái tĩnh. Engine audio, micro và đánh giá vẫn dùng preview hiện có." = "Mẫu trạng thái tĩnh. Engine audio, micro và đánh giá vẫn dùng preview hiện có.";
+"Mẫu tương tác: không ghi dữ liệu bài học." = "Mẫu tương tác: không ghi dữ liệu bài học.";
+"Mặc định" = "Mặc định";
+"Mỗi lượt, một bản thu" = "Mỗi lượt, một bản thu";
+"Mỗi ngày, một chút tốt hơn." = "Mỗi ngày, một chút tốt hơn.";
+"Mới bắt đầu" = "Mới bắt đầu";
+"Mở sheet" = "Mở sheet";
+"Mục tiêu luyện" = "Mục tiêu luyện";
+"Mục tiêu luyện tập" = "Mục tiêu luyện tập";
+"Mục tiêu và mức tự đánh giá của bạn." = "Mục tiêu và mức tự đánh giá của bạn.";
+"Mức tự đánh giá" = "Mức tự đánh giá";
+"Nghe & đọc theo" = "Nghe & đọc theo";
+"Nghe A/B" = "Nghe A/B";
+"Nghe audio gốc và mở phát âm" = "Nghe audio gốc và mở phát âm";
+"Nghe lại audio gốc" = "Nghe lại audio gốc";
+"Nghe mẫu" = "Nghe mẫu";
+"Nghe nguồn" = "Nghe nguồn";
+"Nghe tham khảo" = "Nghe tham khảo";
+"Nghe trong ngữ cảnh" = "Nghe trong ngữ cảnh";
+"Nghe trong ngữ cảnh; cần chỉnh timing" = "Nghe trong ngữ cảnh; cần chỉnh timing";
+"Nghe từ trong audio gốc" = "Nghe từ trong audio gốc";
+"Nghe và bắt kịp câu" = "Nghe và bắt kịp câu";
+"Nghe xong → đếm ngược → ghi âm." = "Nghe xong → đếm ngược → ghi âm.";
+"Ngôn ngữ" = "Ngôn ngữ";
+"Nhóm D00" = "Nhóm D00";
+"Nhóm cài đặt" = "Nhóm cài đặt";
+"Nhập tên bài trước khi lưu." = "Nhập tên bài trước khi lưu.";
+"Những từ muốn luyện lại" = "Những từ muốn luyện lại";
+"Nói rõ và tự nhiên hơn" = "Nói rõ và tự nhiên hơn";
+"Nền tảng" = "Nền tảng";
+"Nội dung cuộn độc lập" = "Nội dung cuộn độc lập";
+"Pencil D00 → SwiftUI\nDữ liệu ví dụ để kiểm tra UI." = "Pencil D00 → SwiftUI\nDữ liệu ví dụ để kiểm tra UI.";
+"Phát âm tham khảo" = "Phát âm tham khảo";
+"Phản hồi" = "Phản hồi";
+"Popover theo ngữ cảnh" = "Popover theo ngữ cảnh";
+"Quay lại các đoạn cần cải thiện trong bài đang học." = "Quay lại các đoạn cần cải thiện trong bài đang học.";
+"RAM / độ trễ trên M1" = "RAM / độ trễ trên M1";
+"Row · thumbnail · số" = "Row · thumbnail · số";
+"Sheet căn giữa · footer cố định" = "Sheet căn giữa · footer cố định";
+"Sheet dùng cửa sổ native, cuộn phần nội dung và luôn giữ nút hành động ở đáy." = "Sheet dùng cửa sổ native, cuộn phần nội dung và luôn giữ nút hành động ở đáy.";
+"Sẵn sàng" = "Sẵn sàng";
+"Số vòng" = "Số vòng";
+"Thay đổi chỉ áp dụng cho ví dụ này." = "Thay đổi chỉ áp dụng cho ví dụ này.";
+"Thiết kế" = "Thiết kế";
+"Thu sau mỗi lượt nghe" = "Thu sau mỗi lượt nghe";
+"Thu tự động tắt · Mic tắt" = "Thu tự động tắt · Mic tắt";
+"Thu tự động đã bật · Mic tắt" = "Thu tự động đã bật · Mic tắt";
+"Thu âm" = "Thu âm";
+"Thành phần UI…" = "Thành phần UI…";
+"Thêm một video để bắt đầu nghe từng câu." = "Thêm một video để bắt đầu nghe từng câu.";
+"Thêm video" = "Thêm video";
+"Thông báo có ngữ cảnh" = "Thông báo có ngữ cảnh";
+"Thông tin có thể chỉnh sau." = "Thông tin có thể chỉnh sau.";
+"Thư viện" = "Thư viện";
+"Thời gian chuẩn bị trước khi bắt đầu thu." = "Thời gian chuẩn bị trước khi bắt đầu thu.";
+"Thử hover, Tab, Space, phím mũi tên và Escape." = "Thử hover, Tab, Space, phím mũi tên và Escape.";
+"Thử lưu lại" = "Thử lưu lại";
+"Thử lại" = "Thử lại";
+"Thử từ khóa khác hoặc xóa tìm kiếm." = "Thử từ khóa khác hoặc xóa tìm kiếm.";
+"Thử từ khóa khác hoặc xóa tìm kiếm. Câu đang luyện vẫn được giữ." = "Thử từ khóa khác hoặc xóa tìm kiếm. Câu đang luyện vẫn được giữ.";
+"Timing từ chưa đúng?" = "Timing từ chưa đúng?";
+"Tiến bộ" = "Tiến bộ";
+"Tiến bộ theo video" = "Tiến bộ theo video";
+"Tiến trình tải (mô phỏng)" = "Tiến trình tải (mô phỏng)";
+"Tiếng Anh, IPA và bản dịch cùng thay đổi.\nKhông đổi kích thước phần còn lại của app." = "Tiếng Anh, IPA và bản dịch cùng thay đổi.\nKhông đổi kích thước phần còn lại của app.";
+"Tiếp tục" = "Tiếp tục";
+"Tiếp tục sửa" = "Tiếp tục sửa";
+"Tiếp tục vòng" = "Tiếp tục vòng";
+"Transport & nhận xét" = "Transport & nhận xét";
+"Trong bài này" = "Trong bài này";
+"Trạng thái nghe → thu" = "Trạng thái nghe → thu";
+"Tác vụ" = "Tác vụ";
+"Tên bài" = "Tên bài";
+"Tên hiển thị" = "Tên hiển thị";
+"Tìm bài luyện…" = "Tìm bài luyện…";
+"Tìm câu tiếng Anh hoặc tiếng Việt…" = "Tìm câu tiếng Anh hoặc tiếng Việt…";
+"Tìm trong bài…" = "Tìm trong bài…";
+"Tùy chọn lặp" = "Tùy chọn lặp";
+"Tăng cỡ chữ 10%" = "Tăng cỡ chữ 10%";
+"Tạm dừng" = "Tạm dừng";
+"Tạm dừng nghe" = "Tạm dừng nghe";
+"Tạm dừng và giữ bản thu" = "Tạm dừng và giữ bản thu";
+"Tạm dừng vòng" = "Tạm dừng vòng";
+"Tải gói" = "Tải gói";
+"Tải thất bại · model đang dùng không đổi" = "Tải thất bại · model đang dùng không đổi";
+"Tắt video" = "Tắt video";
+"Tắt đánh giá" = "Tắt đánh giá";
+"Tắt đánh giá hoặc chọn model khác trước khi xóa" = "Tắt đánh giá hoặc chọn model khác trước khi xóa";
+"Tốc độ nghe" = "Tốc độ nghe";
+"Tốc độ nghe từ" = "Tốc độ nghe từ";
+"Từ chưa có mốc chắc chắn. Nghe trong ngữ cảnh để tránh cắt mất âm." = "Từ chưa có mốc chắc chắn. Nghe trong ngữ cảnh để tránh cắt mất âm.";
+"Từ không còn trong phiên bản câu này." = "Từ không còn trong phiên bản câu này.";
+"Tự động lưu trên máy · Không cần nhấn Lưu" = "Tự động lưu trên máy · Không cần nhấn Lưu";
+"UK/US chỉ đổi IPA và giọng tham khảo, không đổi audio gốc." = "UK/US chỉ đổi IPA và giọng tham khảo, không đổi audio gốc.";
+"UK/US chỉ đổi giọng tham khảo, không đổi audio gốc." = "UK/US chỉ đổi giọng tham khảo, không đổi audio gốc.";
+"US English · dữ liệu mẫu" = "US English · dữ liệu mẫu";
+"Video YouTube luôn tắt âm và đi theo audio. Không tải video về máy." = "Video YouTube luôn tắt âm và đi theo audio. Không tải video về máy.";
+"Video tắt · đang dùng audio gốc" = "Video tắt · đang dùng audio gốc";
+"Ví dụ UI" = "Ví dụ UI";
+"Vòng lặp đã tạm dừng." = "Vòng lặp đã tạm dừng.";
+"Vẫn nghe, thu và so sánh A/B. Không tự đổi engine." = "Vẫn nghe, thu và so sánh A/B. Không tự đổi engine.";
+"Về câu hiện tại" = "Về câu hiện tại";
+"Vị trí trong audio gốc" = "Vị trí trong audio gốc";
+"WordIPA · các trạng thái" = "WordIPA · các trạng thái";
+"Xem chi tiết" = "Xem chi tiết";
+"Xem khẩu hình khi cần, vẫn ưu tiên nghe." = "Xem khẩu hình khi cần, vẫn ưu tiên nghe.";
+"Xóa audio, transcript và phần chỉnh tay, bản thu cùng lịch sử của bài này trên máy." = "Xóa audio, transcript và phần chỉnh tay, bản thu cùng lịch sử của bài này trên máy.";
+"Xóa bài" = "Xóa bài";
+"Xóa bài luyện này?" = "Xóa bài luyện này?";
+"Xóa gói model?" = "Xóa gói model?";
+"Áp dụng mặc định khi bạn mở một bài luyện." = "Áp dụng mặc định khi bạn mở một bài luyện.";
+"Đang chuẩn bị transcript…" = "Đang chuẩn bị transcript…";
+"Đang chấm câu này… Bạn vẫn có thể tiếp tục luyện." = "Đang chấm câu này… Bạn vẫn có thể tiếp tục luyện.";
+"Đang dùng" = "Đang dùng";
+"Đang lưu lượt thu…" = "Đang lưu lượt thu…";
+"Đang lưu…" = "Đang lưu…";
+"Đang nghe" = "Đang nghe";
+"Đang nghe trong ngữ cảnh" = "Đang nghe trong ngữ cảnh";
+"Đang nghe · Mic tắt" = "Đang nghe · Mic tắt";
+"Đang thu · 00:04" = "Đang thu · 00:04";
+"Đang tải gói · số liệu minh họa" = "Đang tải gói · số liệu minh họa";
+"Đang tải nội dung" = "Đang tải nội dung";
+"Đang xác minh toàn bộ gói (mô phỏng)…" = "Đang xác minh toàn bộ gói (mô phỏng)…";
+"Đang xác minh…" = "Đang xác minh…";
+"Điều chỉnh cách học, nghe và ghi âm của bạn." = "Điều chỉnh cách học, nghe và ghi âm của bạn.";
+"Đánh giá đang tắt" = "Đánh giá đang tắt";
+"Đây là nhận xét mẫu, chưa phải đánh giá giọng nói thật. Nghe A/B để so sánh." = "Đây là nhận xét mẫu, chưa phải đánh giá giọng nói thật. Nghe A/B để so sánh.";
+"Đã chọn" = "Đã chọn";
+"Đã cài · dữ liệu mẫu" = "Đã cài · dữ liệu mẫu";
+"Đã giữ lượt thu bị gián đoạn, không chấm điểm." = "Đã giữ lượt thu bị gián đoạn, không chấm điểm.";
+"Đã gửi yêu cầu thử lại" = "Đã gửi yêu cầu thử lại";
+"Đã hủy chấm; bản thu vẫn được giữ." = "Đã hủy chấm; bản thu vẫn được giữ.";
+"Đã lưu" = "Đã lưu";
+"Đã lưu bản dịch" = "Đã lưu bản dịch";
+"Đã lưu lượt thu" = "Đã lưu lượt thu";
+"Đã lưu timing" = "Đã lưu timing";
+"Đã lưu ví dụ" = "Đã lưu ví dụ";
+"Đóng" = "Đóng";
+"Đóng bằng Escape hoặc bấm bên ngoài. Menu select không bị cắt bởi vùng cuộn." = "Đóng bằng Escape hoặc bấm bên ngoài. Menu select không bị cắt bởi vùng cuộn.";
+"Đếm ngược" = "Đếm ngược";
+"Độ dài bản thu tối đa" = "Độ dài bản thu tối đa";
+"Độ phóng chữ" = "Độ phóng chữ";
+"Độ phóng chữ câu luyện" = "Độ phóng chữ câu luyện";
+"Đủ câu. Thử nối “thought it” liền hơn." = "Đủ câu. Thử nối “thought it” liền hơn.";
+"Ẩn chi tiết" = "Ẩn chi tiết";
+
+/* Import modal recovery. */
+"Enter a valid public YouTube URL." = "Nhập đường dẫn YouTube công khai hợp lệ.";
+"The selected audio file is no longer accessible." = "Không còn truy cập được file audio đã chọn.";
+"This lesson is already in your Library." = "Bài luyện này đã có trong thư viện.";
+"Import cancelled." = "Đã hủy nhập bài.";
+"This lesson changed while the import was running." = "Bài luyện đã thay đổi trong lúc nhập.";
+"This source does not contain audio that EchoLab can prepare." = "Nguồn này không có audio mà EchoLab có thể xử lý.";
+"The local import tools are unavailable. Reopen EchoLab, then try again." = "Công cụ nhập bài trên máy chưa khả dụng. Mở lại EchoLab rồi thử lại.";
+"EchoLab could not prepare this lesson. Try again or import an audio file." = "EchoLab không chuẩn bị được bài này. Hãy thử lại hoặc chọn một file audio.";
+"EchoLab could not save the import locally. Check free storage, then try again." = "EchoLab không lưu được bài trên máy. Kiểm tra dung lượng trống rồi thử lại.";
+"YouTube is temporarily limiting downloads. Wait a little, then try again." = "YouTube đang tạm giới hạn tải xuống. Đợi một lát rồi thử lại.";
+"YouTube requires verification for this video. Try another public video or import an audio file." = "YouTube yêu cầu xác minh video này. Thử video công khai khác hoặc chọn một file audio.";
+"import.submit.failed" = "Không bắt đầu nhập bài được. Nội dung đã nhập vẫn được giữ lại; hãy thử lại.";
+"import.file.failed" = "Không mở được file audio đã chọn. Hãy chọn lại file.";
+
+// Explicit Apple Speech word timing preparation
+"speech.preparation.action" = "Bổ sung timing từ";
+"speech.preparation.title" = "Bổ sung timing cho từ";
+"speech.preparation.subtitle" = "Apple SpeechTranscriber · Không bắt buộc";
+"speech.preparation.explanation" = "Apple SpeechTranscriber phân tích audio bài học ngay trên Mac để bổ sung mốc thời gian còn thiếu của từ. Gói ngôn ngữ sẽ được tải nếu cần. Thao tác này không dùng micro. Bạn có thể bỏ qua và luyện với timing hiện tại.";
+"speech.preparation.skip" = "Giữ timing hiện tại";
+"speech.preparation.busy" = "Đang bổ sung timing từ…";
+"speech.preparation.denied" = "Quyền Nhận dạng giọng nói bị từ chối hoặc hạn chế. Bạn có thể cấp quyền trong Cài đặt hệ thống rồi thử lại, hoặc tiếp tục luyện với timing hiện tại.";
+"speech.preparation.unavailable" = "Apple SpeechTranscriber chưa khả dụng. Hãy chuẩn bị gói tiếng Anh trong Cài đặt hoặc thử lại sau.";
+"speech.preparation.timeout" = "Apple Speech quá thời gian chờ. Hãy thử lại hoặc giữ timing hiện tại.";
+"speech.preparation.failed" = "Không thể bổ sung timing từ: %@";
+"speech.preparation.no_changes" = "Không tìm được mốc thời gian đáng tin cậy để bổ sung. Timing hiện tại được giữ nguyên. Bạn có thể chỉnh trong trình sửa timing.";
+
+"speech.model.title" = "Apple Speech · đối chiếu transcript";
+
+"speech.model.description" = "Đối chiếu tùy chọn với engine tạo transcript đã chọn.";
+
+"speech.model.local" = "Apple cung cấp transcript và timing để đối chiếu khi gói ngôn ngữ đã sẵn sàng. Chuẩn bị gói tại đây; import không tự tải gói này.";
+
+"speech.model.uk" = "Tiếng Anh (UK)";
+
+"speech.model.us" = "Tiếng Anh (US)";
+
+"speech.model.checking" = "Đang kiểm tra model…";
+
+"speech.model.installed" = "Đã sẵn sàng trên Mac";
+
+"speech.model.download_needed" = "Sẽ tải khi chuẩn bị";
+
+"speech.model.downloading" = "Đang tải gói ngôn ngữ…";
+
+"speech.model.unavailable" = "Chưa khả dụng";
+
+"speech.model.prepare" = "Chuẩn bị gói ngôn ngữ";
+
+"speech.model.preparing" = "Chuẩn bị gói tiếng Anh";
+"speech.import.timing_review" = "%1$@ câu cần kiểm tra transcript/timing. Bạn vẫn có thể bắt đầu luyện tập.";
+
+"import.combined.sources" = "Phụ đề và model trên máy";
+
+"Import cancelled" = "Đã hủy nhập bài";
+
+"import.banner.background" = "%@ · tiếp tục chạy nền";
+
+"An import restart is already in progress." = "Đang khởi động lại lượt nhập bài.";
+
+"Checking source audio" = "Đang kiểm tra audio nguồn";
+
+"Finding English captions" = "Đang tìm phụ đề tiếng Anh";
+
+"Checking transcript and word timing" = "Đang kiểm tra transcript và timing từ";
+
+"Saving lesson" = "Đang lưu bài học";
+
+"Audio ready" = "Audio đã sẵn sàng";
+
+"Whisper did not produce usable words. Check the audio or choose another installed Whisper model." = "Whisper không tạo được dữ liệu từ. Kiểm tra audio hoặc chọn model Whisper đã cài khác.";
+
+"Apple Speech did not recognize speech in this audio. Check the audio and English language package." = "Apple Speech không nhận được lời nói trong audio. Kiểm tra audio và gói ngôn ngữ tiếng Anh.";
+
+"The recognized timing is outside the audio. No playable sentence could be prepared." = "Timing nhận dạng nằm ngoài audio. Chưa tạo được câu có thể phát.";
+
+"transcription.engine.title" = "Engine tạo transcript";
+
+"transcription.engine.help" = "Chọn engine local chính cho lần import mới. Đổi engine vẫn giữ các model Whisper đã tải.";
+
+"transcription.parakeet.installed" = "Parakeet TDT 0.6B v3 đã cài · encoder INT8 · xử lý trên máy.";
+
+"transcription.parakeet.missing" = "Tải Parakeet trước khi import bằng engine này. Lần tải đầu cần internet.";
+
+"transcription.parakeet.installing" = "Đang tải và kiểm tra Parakeet…";
+
+"transcription.parakeet.download" = "Tải Parakeet TDT 0.6B v3";
+
+"transcription.apple.compare" = "Đối chiếu với Apple Speech khi khả dụng";
+
+"transcription.apple.optional" = "Phụ đề YouTube vẫn được dùng để tham khảo khi có. Apple là bước tùy chọn; thiếu gói ngôn ngữ không chặn import. Nội dung chưa đối chiếu hoặc bất đồng được đánh dấu cần kiểm tra.";
+
+"transcription.package.check_failed" = "Không kiểm tra được gói Parakeet. Mở lại Cài đặt để thử lại.";
+
+"transcription.package.install_failed" = "Tải hoặc kiểm tra Parakeet thất bại. Kiểm tra kết nối, dung lượng trống rồi thử lại.";
+
+"transcription.retry.selected" = "Thử lại bằng model trong Cài đặt";
+"transcription.model.preparing" = "Đang chuẩn bị model transcript";
+
+"transcription.import.empty" = "Engine đã chọn không tạo được transcript có thể dùng. Kiểm tra audio hoặc chọn model khác đã cài.";
+"transcription.retry.prepared" = "Bài đã được xử lý. Dùng Thử lại để hoàn tất lưu kết quả hiện có.";
+
+"transcription.parakeet.details" = "Parakeet TDT 0.6B v3 · encoder INT8 · timing từ tiếng Anh. Model: NVIDIA / FluidInference, CC BY 4.0.";
+
+"timing.observed.review" = "Đã có timing tự động cho từ · cần kiểm tra.";
+"timing.observed.sentence_review" = "Transcript và timing tự động cần kiểm tra.";

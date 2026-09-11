@@ -2,6 +2,33 @@ import CryptoKit
 import Foundation
 import OSLog
 
+/// Thread-safe latest-value store for the slow WhisperKit transcription step.
+/// WhisperKit's progress callback fires from a background thread, so this is a
+/// lock-guarded box rather than actor state: the callback writes without an
+/// await hop, and the UI poll reads the latest fraction on the main actor.
+final class TranscriptionProgressTracker: @unchecked Sendable {
+  private let lock = NSLock()
+  private var values: [UUID: Double] = [:]
+
+  func set(_ value: Double, for id: UUID) {
+    lock.lock()
+    defer { lock.unlock() }
+    values[id] = value
+  }
+
+  func value(for id: UUID) -> Double? {
+    lock.lock()
+    defer { lock.unlock() }
+    return values[id]
+  }
+
+  func clear(_ id: UUID) {
+    lock.lock()
+    defer { lock.unlock() }
+    values[id] = nil
+  }
+}
+
 actor ProductionImportService {
   private let database: ProductionDatabase
   private let paths: BackendPaths
@@ -9,7 +36,11 @@ actor ProductionImportService {
   private let runner: SubprocessRunner
   private let removeManagedItem: @Sendable (URL) throws -> Void
   private let usesSpeechFallback: Bool
+  private let audioTranscriber: (any AudioTranscriptTranscribing)?
+  private let transcriber: (any WhisperWordTranscribing)?
+  private let transcriptionAdapters: TranscriptionAdapterRegistry?
   private let ipaDictionary: OfflineIPADictionary?
+  private let transcriptionProgressTracker = TranscriptionProgressTracker()
   private let logger = Logger(
     subsystem: "com.unknownstudio.EchoLab", category: "ProductionImport")
   private struct ActiveImport {
@@ -19,11 +50,15 @@ actor ProductionImportService {
   }
   private var tasks: [UUID: ActiveImport] = [:]
   private var runtimeFailures: [UUID: ProductionImportJob] = [:]
+  private var restartingJobs: Set<UUID> = []
 
   init(
     database: ProductionDatabase, paths: BackendPaths, toolchain: BundledImportToolchain = .init(),
     runner: SubprocessRunner = .init(),
     usesSpeechFallback: Bool = true,
+    transcriber: (any WhisperWordTranscribing)? = nil,
+    audioTranscriber: (any AudioTranscriptTranscribing)? = nil,
+    transcriptionAdapters: TranscriptionAdapterRegistry? = nil,
     ipaDictionary: OfflineIPADictionary? = nil,
     removeManagedItem: @escaping @Sendable (URL) throws -> Void = {
       try FileManager.default.removeItem(at: $0)
@@ -34,22 +69,58 @@ actor ProductionImportService {
     self.toolchain = toolchain
     self.runner = runner
     self.usesSpeechFallback = usesSpeechFallback
+    self.audioTranscriber = audioTranscriber
+    self.transcriber = transcriber
+    self.transcriptionAdapters = transcriptionAdapters ?? transcriber.map {
+      TranscriptionAdapterRegistry([WhisperTranscriptionAdapter(transcriber: $0, database: database)])
+    }
     self.ipaDictionary = ipaDictionary ?? (try? OfflineIPADictionary.bundled())
     self.removeManagedItem = removeManagedItem
   }
 
-  func submit(_ request: ProductionImportRequest) async throws -> ProductionImportJob {
+  func submit(_ request: ProductionImportRequest, localeIdentifier: String = "en-GB", whisperModel: String? = nil, transcriptionEngine: String = "whisper", transcriptionModelID: String? = nil, compareWithApple: Bool = true) async throws -> ProductionImportJob {
     let tools: BundledImportToolchain.Tools
     do { tools = try toolchain.resolve() } catch let error as BundledImportToolchainError {
       throw ProductionImportError.toolchain(error)
     }
     try paths.prepare()
     var identity = try await resolveIdentity(for: request)
+    if let existing = try await database.lesson(provider: identity.provider, externalID: identity.externalID) {
+      // Keep the identity and attempt history; an unfinished import is resumable,
+      // whereas a completed lesson must not be silently replaced.
+      guard existing.lifecycle != .ready && existing.lifecycle != .deleting,
+        let stored = try await database.unfinishedImportJobs().first(where: {
+          (try? decodeInput($0).lessonID) == existing.id
+        }) else { throw ProductionImportError.duplicateIdentity }
+      if stored.status == "running", tasks[stored.id] != nil,
+        let current = try await importJobs().first(where: { $0.id == stored.id }) {
+        return current
+      }
+      return try await retry(jobID: stored.id)
+    }
     let lessonID = UUID()
     let jobID = UUID()
     let runToken = UUID()
     let createdAt = Date()
     identity.lessonID = lessonID
+    identity.localeIdentifier = localeIdentifier
+    if let transcriptionAdapters {
+      let selection: TranscriptionSelection
+      if transcriptionEngine == "whisper" {
+        guard let variant = WhisperModelSelection.active(
+          from: try await database.engineReleases(engineKey: WhisperModelCatalog.engineKey), selected: whisperModel)
+        else { throw ProductionImportError.modelNotInstalled }
+        identity.whisperModel = variant.rawValue
+        selection = TranscriptionSelection(engineID: "whisper", modelID: variant.rawValue)
+      } else {
+        guard let transcriptionModelID else { throw TranscriptionAdapterError.unsupportedModel(transcriptionEngine) }
+        selection = TranscriptionSelection(engineID: transcriptionEngine, modelID: transcriptionModelID)
+      }
+      do { try await transcriptionAdapters.adapter(for: selection).validate(modelID: selection.modelID) }
+      catch TranscriptionAdapterError.modelNotInstalled { throw ProductionImportError.modelNotInstalled }
+      identity.transcriptionSelection = selection
+      identity.compareWithApple = compareWithApple
+    }
     do {
       _ = try await database.insertLesson(
         NewLesson(
@@ -111,20 +182,62 @@ actor ProductionImportService {
     tasks[jobID]?.task.cancel()
   }
 
-  func retry(jobID: UUID) async throws {
+  /// Sub-progress (0...1) of the in-flight transcription step for a job, if one
+  /// is running. `nil` when the job is in a different phase or has finished.
+  nonisolated func transcriptionProgress(jobID: UUID) -> Double? {
+    transcriptionProgressTracker.value(for: jobID)
+  }
+
+  func retryUsingSettings(jobID: UUID, engine: String, whisperModel: String?, compareWithApple: Bool) async throws -> ProductionImportJob {
+    let selection: TranscriptionSelection
+    if engine == "whisper" {
+      guard let variant = WhisperModelSelection.active(
+        from: try await database.engineReleases(engineKey: WhisperModelCatalog.engineKey), selected: whisperModel)
+      else { throw ProductionImportError.modelNotInstalled }
+      selection = TranscriptionSelection(engineID: "whisper", modelID: variant.rawValue)
+    } else {
+      selection = TranscriptionSelection(engineID: engine, modelID: TranscriptionSelection.parakeet.modelID)
+    }
+    return try await retry(jobID: jobID, replacementSelection: selection, compareWithApple: compareWithApple)
+  }
+
+  @discardableResult
+  func retry(jobID: UUID, replacementSelection: TranscriptionSelection? = nil, compareWithApple: Bool? = nil) async throws -> ProductionImportJob {
+    guard restartingJobs.insert(jobID).inserted else {
+      throw ProductionImportError.recoveryRequired("An import restart is already in progress.")
+    }
+    defer { restartingJobs.remove(jobID) }
+    // Never run two decoders or mutate one staging folder concurrently.
+    if let previous = tasks[jobID] {
+      previous.task.cancel()
+      await previous.task.value
+    }
     let stored = try await database.unfinishedImportJobs().first(where: { $0.id == jobID })
     guard let stored else {
       throw ProductionImportError.recoveryRequired("Import job no longer exists.")
     }
-    let input = try JSONDecoder().decode(StoredInput.self, from: Data(stored.inputJSON.utf8))
+    var input = try JSONDecoder().decode(StoredInput.self, from: Data(stored.inputJSON.utf8))
+    if let replacementSelection {
+      guard let transcriptionAdapters else { throw TranscriptionAdapterError.unsupportedModel(replacementSelection.engineID) }
+      try await transcriptionAdapters.adapter(for: replacementSelection).validate(modelID: replacementSelection.modelID)
+      let previous = input.transcriptionSelection ?? input.whisperModel.map { TranscriptionSelection(engineID: "whisper", modelID: $0) }
+      let manifest = paths.importWorkspace(for: jobID).appendingPathComponent("commit-manifest.json")
+      if previous != replacementSelection && FileManager.default.fileExists(atPath: manifest.path) {
+        throw ProductionImportError.recoveryRequired("This lesson is already prepared. Use Retry to finish saving it before importing with another model.")
+      }
+      if let previous, previous != replacementSelection {
+        input.previousTranscriptionSelections = (input.previousTranscriptionSelections ?? []) + [previous]
+      }
+      input.transcriptionSelection = replacementSelection
+      input.compareWithApple = compareWithApple ?? input.compareWithApple
+    }
     guard let lessonID = input.lessonID else {
       throw ProductionImportError.recoveryRequired("Import job has no lesson identity.")
     }
     let tools = try toolchain.resolve()
-    tasks[jobID]?.task.cancel()
     runtimeFailures[jobID] = nil
     let runToken = try await database.beginImportRetry(
-      id: stored.id, expectedGeneration: stored.expectedGeneration)
+      id: stored.id, expectedGeneration: stored.expectedGeneration, replacementInputJSON: replacementSelection == nil ? nil : try json(input))
     let job = ProductionImportJob(
       id: stored.id, lessonID: lessonID, title: input.title, phase: .resolving,
       runToken: runToken, expectedGeneration: stored.expectedGeneration, error: nil,
@@ -134,6 +247,7 @@ actor ProductionImportService {
       await self.run(job: job, input: input, tools: tools)
     }
     tasks[jobID] = ActiveImport(lessonID: lessonID, runToken: runToken, task: task)
+    return job
   }
 
   func resumePendingJobs() async throws {
@@ -243,6 +357,8 @@ actor ProductionImportService {
     job: ProductionImportJob, input: StoredInput, tools: BundledImportToolchain.Tools
   ) async {
     do {
+      try Task.checkCancellation()
+      try await checkpoint(job, .resolving, detail: nil)
       let workspace = paths.importWorkspace(for: job.id)
       try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: true)
       let audio = workspace.appendingPathComponent("source.m4a")
@@ -354,6 +470,122 @@ actor ProductionImportService {
       var preparedSegments: [PreparedLessonSegment]?
       var captionAsset: MediaAsset?
       var stagedCaption: URL?
+      if let transcriptionAdapters {
+        // Jobs written before adapters retain their captured Whisper variant.
+        let selection: TranscriptionSelection
+        if let stored = input.transcriptionSelection { selection = stored }
+        else {
+          guard let variant = WhisperModelSelection.active(
+            from: try await database.engineReleases(engineKey: WhisperModelCatalog.engineKey), selected: input.whisperModel)
+          else { throw ProductionImportError.modelNotInstalled }
+          selection = TranscriptionSelection(engineID: "whisper", modelID: variant.rawValue)
+        }
+        let adapter = try transcriptionAdapters.adapter(for: selection)
+        let locale = input.localeIdentifier ?? "en-GB"
+        let provenance = try adapter.provenance(modelID: selection.modelID, locale: locale)
+        try await checkpoint(job, .fetchingCaptions, detail: nil)
+        let downloaded = try await captionFile(in: workspace, input: input, tools: tools)
+        let captions = try downloaded.map { try WebVTTCaptionParser.parse(String(contentsOf: $0.url, encoding: .utf8)) } ?? []
+        try await checkpoint(job, .preparingSpeechModel, detail: nil)
+        try await adapter.validate(modelID: selection.modelID)
+        try await checkpoint(job, .preparingTranscript, detail: nil)
+        let tracker = transcriptionProgressTracker
+        let progressJobID = job.id
+        tracker.set(0, for: progressJobID)
+        defer { tracker.clear(progressJobID) }
+        let checksum = try sha256(audio)
+        let identity = ImportTranscriptCacheIdentity(sourceChecksum: checksum, engine: provenance.engine,
+          model: provenance.model, locale: provenance.localeIdentifier, runtime: provenance.runtimeVersion, formatVersion: 2)
+        let primaryFile = workspace.appendingPathComponent("primary-output.json")
+        let primary: AudioTranscription
+        if let cached = ImportTranscriptCache.load(AudioTranscription.self, from: primaryFile, identity: identity), !cached.words.isEmpty {
+          primary = cached
+        } else {
+          primary = try await adapter.transcribe(audioURL: audio, modelID: selection.modelID, locale: locale,
+            onProgress: { tracker.set(min(1, max(0, $0)) * 0.8, for: progressJobID) })
+          try Task.checkCancellation()
+          guard !primary.words.isEmpty else { throw TranscriptionAdapterError.emptyTranscript }
+          try ImportTranscriptCache.save(primary, to: primaryFile, identity: identity)
+        }
+        tracker.set(0.8, for: progressJobID)
+        var apple: AudioTranscription?
+        var appleFailure: String?
+        if input.compareWithApple != false, let audioTranscriber {
+          do {
+            let appleIdentity = ImportTranscriptCacheIdentity(sourceChecksum: checksum, engine: "Apple SpeechAnalyzer",
+              model: "SpeechTranscriber", locale: locale,
+              runtime: ProcessInfo.processInfo.operatingSystemVersionString, formatVersion: 1)
+            let appleFile = workspace.appendingPathComponent("apple-output.json")
+            if let cached = ImportTranscriptCache.load(AudioTranscription.self, from: appleFile, identity: appleIdentity), !cached.words.isEmpty {
+              apple = cached
+            } else {
+              try await audioTranscriber.prepareForComparison(localeIdentifier: locale)
+              let recognized = try await audioTranscriber.transcribe(audioURL: audio, localeIdentifier: locale,
+                onProgress: { tracker.set(0.8 + min(1, max(0, $0)) * 0.2, for: progressJobID) })
+              try Task.checkCancellation()
+              guard !recognized.words.isEmpty else { throw TranscriptPreparationError.emptyApple }
+              apple = recognized
+              try ImportTranscriptCache.save(recognized, to: appleFile, identity: appleIdentity)
+            }
+          } catch {
+            if Task.isCancelled || error is CancellationError { throw CancellationError() }
+            appleFailure = error.localizedDescription
+            logger.warning("Optional Apple comparison unavailable; retain primary ASR and mark review: \(error.localizedDescription, privacy: .public)")
+          }
+        }
+        try Task.checkCancellation()
+        try await checkpoint(job, .checkingTiming, detail: nil)
+        let evidence = CombinedTranscriptArchive(version: 2, captionSource: downloaded?.source,
+          captions: captions, whisperModel: primary.source == .whisper ? provenance.model : nil,
+          whisperWords: primary.source == .whisper ? primary.words : [], apple: apple,
+          primary: primary, appleFailure: appleFailure)
+        try JSONEncoder().encode(evidence).write(to: speechCaption, options: .atomic)
+        preparedSegments = try CombinedTranscriptPreparation.prepare(
+          primary: primary, apple: apple, captions: captions,
+          captionSource: downloaded?.source, sampleRate: resolvedProbe.sampleRate,
+          frameCount: resolvedProbe.frameCount)
+        stagedCaption = speechCaption
+        let captionAssetID = UUID()
+        captionAsset = MediaAsset(id: captionAssetID, lessonID: job.lessonID, role: .caption,
+          relativePath: "Media/Captions/\(captionAssetID.uuidString).json",
+          checksum: try sha256(speechCaption), format: "json", sampleRate: nil,
+          frameCount: nil, createdAt: Date())
+      } else if let audioTranscriber {
+        try await checkpoint(job, .preparingSpeechModel, detail: nil)
+        try await audioTranscriber.prepare(localeIdentifier: input.localeIdentifier ?? "en-GB")
+        try Task.checkCancellation()
+        try await checkpoint(job, .preparingTranscript, detail: nil)
+        let tracker = transcriptionProgressTracker
+        let progressJobID = job.id
+        tracker.set(0, for: progressJobID)
+        defer { tracker.clear(progressJobID) }
+        let transcript = try await audioTranscriber.transcribe(
+          audioURL: audio, localeIdentifier: input.localeIdentifier ?? "en-GB",
+          onProgress: { tracker.set($0, for: progressJobID) })
+        try Task.checkCancellation()
+        try await checkpoint(job, .checkingTiming, detail: nil)
+        preparedSegments = try AudioFirstPreparation.prepareSegments(
+          transcript: transcript, sampleRate: resolvedProbe.sampleRate,
+          frameCount: resolvedProbe.frameCount)
+      } else if let transcriber {
+        try await checkpoint(job, .preparingTranscript, detail: nil)
+        guard
+          let variant = WhisperModelSelection.active(
+            from: try await database.engineReleases(engineKey: WhisperModelCatalog.engineKey), selected: input.whisperModel)
+        else { throw ProductionImportError.modelNotInstalled }
+        let tracker = transcriptionProgressTracker
+        let progressJobID = job.id
+        tracker.set(0, for: progressJobID)
+        defer { tracker.clear(progressJobID) }
+        preparedSegments = try await AudioFirstPreparation.prepareSegments(
+          audioURL: audio, captionText: nil, variant: variant,
+          sampleRate: resolvedProbe.sampleRate, frameCount: resolvedProbe.frameCount,
+          transcribe: { url, model in
+            try await transcriber.transcribe(
+              audioURL: url, variant: model,
+              onProgress: { tracker.set($0, for: progressJobID) })
+          })
+      } else {
       if input.kind == .youtube {
         try await checkpoint(job, .fetchingCaptions, detail: nil)
         if let downloadedCaption = try await captionFile(
@@ -419,6 +651,7 @@ actor ProductionImportService {
           checksum: try sha256(speechCaption), format: "json", sampleRate: nil,
           frameCount: nil, createdAt: Date())
       }
+      }
 
       try await checkpoint(job, .publishing, detail: nil)
       let sourceAssetID = UUID()
@@ -473,7 +706,7 @@ actor ProductionImportService {
     } catch SubprocessError.cancelled {
       await recordTerminal(job, phase: .cancelled, failure: ProductionImportError.cancelled)
     } catch {
-      await recordTerminal(job, phase: .failed, failure: error)
+      await recordTerminal(job, phase: Task.isCancelled || error is CancellationError ? .cancelled : .failed, failure: error)
     }
     if tasks[job.id]?.runToken == job.runToken { tasks[job.id] = nil }
   }
@@ -489,6 +722,7 @@ actor ProductionImportService {
   private func publish(
     manifest: CommitManifest, job: ProductionImportJob, checkpointJSON: String
   ) async throws {
+    try Task.checkCancellation()
     if let segments = manifest.segments, !segments.isEmpty {
       try await database.publishPreparedLesson(
         lessonID: job.lessonID, expectedGeneration: job.expectedGeneration, jobID: job.id,
@@ -513,18 +747,24 @@ actor ProductionImportService {
   private func captionFile(
     in workspace: URL, input: StoredInput, tools: BundledImportToolchain.Tools
   ) async throws -> DownloadedCaption? {
+    guard input.kind == .youtube else { return nil }
     if let authorCaption = vttFile(in: workspace) {
       return DownloadedCaption(url: authorCaption, source: .creatorCaption)
     }
-    guard input.kind == .youtube else { return nil }
+    // Keep automatic captions separate so a retry cannot relabel them as creator captions.
+    let automaticFolder = workspace.appendingPathComponent("automatic-captions", isDirectory: true)
+    try FileManager.default.createDirectory(at: automaticFolder, withIntermediateDirectories: true)
+    if let cached = vttFile(in: automaticFolder) {
+      return DownloadedCaption(url: cached, source: .automaticCaption)
+    }
     _ = try await runner.run(
       executable: tools.ytDLP,
       arguments: [
         "--no-config", "--no-update", "--no-playlist", "--js-runtimes", "quickjs:\(tools.qjs.path)",
         "--skip-download", "--write-auto-subs", "--sub-langs", "en.*", "--sub-format", "vtt",
-        "-o", "\(workspace.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
+        "-o", "\(automaticFolder.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
       ], currentDirectory: workspace)
-    guard let automaticCaption = vttFile(in: workspace) else { return nil }
+    guard let automaticCaption = vttFile(in: automaticFolder) else { return nil }
     return DownloadedCaption(url: automaticCaption, source: .automaticCaption)
   }
 
@@ -539,6 +779,7 @@ actor ProductionImportService {
   private func recordTerminal(
     _ job: ProductionImportJob, phase: ProductionImportPhase, failure: any Error
   ) async {
+    guard tasks[job.id]?.runToken == job.runToken else { return }
     let displayed: ProductionImportError
     if phase == .cancelled {
       displayed = .cancelled
@@ -570,6 +811,7 @@ actor ProductionImportService {
   private func checkpoint(
     _ job: ProductionImportJob, _ phase: ProductionImportPhase, detail: String?
   ) async throws {
+    if !phase.isTerminal { try Task.checkCancellation() }
     let checkpoint = ImportCheckpoint(
       phase: phase, workspaceRelativePath: "Cache/ImportJobs/\(job.id.uuidString)",
       manifestRelativePath: nil, detail: detail, updatedAt: Date())
@@ -653,6 +895,11 @@ private struct StoredInput: Codable, Sendable {
   let title: String
   var lessonID: UUID?
   let securityScoped: Bool?
+  var localeIdentifier: String?
+  var whisperModel: String?
+  var transcriptionSelection: TranscriptionSelection?
+  var compareWithApple: Bool?
+  var previousTranscriptionSelections: [TranscriptionSelection]?
 }
 private struct YouTubeMetadata: Decodable {
   let title: String

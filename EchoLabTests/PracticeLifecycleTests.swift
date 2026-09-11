@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+@preconcurrency import Speech
 
 @testable import EchoLab
 
@@ -7,6 +8,240 @@ import Testing
 struct PracticeLifecycleTests {
   private func store() -> EchoStore {
     EchoStore(snapshot: PreviewFixtures.snapshot(), repository: .memory)
+  }
+
+  @Test(arguments: [false, true])
+  func productionRepeatOnePlaysNextSentenceAndStopsAtTheEnd(repeating: Bool) async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("Sequence-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let playback = SequencePlaybackSpy()
+    let model = try await sequenceModel(root: root, playback: playback)
+    let first = try #require(model.targets.first)
+    let last = try #require(model.targets.last)
+    if repeating { model.listenLoop() } else { model.listen() }
+    #expect(playback.targets.map(\.segmentRevisionID) == [first.segmentRevisionID])
+    let staleCompletion = try #require(playback.completions.first)
+    staleCompletion()
+    #expect(model.selectedTarget?.segmentRevisionID == last.segmentRevisionID)
+    #expect(model.controller.phase == .listening)
+    #expect(model.controller.round == 1)
+    #expect(model.controller.isRepeating == repeating)
+    #expect(playback.targets.map(\.segmentRevisionID) == [first.segmentRevisionID, last.segmentRevisionID])
+    #expect(playback.speeds == [0.75, 0.75])
+    staleCompletion() // A late completion from the previous sentence must be ignored.
+    #expect(playback.targets.count == 2)
+    #expect(model.controller.phase == .listening)
+    playback.completions[1]()
+    #expect(model.selectedTarget?.segmentRevisionID == last.segmentRevisionID)
+    #expect(model.controller.phase == .paused)
+    #expect(model.controller.hasListened)
+    #expect(playback.targets.count == 2)
+  }
+
+  @Test func productionPauseFailureAndMultipleRepeatsDoNotAutoAdvance() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("Sequence-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let playback = SequencePlaybackSpy()
+    let model = try await sequenceModel(root: root, playback: playback)
+    let first = try #require(model.selectedTarget)
+    model.listen()
+    model.pause()
+    playback.completions[0]()
+    #expect(model.controller.phase == .paused)
+    #expect(model.selectedTarget == first)
+    #expect(playback.targets.count == 1)
+
+    model.select(first)
+    playback.failure = .sourceUnavailable
+    model.listen()
+    #expect(model.controller.error == .sourceUnavailable)
+    #expect(model.selectedTarget == first)
+    #expect(playback.targets.count == 1)
+    playback.failure = nil
+
+    var preferences = Preferences()
+    preferences.repeats = 2
+    preferences.autoRecord = false
+    model.applyPreferences(preferences)
+    model.select(first)
+    model.listenLoop()
+    playback.completions[1]()
+    #expect(model.controller.round == 2)
+    #expect(model.selectedTarget == first)
+    playback.completions[2]()
+    #expect(model.controller.phase == .paused)
+    #expect(model.selectedTarget == first)
+    #expect(playback.targets.allSatisfy { $0.segmentRevisionID == first.segmentRevisionID })
+  }
+
+  @Test func repeatOneKeepsAutomaticRecordingOnTheCurrentSentence() {
+    let store = store()
+    store.preferences.repeats = 1
+    store.preferences.autoRecord = true
+    store.practice.permission = "granted"
+    let selected = store.selectedSentenceID
+    store.practice.playSentence(repeating: true)
+    store.practice.sourceFinished()
+    #expect(store.selectedSentenceID == selected)
+    #expect(store.practice.phase == .countdown)
+    _ = store.practice.interrupt()
+  }
+
+  @Test func previewRepeatOneFollowsTheSameSentenceSequence() throws {
+    let store = store()
+    store.preferences.repeats = 1
+    store.preferences.autoRecord = false
+    let sentences = try #require(store.selectedLesson?.sentences)
+    store.selectSentence(sentences[0].id)
+    store.practice.playSentence()
+    store.practice.sourceFinished()
+    #expect(store.selectedSentenceID == sentences[1].id)
+    #expect(store.practice.phase == .listening)
+    _ = store.practice.interrupt()
+  }
+
+  @Test(arguments: [SFSpeechRecognizerAuthorizationStatus.authorized, .denied, .restricted])
+  func speechPermissionCallbackCanArriveOffMainActor(status: SFSpeechRecognizerAuthorizationStatus) async throws {
+    let result = try await AppleSpeechCaptionTranscriber.authorizationStatus(current: .notDetermined) { callback in
+      DispatchQueue.global().async {
+        #expect(!Thread.isMainThread)
+        callback(status)
+      }
+    }
+    #expect(result == status)
+    let existing = try await AppleSpeechCaptionTranscriber.authorizationStatus(current: status) { _ in
+      Issue.record("Known permission must not request consent again")
+    }
+    #expect(existing == status)
+  }
+
+  @Test func speechCallbackCompletesOnceWhenFrameworkReportsLateErrors() async throws {
+    var cleanupCount = 0
+    let result = try await SpeechCallbackOperation<Int>().value { completion in
+      DispatchQueue.global().async {
+        completion(.success(42))
+        completion(.failure(AppleSpeechCaptionError.noTranscription))
+        completion(.success(99))
+      }
+      return { cleanupCount += 1 }
+    }
+    #expect(result == 42)
+    await Task.yield()
+    #expect(cleanupCount == 1)
+  }
+
+  @Test func speechRecognitionTimeoutAndCancellationReleaseTask() async throws {
+    var cleanupCount = 0
+    await #expect(throws: AppleSpeechCaptionError.timedOut) {
+      try await SpeechCallbackOperation<Int>().value(timeout: .milliseconds(10)) { _ in
+        return { cleanupCount += 1 }
+      }
+    }
+    #expect(cleanupCount == 1)
+    var callback: (@Sendable (Result<Int, any Error>) -> Void)?
+    let task = Task { @MainActor in
+      try await SpeechCallbackOperation<Int>().value { completion in
+        callback = completion
+        return { cleanupCount += 1 }
+      }
+    }
+    while callback == nil { await Task.yield() }
+    task.cancel()
+    await #expect(throws: CancellationError.self) { try await task.value }
+    callback?(.success(42))
+    await Task.yield()
+    #expect(cleanupCount == 2)
+  }
+
+  @Test func openingLessonAndDismissingPreflightDoNotInvokeSpeech() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("SpeechConsent-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    var calls = 0
+    let model = try await sequenceModel(root: root, playback: SequencePlaybackSpy()) { _ in
+      calls += 1
+      throw AppleSpeechCaptionError.permissionDenied
+    }
+    let targets = model.targets
+    #expect(calls == 0)
+    #expect(model.canPrepareWordTiming)
+    #expect(!model.showingSpeechPreparation)
+    model.presentSpeechPreparation()
+    #expect(model.showingSpeechPreparation)
+    #expect(calls == 0)
+    model.dismissSpeechPreparation()
+    #expect(calls == 0)
+    model.startWordTimingPreparation() // Cannot bypass a dismissed preflight.
+    #expect(calls == 0)
+    model.presentSpeechPreparation()
+    model.startWordTimingPreparation()
+    while model.isPreparingWordTiming { await Task.yield() }
+    #expect(calls == 1)
+    #expect(model.speechPreparationError != nil)
+    #expect(model.showingSpeechPreparation)
+    #expect(model.targets == targets)
+    #expect(model.selectedTarget != nil)
+    model.dismissSpeechPreparation()
+    #expect(!model.showingSpeechPreparation)
+    #expect(model.speechPreparationError == nil)
+  }
+
+  @Test func explicitSpeechPreparationPublishesTimingAndRefreshesLesson() async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("SpeechTiming-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let model = try await sequenceModel(root: root, playback: SequencePlaybackSpy()) { _ in
+      [CaptionCue(start: 0, end: 1, text: "First.", words: [CaptionWord(text: "First", start: 0, end: 1)]),
+       CaptionCue(start: 2, end: 3, text: "Last.", words: [CaptionWord(text: "Last", start: 2, end: 3)])]
+    }
+    let oldRevisions = model.targets.map(\.segmentRevisionID)
+    model.presentSpeechPreparation()
+    model.startWordTimingPreparation()
+    while model.isPreparingWordTiming { await Task.yield() }
+    #expect(model.speechPreparationError == nil)
+    #expect(!model.showingSpeechPreparation)
+    #expect(model.targets.map(\.segmentRevisionID) != oldRevisions)
+    #expect(!model.canPrepareWordTiming)
+  }
+
+  private func sequenceModel(
+    root: URL, playback: SequencePlaybackSpy,
+    transcribe: (@MainActor (URL) async throws -> [CaptionCue])? = nil
+  ) async throws -> ProductionShadowingModel {
+    let paths = BackendPaths(root: root)
+    let database = try ProductionDatabase(url: paths.database)
+    let lesson = try await database.insertLesson(
+      NewLesson(provider: "local", externalID: UUID().uuidString, title: "Sequence"))
+    let jobID = UUID(), runToken = UUID()
+    try await database.persistImportJob(
+      id: jobID, lessonID: lesson.id, expectedGeneration: lesson.generation, runToken: runToken,
+      inputJSON: "{}", checkpointJSON: "{}")
+    let segments = try CaptionTranscriptBuilder.build(
+      cues: [CaptionCue(start: 0, end: 1, text: "First."), CaptionCue(start: 2, end: 3, text: "Last.")],
+      source: .whisper, sampleRate: 16_000, frameCount: 64_000)
+    let asset = MediaAsset(
+      id: UUID(), lessonID: lesson.id, role: .sourceAudio,
+      relativePath: "Media/SourceAudio/sequence.caf", checksum: "fixture", format: "caf",
+      sampleRate: 16_000, frameCount: 64_000, createdAt: Date())
+    try await database.publishPreparedLesson(
+      lessonID: lesson.id, expectedGeneration: lesson.generation, jobID: jobID, runToken: runToken,
+      title: lesson.title, author: nil, assets: [asset], segments: segments, checkpointJSON: "{}")
+    let service = ProductionPracticeService(database: database, paths: paths)
+    let controller = ProductionPracticeController(service: service, playSource: playback.play)
+    let model = ProductionShadowingModel(
+      service: service, controller: controller,
+      wordTimingPreparer: transcribe.map { AppleSpeechWordTimingPreparer(service: service, transcribe: $0) })
+    var preferences = Preferences()
+    preferences.repeats = 1
+    preferences.autoRecord = false
+    preferences.speed = 0.75
+    let summary = try #require(try await database.librarySummaries(paths: paths).first)
+    model.open(summary, preferences: preferences)
+    for _ in 0..<100 {
+      if model.selectedTarget != nil { break }
+      try await Task.sleep(for: .milliseconds(10))
+    }
+    #expect(model.targets.count == 2)
+    _ = try #require(model.selectedTarget)
+    return model
   }
 
   @Test func manualRecordingAlwaysListensFirst() {
@@ -151,5 +386,20 @@ struct PracticeLifecycleTests {
     #expect(requested.engine == .phone)
     store.cancelAssessments()
     #expect(store.takes.first?.assessments.last?.status == .cancelled)
+  }
+}
+
+@MainActor private final class SequencePlaybackSpy {
+  var targets: [ProductionPracticeTarget] = []
+  var speeds: [Double] = []
+  var completions: [@MainActor @Sendable () -> Void] = []
+  var failure: ProductionPracticeError?
+
+  func play(_ target: ProductionPracticeTarget, _ speed: Double,
+    _ completion: @escaping @MainActor @Sendable () -> Void) throws {
+    if let failure { throw failure }
+    targets.append(target)
+    speeds.append(speed)
+    completions.append(completion)
   }
 }

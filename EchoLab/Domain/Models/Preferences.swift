@@ -11,6 +11,19 @@ struct Preferences: Codable, Equatable, Sendable {
   var silence = 2.0
   var maxDuration = 30.0
   var activeEngine: EngineID? = .phone
+  // Optional backing fields preserve snapshots created before engine selection.
+  private var transcriptionEngineID: String?
+  var transcriptionEngine: String {
+    get { transcriptionEngineID ?? "parakeet" }
+    set { transcriptionEngineID = newValue }
+  }
+  private var appleTranscriptComparison: Bool?
+  var compareTranscriptWithApple: Bool {
+    get { appleTranscriptComparison ?? true }
+    set { appleTranscriptComparison = newValue }
+  }
+  /// Preserve the selected Whisper variant when switching to another engine.
+  var activeTranscriptionModel: String?
   var video = false
   var learningGoal: LearningGoal?
   var selfAssessedLevel: SelfAssessedLevel?

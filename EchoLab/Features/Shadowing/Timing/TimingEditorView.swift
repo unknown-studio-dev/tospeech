@@ -221,7 +221,7 @@ struct TimingEditorView: View {
       }
       EchoSegmented(selection: $handle, options: TimingHandle.allCases.map {
         ($0, $0 == .move ? "Move whole sentence" : $0.rawValue)
-      }).accessibilityLabel("Timing adjustment handle")
+      }).echoAccessibilityLabel("Timing adjustment handle")
       HStack(spacing: 12) {
         EchoButton("−100 ms") { nudge(-0.1, span: span, bounds: bounds, update: update) }
         EchoButton("+100 ms") { nudge(0.1, span: span, bounds: bounds, update: update) }

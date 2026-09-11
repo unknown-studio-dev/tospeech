@@ -7,6 +7,9 @@ enum TranscriptSource: String, Codable, Sendable {
   case creatorCaption
   case automaticCaption
   case appleSpeech
+  case whisper
+  case parakeet
+  case appleSpeechAnalyzer
 }
 
 struct CaptionCue: Codable, Equatable, Sendable {
@@ -34,6 +37,8 @@ struct CaptionWord: Codable, Equatable, Sendable {
   let text: String
   let start: TimeInterval
   let end: TimeInterval
+  /// Nil preserves the cue-level review behavior of existing preparation paths.
+  var needsReview: Bool? = nil
 }
 
 struct TranscriptWordToken: Codable, Equatable, Sendable {
@@ -96,6 +101,7 @@ struct SegmentTimingRevisionDraft: Codable, Equatable, Sendable {
   /// True only after the editor has reviewed the updated timing. It is never
   /// inferred from a UI opening or a background job.
   let resolvesTimingReview: Bool
+  var timingTranscription: TranscriptionProvenance? = nil
 }
 
 struct StoredTimingRevision: Codable, Equatable, Sendable {
@@ -226,26 +232,28 @@ enum WebVTTCaptionParser {
 
 enum CaptionTranscriptBuilder {
   static func build(
-    cues: [CaptionCue], source: TranscriptSource, sampleRate: Int, frameCount: Int
+    cues: [CaptionCue], source: TranscriptSource, sampleRate: Int, frameCount: Int,
+    provenance: TranscriptionProvenance? = nil, ordinalOffset: Int = 0
   ) throws -> [PreparedLessonSegment] {
     guard sampleRate > 0, frameCount > 0 else { throw CaptionTranscriptError.invalidAudioTimeline }
     var segments: [PreparedLessonSegment] = []
     for cue in cues {
+      guard cue.start.isFinite, cue.end.isFinite, cue.end > cue.start, cue.start < Double(frameCount) / Double(sampleRate) else { continue }
       let start = max(0, min(frameCount - 1, Int((cue.start * Double(sampleRate)).rounded())))
       let end = max(start + 1, min(frameCount, Int((cue.end * Double(sampleRate)).rounded())))
       guard end > start else { continue }
       let normalized = cue.text.trimmingCharacters(in: .whitespacesAndNewlines)
       guard !normalized.isEmpty else { continue }
-      let ordinal = segments.count
+      let ordinal = ordinalOffset + segments.count
       let words = tokens(for: cue, ordinal: ordinal, sampleRate: sampleRate, frameCount: frameCount)
-      let hasTrustedWordTiming = words.allSatisfy {
+      let hasTrustedWordTiming = words.filter { IPAFormatting.isPronounceable($0.text) }.allSatisfy {
         $0.startFrame != nil && $0.endFrame != nil && !$0.needsTimingReview
       }
       let baseline = CaptionBaseline(
         source: source, cueStartFrame: start, cueEndFrame: end,
         sentenceTimingNeedsReview: cue.timingReviewReason != nil,
-        wordTimingNeedsReview: !hasTrustedWordTiming,
-        timingReviewReason: cue.timingReviewReason, originalTokens: words)
+        wordTimingNeedsReview: !hasTrustedWordTiming || cue.timingReviewReason != nil,
+        timingReviewReason: cue.timingReviewReason, originalTokens: words, transcription: provenance)
       let contentKey = hash(normalized.lowercased())
       segments.append(
         PreparedLessonSegment(
@@ -277,13 +285,20 @@ enum CaptionTranscriptBuilder {
       }
     }
     return cueWords.enumerated().map { index, word in
+      guard word.start.isFinite, word.end.isFinite, word.start >= 0,
+        word.end > word.start, word.start >= cue.start, word.end <= cue.end,
+        word.end <= Double(frameCount) / Double(sampleRate) else {
+        return TranscriptWordToken(
+          id: "speech-\(ordinal)-word-\(index)", text: word.text,
+          startFrame: nil, endFrame: nil, needsTimingReview: IPAFormatting.isPronounceable(word.text))
+      }
       let start = max(0, min(frameCount - 1, Int((word.start * Double(sampleRate)).rounded())))
       let end = max(start + 1, min(frameCount, Int((word.end * Double(sampleRate)).rounded())))
       let valid = word.end > word.start && start >= 0 && end > start && end <= frameCount
       return TranscriptWordToken(
         id: "speech-\(ordinal)-word-\(index)", text: word.text,
         startFrame: valid ? start : nil, endFrame: valid ? end : nil,
-        needsTimingReview: !valid)
+        needsTimingReview: !valid || ((word.needsReview ?? (cue.timingReviewReason != nil)) && IPAFormatting.isPronounceable(word.text)))
     }
   }
 }
@@ -439,11 +454,15 @@ struct CaptionBaseline: Codable, Equatable, Sendable {
   let wordTimingNeedsReview: Bool
   let timingReviewReason: String?
   let originalTokens: [TranscriptWordToken]?
+  let transcription: TranscriptionProvenance?
+  let timingTranscription: TranscriptionProvenance?
+  var reconciliation: CombinedTranscriptEvidence? = nil
 
   init(
     source: TranscriptSource, cueStartFrame: Int, cueEndFrame: Int,
     sentenceTimingNeedsReview: Bool, wordTimingNeedsReview: Bool,
-    timingReviewReason: String?, originalTokens: [TranscriptWordToken]? = nil
+    timingReviewReason: String?, originalTokens: [TranscriptWordToken]? = nil,
+    transcription: TranscriptionProvenance? = nil, timingTranscription: TranscriptionProvenance? = nil
   ) {
     self.source = source
     self.cueStartFrame = cueStartFrame
@@ -452,17 +471,22 @@ struct CaptionBaseline: Codable, Equatable, Sendable {
     self.wordTimingNeedsReview = wordTimingNeedsReview
     self.timingReviewReason = timingReviewReason
     self.originalTokens = originalTokens
+    self.transcription = transcription
+    self.timingTranscription = timingTranscription
   }
 
   func applying(
     startFrame: Int, endFrame: Int, wordTimingNeedsReview: Bool,
-    resolvesTimingReview: Bool
+    resolvesTimingReview: Bool, timingTranscription: TranscriptionProvenance? = nil
   ) -> CaptionBaseline {
-    CaptionBaseline(
+    var result = CaptionBaseline(
       source: source, cueStartFrame: cueStartFrame, cueEndFrame: cueEndFrame,
       sentenceTimingNeedsReview: resolvesTimingReview ? false : sentenceTimingNeedsReview,
       wordTimingNeedsReview: wordTimingNeedsReview,
       timingReviewReason: resolvesTimingReview ? nil : timingReviewReason,
-      originalTokens: originalTokens)
+      originalTokens: originalTokens, transcription: transcription,
+      timingTranscription: timingTranscription ?? self.timingTranscription)
+    result.reconciliation = reconciliation
+    return result
   }
 }

@@ -56,7 +56,9 @@ struct EchoNotice: View {
 
   var body: some View {
     Label {
-      if let copy { EchoLocalizedText(copy) } else { EchoLocalizedText(text) }
+      Group {
+        if let copy { EchoLocalizedText(copy) } else { EchoLocalizedText(text) }
+      }.fixedSize(horizontal: false, vertical: true)
     } icon: {
       Image(systemName: error ? "exclamationmark.triangle" : "info.circle")
     }

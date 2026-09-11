@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 
 @MainActor @Observable final class ProductionLibraryModel {
   private let service: ProductionImportService
@@ -11,18 +12,21 @@ import Observation
   private(set) var failedDeletionID: UUID?
   var importPresentation: ProductionImportPresentationContext?
   private var watchedImportJobID: UUID?
+  private var watchedImportJob: ProductionImportJob?
   private var isImportPresentationDismissed = false
+  private var transcriptionSubProgress: Double?
 
   init(service: ProductionImportService) { self.service = service }
 
-  func load() async {
-    isLoading = true
-    defer { isLoading = false }
+  func load(showLoadingIndicator: Bool = true) async {
+    if showLoadingIndicator { isLoading = true }
+    defer { if showLoadingIndicator { isLoading = false } }
     do {
       async let loadedLessons = service.librarySummaries()
       async let loadedJobs = service.importJobs()
       lessons = try await loadedLessons
       jobs = try await loadedJobs
+      updateTranscriptionSubProgress()
       refreshImportPresentation()
       error = nil
     } catch let failure {
@@ -45,17 +49,19 @@ import Observation
   }
 
   @discardableResult
-  func submit(_ request: ProductionImportRequest) async -> ProductionImportJob? {
+  func submit(_ request: ProductionImportRequest, localeIdentifier: String = "en-GB", whisperModel: String? = nil, transcriptionEngine: String = "whisper", transcriptionModelID: String? = nil, compareWithApple: Bool = true) async -> ProductionImportJob? {
     do {
-      let job = try await service.submit(request)
+      let job = try await service.submit(request, localeIdentifier: localeIdentifier, whisperModel: whisperModel, transcriptionEngine: transcriptionEngine, transcriptionModelID: transcriptionModelID, compareWithApple: compareWithApple)
       jobs.removeAll { $0.id == job.id }
       jobs.insert(job, at: 0)
       error = nil
-      showImportStatus(for: job)
       startMonitoring()
       return job
     } catch let failure {
-      self.error = EchoCopy("storage.detail", arguments: [.raw(failure.localizedDescription)])
+      Logger(subsystem: "com.unknownstudio.EchoLab", category: "ProductionImport")
+        .error("Import submission failed: \(failure.localizedDescription)")
+      self.error = EchoCopy(
+        (failure as? ProductionImportError)?.presentationDescription ?? "import.submit.failed")
       return nil
     }
   }
@@ -70,9 +76,9 @@ import Observation
     startMonitoring()
   }
 
-  func retry(_ job: ProductionImportJob) async {
+  func retry(_ job: ProductionImportJob, selection: TranscriptionSelection? = nil, compareWithApple: Bool? = nil) async {
     do {
-      try await service.retry(jobID: job.id)
+      try await service.retry(jobID: job.id, replacementSelection: selection, compareWithApple: compareWithApple)
       await load()
       if let restarted = jobs.first(where: { $0.id == job.id }) {
         showImportStatus(for: restarted)
@@ -83,6 +89,18 @@ import Observation
     }
   }
 
+  func retryUsingSettings(_ job: ProductionImportJob, preferences: Preferences) async {
+    do {
+      try await service.retryUsingSettings(jobID: job.id, engine: preferences.transcriptionEngine,
+        whisperModel: preferences.activeTranscriptionModel, compareWithApple: preferences.compareTranscriptWithApple)
+      await load()
+      if let restarted = jobs.first(where: { $0.id == job.id }) { showImportStatus(for: restarted) }
+      startMonitoring()
+    } catch {
+      self.error = EchoCopy((error as? ProductionImportError)?.presentationDescription ?? "import.submit.failed")
+    }
+  }
+
   private func startMonitoring() {
     monitorTask?.cancel()
     guard jobs.contains(where: { !$0.phase.isTerminal }) else { return }
@@ -90,7 +108,7 @@ import Observation
       while !Task.isCancelled {
         try? await Task.sleep(for: .milliseconds(400))
         guard let self else { return }
-        await self.load()
+        await self.load(showLoadingIndicator: false)
         if !self.jobs.contains(where: { !$0.phase.isTerminal }) { return }
       }
     }
@@ -131,6 +149,7 @@ import Observation
 
   func showImportStatus(for job: ProductionImportJob) {
     watchedImportJobID = job.id
+    watchedImportJob = job
     isImportPresentationDismissed = false
     refreshImportPresentation()
   }
@@ -139,20 +158,51 @@ import Observation
     guard jobID == nil || jobID == watchedImportJobID else { return }
     isImportPresentationDismissed = true
     importPresentation = nil
+    watchedImportJob = nil
+  }
+
+  private func updateTranscriptionSubProgress() {
+    guard let watchedImportJobID,
+      let job = jobs.first(where: { $0.id == watchedImportJobID }),
+      job.phase == .preparingTranscript
+    else {
+      transcriptionSubProgress = nil
+      return
+    }
+    transcriptionSubProgress = service.transcriptionProgress(jobID: watchedImportJobID)
   }
 
   private func refreshImportPresentation() {
     guard !isImportPresentationDismissed,
-      let watchedImportJobID,
-      let job = jobs.first(where: { $0.id == watchedImportJobID })
+      let watchedImportJobID
     else {
       importPresentation = nil
       return
     }
+    let currentJob = jobs.first(where: { $0.id == watchedImportJobID })
+    if let currentJob { watchedImportJob = currentJob }
+    let lesson = lessons.first(where: { $0.id == (currentJob ?? watchedImportJob)?.lessonID })
+    let job: ProductionImportJob?
+    if let currentJob {
+      job = currentJob
+    } else if let snapshot = watchedImportJob, lesson?.isPracticeReady == true {
+      job = ProductionImportJob(
+        id: snapshot.id, lessonID: snapshot.lessonID, title: snapshot.title, phase: .ready,
+        runToken: snapshot.runToken, expectedGeneration: snapshot.expectedGeneration,
+        error: nil, createdAt: snapshot.createdAt, updatedAt: Date())
+    } else {
+      job = nil
+    }
+    guard let job else {
+      importPresentation = nil
+      return
+    }
     let presentation: ImportPreparationPresentation?
-    if let progress = ProductionImportPresentationMapper.progress(for: job) {
+    if let progress = ProductionImportPresentationMapper.progress(
+      for: job, subProgress: transcriptionSubProgress)
+    {
       presentation = .progress(progress)
-    } else if let lesson = lessons.first(where: { $0.id == job.lessonID }), lesson.isPracticeReady,
+    } else if let lesson, lesson.isPracticeReady,
       let ready = ProductionImportPresentationMapper.ready(
         for: job, lesson: lesson)
     {

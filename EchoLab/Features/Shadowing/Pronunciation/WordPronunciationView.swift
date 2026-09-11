@@ -54,12 +54,13 @@ struct WordPronunciationView: View {
                 )
                 .frame(width: 100)
               }
-              Text(
+              EchoLocalizedText(
                 word.span == nil
-                  ? "Chưa có timing chính xác · nghe cả ngữ cảnh." : "Vòng lặp đã tạm dừng."
+                  ? "Chưa có timing chính xác · nghe cả ngữ cảnh."
+                  : word.needsTimingReview ? "timing.observed.review" : "Vòng lặp đã tạm dừng."
               )
               .font(EchoFont.metadata).foregroundStyle(
-                word.span == nil ? EchoTheme.caution : EchoTheme.secondaryText)
+                word.span == nil || word.needsTimingReview ? EchoTheme.caution : EchoTheme.secondaryText)
               Text(sentence.text).font(EchoFont.body(size: 13)).foregroundStyle(
                 EchoTheme.secondaryText)
               if !sentence.translation.isEmpty {
@@ -68,33 +69,35 @@ struct WordPronunciationView: View {
               }
             }.padding(16).frame(maxWidth: .infinity, alignment: .leading)
               .background(EchoTheme.surface, in: RoundedRectangle(cornerRadius: 10))
-            VStack(alignment: .leading, spacing: 12) {
-              HStack {
-                Text("Phát âm tham khảo").font(EchoFont.body(size: 14, weight: .semibold))
-                Spacer()
-                ForEach(ReferenceAccent.allCases, id: \.self) { value in
-                  EchoButton(value.rawValue, kind: accent == value ? .primary : .secondary) {
-                    accent = value
-                  }
-                  .accessibilityAddTraits(accent == value ? .isSelected : [])
-                }
-              }
-              HStack {
-                Group {
-                  if let ipa = word.ipa(for: accent) { Text(verbatim: ipa) }
-                  else { EchoLocalizedText("Chưa có IPA") }
-                }.font(EchoFont.body(size: 28)).textSelection(.enabled)
-                Spacer()
-                EchoButton("Nghe tham khảo", symbol: "speaker.wave.2", size: .regular) {
-                  if let onPreviewReference { onPreviewReference(word, accent) }
-                  else if usesPreviewReferenceAudio {
-                    store.practice.previewReference(word: word, accent: accent)
+            if IPAFormatting.isPronounceable(word.text) {
+              VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                  Text("Phát âm tham khảo").font(EchoFont.body(size: 14, weight: .semibold))
+                  Spacer()
+                  ForEach(ReferenceAccent.allCases, id: \.self) { value in
+                    EchoButton(value.rawValue, kind: accent == value ? .primary : .secondary) {
+                      accent = value
+                    }
+                    .accessibilityAddTraits(accent == value ? .isSelected : [])
                   }
                 }
-                .disabled(!usesPreviewReferenceAudio && onPreviewReference == nil)
+                HStack {
+                  Group {
+                    if let ipa = IPAFormatting.display(word.ipa(for: accent)) { Text(verbatim: ipa) }
+                    else { EchoLocalizedText("Chưa có IPA") }
+                  }.font(EchoFont.body(size: 28)).textSelection(.enabled)
+                  Spacer()
+                  EchoButton("Nghe tham khảo", symbol: "speaker.wave.2", size: .regular) {
+                    if let onPreviewReference { onPreviewReference(word, accent) }
+                    else if usesPreviewReferenceAudio {
+                      store.practice.previewReference(word: word, accent: accent)
+                    }
+                  }
+                  .disabled(!usesPreviewReferenceAudio && onPreviewReference == nil)
+                }
+                Text("UK/US chỉ đổi IPA và giọng tham khảo, không đổi audio gốc.")
+                  .font(EchoFont.metadata).foregroundStyle(EchoTheme.secondaryText)
               }
-              Text("UK/US chỉ đổi IPA và giọng tham khảo, không đổi audio gốc.")
-                .font(EchoFont.metadata).foregroundStyle(EchoTheme.secondaryText)
             }
           } else {
             EchoNotice(text: "Từ không còn trong phiên bản câu này.", error: true)

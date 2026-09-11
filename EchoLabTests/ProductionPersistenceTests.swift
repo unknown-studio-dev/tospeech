@@ -1,6 +1,7 @@
 import AVFAudio
 import CryptoKit
 import Foundation
+import JavaScriptCore
 import SQLite3
 import Testing
 
@@ -132,6 +133,59 @@ struct ProductionPersistenceTests {
     #expect(follower.state == .paused)
     follower.receive(event: "error", code: 150)
     #expect(follower.state == .unavailable)
+    #expect(follower.lastErrorCode == 150)
+    let failedPage = follower.pageID
+    follower.retry()
+    #expect(follower.state == .loading)
+    #expect(follower.pageID != failedPage)
+    #expect(follower.lastErrorCode == nil)
+    #expect(YouTubeVideoFollowerView.applicationOrigin.scheme == "https")
+    #expect(YouTubeVideoFollowerView.applicationOrigin.host == "studio.unknown.echolab")
+  }
+
+  @MainActor @Test func youtubeTransportWaitsForPlayerReadyAndKeepsTheLatestIntent() throws {
+    for pauseBeforeReady in [false, true] {
+      let context = try #require(JSContext())
+      context.evaluateScript("""
+        var calls=[], notices=[], options, fakePlayer, isReady=false;
+        var window={location:{origin:'https://studio.unknown.echolab'},webkit:{messageHandlers:{
+          echoLabYouTube:{postMessage:function(message){notices.push(message.event);}}
+        }}};
+        function record(value) { if(!isReady) throw new Error('Player used before ready'); calls.push(value); }
+        var YT={Player:function(id, config){
+          options=config;
+          fakePlayer={
+            mute:function(){record('mute');}, setVolume:function(v){record('volume:'+v);},
+            seekTo:function(s){record('seek:'+s);}, playVideo:function(){record('play');},
+            pauseVideo:function(){record('pause');}, cueVideoById:function(){record('cue');}
+          };
+          return fakePlayer;
+        }};
+        """)
+      context.evaluateScript(YouTubeVideoFollowerView.playerScript)
+      context.evaluateScript("""
+        window.EchoLabVideo.dispatch({action:'cue',videoID:'Ahc8WG5FXCs',seconds:0});
+        window.EchoLabVideo.dispatch({action:'follow',seconds:4});
+        onYouTubeIframeAPIReady();
+        window.EchoLabVideo.dispatch({action:'follow',seconds:12});
+        """)
+      #expect(context.exception == nil)
+      #expect(context.evaluateScript("calls.length")?.toInt32() == 0)
+      if pauseBeforeReady {
+        context.evaluateScript("window.EchoLabVideo.dispatch({action:'pause'});")
+      }
+      context.evaluateScript("isReady=true;options.events.onReady({target:fakePlayer});")
+      #expect(context.exception == nil)
+      let actions = try #require(context.evaluateScript("calls.join('|')")?.toString())
+      #expect(actions.contains("mute|volume:0"))
+      if pauseBeforeReady {
+        #expect(actions.hasSuffix("pause"))
+        #expect(!actions.contains("play"))
+      } else {
+        #expect(actions.hasSuffix("seek:12|play"))
+        #expect(!actions.contains("seek:4"))
+      }
+    }
   }
 
   @Test func deletionFenceAdvancesGenerationAndRejectsStaleCallbacks() async throws {
@@ -211,6 +265,30 @@ struct ProductionPersistenceTests {
     }
     #expect(try await database.unfinishedImportJobs().first?.status == "running")
   }
+  @Test func retryRevokesAnAttemptThatWasStillRunning() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let db = try ProductionDatabase(url: root.appendingPathComponent("echolab.sqlite3"))
+    let lesson = try await db.insertLesson(NewLesson(provider: "youtube", externalID: "abcdefghijk", title: "Retry race"))
+    let jobID = UUID(), oldToken = UUID()
+    try await db.persistImportJob(id: jobID, lessonID: lesson.id, expectedGeneration: 1, runToken: oldToken,
+      inputJSON: "{\"lessonID\":\"\(lesson.id.uuidString)\"}", checkpointJSON: "{\"phase\":\"cancelled\",\"detail\":\"old error\"}")
+    let newToken = try await db.beginImportRetry(id: jobID, expectedGeneration: 1)
+    #expect(try await db.importAttempts(jobID: jobID).map(\.status) == ["cancelled", "running"])
+    let stored = try #require(try await db.unfinishedImportJobs().first)
+    let checkpoint = try #require(try JSONSerialization.jsonObject(with: Data(stored.checkpointJSON.utf8)) as? [String: Any])
+    #expect(checkpoint["phase"] as? String == "resolving")
+    #expect(checkpoint["detail"] is NSNull)
+    do {
+      try await db.checkpointImportJob(id: jobID, expectedGeneration: 1, runToken: oldToken, status: "cancelled", checkpointJSON: "{}")
+      Issue.record("An old live attempt must not cancel the new attempt")
+    } catch let error as ProductionDatabaseError {
+      #expect(error == .staleLessonGeneration(expected: 1))
+    }
+    #expect(try await db.unfinishedImportJobs().first?.runToken == newToken)
+    #expect(try await db.unfinishedImportJobs().first?.status == "running")
+  }
+
   @Test func deleteFenceRejectsInFlightImportCheckpoint() async throws {
     let root = temporaryRoot()
     defer { try? FileManager.default.removeItem(at: root) }
@@ -268,6 +346,78 @@ struct ProductionPersistenceTests {
     #expect(summary?.title == "Published title")
     #expect(summary?.author == "Teacher")
     #expect(summary?.duration == 3)
+  }
+
+  @MainActor @Test func watchedImportPresentationTransitionsToReadyWithoutLosingSheetIdentity()
+    async throws
+  {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let database = try ProductionDatabase(url: paths.database)
+    let lesson = try await database.insertLesson(
+      NewLesson(
+        provider: "youtube", externalID: "stable12345",
+        sourceURL: URL(string: "https://www.youtube.com/watch?v=stable12345"),
+        title: "Stable progress"))
+    let jobID = UUID()
+    let runToken = UUID()
+    let startedAt = Date()
+    let input = try JSONSerialization.data(withJSONObject: [
+      "kind": "youtube",
+      "provider": "youtube",
+      "externalID": "stable12345",
+      "sourceURL": "https://www.youtube.com/watch?v=stable12345",
+      "title": "Stable progress",
+      "lessonID": lesson.id.uuidString,
+    ])
+    let progressCheckpoint = ImportCheckpoint(
+      phase: .preparingTranscript, workspaceRelativePath: "Cache/ImportJobs/\(jobID.uuidString)",
+      manifestRelativePath: nil, detail: nil, updatedAt: startedAt)
+    try await database.persistImportJob(
+      id: jobID, lessonID: lesson.id, expectedGeneration: lesson.generation,
+      runToken: runToken, inputJSON: String(decoding: input, as: UTF8.self),
+      checkpointJSON: String(
+        decoding: try JSONEncoder().encode(progressCheckpoint), as: UTF8.self))
+
+    let service = ProductionImportService(
+      database: database, paths: paths, usesSpeechFallback: false)
+    let model = ProductionLibraryModel(service: service)
+    await model.load()
+    let job = try #require(model.jobs.first)
+    model.showImportStatus(for: job)
+    let progressContext = try #require(model.importPresentation)
+    guard case .progress = progressContext.presentation else {
+      Issue.record("The watched import did not present progress")
+      return
+    }
+
+    let asset = MediaAsset(
+      id: UUID(), lessonID: lesson.id, role: .sourceAudio,
+      relativePath: "Media/SourceAudio/stable.m4a", checksum: "stable", format: "m4a",
+      sampleRate: 48_000, frameCount: 96_000, createdAt: startedAt)
+    let segments = try CaptionTranscriptBuilder.build(
+      cues: [CaptionCue(start: 0, end: 1, text: "Stable progress")],
+      source: .creatorCaption, sampleRate: 48_000, frameCount: 96_000)
+    let readyCheckpoint = ImportCheckpoint(
+      phase: .ready, workspaceRelativePath: "Cache/ImportJobs/\(jobID.uuidString)",
+      manifestRelativePath: nil, detail: nil, updatedAt: Date())
+    try await database.publishPreparedLesson(
+      lessonID: lesson.id, expectedGeneration: lesson.generation, jobID: jobID,
+      runToken: runToken, title: "Stable progress", author: nil, assets: [asset],
+      segments: segments,
+      checkpointJSON: String(
+        decoding: try JSONEncoder().encode(readyCheckpoint), as: UTF8.self))
+
+    await model.load(showLoadingIndicator: false)
+    let readyContext = try #require(model.importPresentation)
+    #expect(readyContext.id == progressContext.id)
+    #expect(model.jobs.isEmpty)
+    guard case .ready = readyContext.presentation else {
+      Issue.record("The watched import disappeared instead of transitioning to ready")
+      return
+    }
   }
 
   @Test func vttPreparationPersistsFrameTimedImmutableRevisionsWithoutInventingWordTimes()
@@ -478,6 +628,88 @@ struct ProductionPersistenceTests {
     #expect(projectedWord.ipaUK == initialValue.pronunciations.first?.ipa)
   }
 
+  @Test func publishingPreparedLessonPersistsSegmentAnnotations() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let database = try ProductionDatabase(url: paths.database)
+    let lesson = try await database.insertLesson(
+      NewLesson(provider: "youtube", externalID: "annotated", title: "Annotated lesson"))
+    let jobID = UUID()
+    let runToken = UUID()
+    try await database.persistImportJob(
+      id: jobID, lessonID: lesson.id, expectedGeneration: lesson.generation, runToken: runToken,
+      inputJSON: "{}", checkpointJSON: "{}")
+    let segments = try CaptionTranscriptBuilder.build(
+      cues: [CaptionCue(start: 0, end: 1, text: "Hello world")], source: .whisper,
+      sampleRate: 48_000, frameCount: 96_000)
+    let audio = MediaAsset(
+      id: UUID(), lessonID: lesson.id, role: .sourceAudio,
+      relativePath: "Media/SourceAudio/annotated.m4a", checksum: "annotated-audio", format: "m4a",
+      sampleRate: 48_000, frameCount: 96_000, createdAt: Date())
+    let annotation = PreparedLessonAnnotation(
+      segmentID: try #require(segments.first).id, kind: .ipa, lookupKey: "hello:us",
+      source: "ipa-dict", automaticValue: Data("/həˈloʊ/".utf8))
+
+    // Regression: the annotation INSERT previously left created_at unbound,
+    // failing the NOT NULL constraint and aborting the whole import.
+    try await database.publishPreparedLesson(
+      lessonID: lesson.id, expectedGeneration: lesson.generation, jobID: jobID, runToken: runToken,
+      title: "Annotated lesson", author: nil, assets: [audio], segments: segments,
+      annotations: [annotation], checkpointJSON: "{\"phase\":\"ready\"}")
+
+    let sentences = try await database.preparedPracticeSentences(lessonID: lesson.id, paths: paths)
+    let stored = try #require(sentences.first).annotations
+    #expect(stored.count == 1)
+    #expect(stored.first?.kind == .ipa)
+    #expect(stored.first?.lookupKey == "hello:us")
+    #expect(stored.first?.automaticValue == Data("/həˈloʊ/".utf8))
+  }
+
+  @Test func sentenceListeningMarginRespectsNeighboursAndAudioEnd() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    let database = try ProductionDatabase(url: paths.database)
+    let lesson = try await database.insertLesson(
+      NewLesson(provider: "local", externalID: "tail-margin", title: "Sentence tails"))
+    let jobID = UUID(), runToken = UUID()
+    try await database.persistImportJob(
+      id: jobID, lessonID: lesson.id, expectedGeneration: lesson.generation, runToken: runToken,
+      inputJSON: "{}", checkpointJSON: "{}")
+    let segments = try CaptionTranscriptBuilder.build(
+      cues: [
+        CaptionCue(start: 0, end: 1, text: "First."),
+        CaptionCue(start: 1.1, end: 2, text: "Second."),
+        CaptionCue(start: 3, end: 3.9, text: "Last."),
+      ], source: .whisper, sampleRate: 16_000, frameCount: 64_000)
+    let audio = MediaAsset(
+      id: UUID(), lessonID: lesson.id, role: .sourceAudio,
+      relativePath: "Media/SourceAudio/tails.caf", checksum: "fixture", format: "caf",
+      sampleRate: 16_000, frameCount: 64_000, createdAt: Date())
+    try await database.publishPreparedLesson(
+      lessonID: lesson.id, expectedGeneration: lesson.generation, jobID: jobID, runToken: runToken,
+      title: lesson.title, author: nil, assets: [audio], segments: segments, checkpointJSON: "{}")
+    let targets = try await database.practiceTargets(lessonID: lesson.id, paths: paths)
+    #expect(targets.map(\.endFrame) == [16_000, 32_000, 62_400])
+    #expect(targets.map(\.playbackEndFrame) == [17_600, 36_000, 64_000])
+    let sentences = try await database.preparedPracticeSentences(lessonID: lesson.id, paths: paths)
+    #expect(sentences.map { $0.baseline.cueEndFrame } == [16_000, 32_000, 62_400])
+    #expect(SentencePlaybackBoundary.endFrame(
+      sentenceEnd: 16_000, sampleRate: 16_000, audioFrameCount: 64_000,
+      nextSentenceStart: 15_000, hasTimingOverride: false) == 16_000)
+    let snapshot = try #require(targets.first).snapshot
+    let encoded = try JSONEncoder().encode(snapshot)
+    #expect(try JSONDecoder().decode(ProductionPracticeTargetSnapshot.self, from: encoded)
+      .sourcePlaybackEndFrame == 17_600)
+    var legacy = try #require(JSONSerialization.jsonObject(with: encoded) as? [String: Any])
+    legacy.removeValue(forKey: "sourcePlaybackEndFrame")
+    let restored = try JSONDecoder().decode(ProductionPracticeTargetSnapshot.self,
+      from: JSONSerialization.data(withJSONObject: legacy))
+    #expect(restored.sourcePlaybackEndFrame == nil)
+  }
+
   @Test func timingEditCreatesANewRevisionAndPreservesAnnotationProvenance() async throws {
     let root = temporaryRoot()
     defer { try? FileManager.default.removeItem(at: root) }
@@ -533,6 +765,7 @@ struct ProductionPersistenceTests {
     #expect(current.segmentRevisionID != original.segmentRevisionID)
     #expect(current.startFrame == 1_000)
     #expect(current.endFrame == 30_000)
+    #expect(current.playbackEndFrame == 30_000)
     let prepared = try #require(
       try await database.preparedPracticeSentences(lessonID: lesson.id, paths: paths).first)
     #expect(prepared.target.segmentRevisionID == result.revisionID)
@@ -881,6 +1114,209 @@ struct ProductionPersistenceTests {
     #expect(!FileManager.default.fileExists(atPath: workspace.path))
   }
 
+  @Test func appleImportPreparesTimingAndPreservesLocaleOnRetryWithoutFallback() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("apple-fixture.wav")
+    try writeAudioFixture(to: source)
+    let database = try ProductionDatabase(url: paths.database)
+    let engine = AppleImportEngineSpy()
+    let importer = ProductionImportService(database: database, paths: paths, audioTranscriber: engine)
+    let job = try await importer.submit(
+      .localAudio(url: source, securityScoped: false, titleOverride: "Apple fixture"), localeIdentifier: "en-US")
+    for _ in 0..<200 {
+      if try await importer.importJobs().contains(where: { $0.id == job.id && $0.phase == .failed }) { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(try await database.lesson(id: job.lessonID).lifecycle != .ready)
+    let stored = try #require(try await database.unfinishedImportJobs().first { $0.id == job.id })
+    #expect(stored.inputJSON.contains("en-US"))
+    #expect(await engine.events == ["prepare:en-US", "transcribe:en-US"])
+    await engine.allowSuccess()
+    try await importer.retry(jobID: job.id)
+    for _ in 0..<200 {
+      if try await database.lesson(id: job.lessonID).lifecycle == .ready { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    let summary = try #require(try await importer.librarySummaries().first { $0.id == job.lessonID })
+    #expect(summary.isPracticeReady)
+    #expect(summary.preparedSentenceCount == 1)
+    #expect(summary.wordTimingReviewCount == 1)
+    let sentences = try await ProductionPracticeService(database: database, paths: paths).preparedSentences(lessonID: job.lessonID)
+    let sentence = try #require(sentences.first)
+    #expect(sentence.target.text == "Hello world.")
+    #expect(sentence.baseline.source == .appleSpeechAnalyzer)
+    #expect(sentence.baseline.transcription?.localeIdentifier == "en-US")
+    #expect(sentence.tokens[0].startFrame == 0)
+    #expect(sentence.tokens[1].startFrame == nil)
+    #expect(await engine.events == ["prepare:en-US", "transcribe:en-US", "prepare:en-US", "transcribe:en-US"])
+  }
+
+  @Test func combinedImportKeepsWhisperWhenOptionalAppleFails() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("combined.wav")
+    try writeAudioFixture(to: source)
+    let database = try ProductionDatabase(url: paths.database)
+    let id = try await database.registerEngineRelease(engineKey: WhisperModelCatalog.engineKey, version: "large-v3", capabilityJSON: "{}")
+    try await database.setEngineInstallationStatus(releaseID: id, status: "installed", relativePath: "Packages/test")
+    let apple = AppleImportEngineSpy()
+    let whisper = CombinedWhisperSpy()
+    let importer = ProductionImportService(database: database, paths: paths, usesSpeechFallback: false, transcriber: whisper, audioTranscriber: apple)
+    let job = try await importer.submit(.localAudio(url: source, securityScoped: false, titleOverride: "Combined"), localeIdentifier: "en-US", whisperModel: "large")
+    for _ in 0..<200 {
+      if try await database.lesson(id: job.lessonID).lifecycle == .ready { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(try await database.lesson(id: job.lessonID).lifecycle == .ready)
+    #expect(await whisper.variants == [.large])
+    #expect(await apple.events == ["prepare:en-US", "transcribe:en-US"])
+    let sentences = try await ProductionPracticeService(database: database, paths: paths).preparedSentences(lessonID: job.lessonID)
+    #expect(sentences.first?.baseline.reconciliation?.whisperModel == "large-v3")
+    #expect(sentences.first?.baseline.reconciliation?.apple == nil)
+    #expect(sentences.first?.baseline.reconciliation?.secondaryUnavailable == true)
+    let files = try FileManager.default.contentsOfDirectory(at: paths.root.appendingPathComponent("Media/Captions"), includingPropertiesForKeys: nil)
+    let archive = try JSONDecoder().decode(CombinedTranscriptArchive.self, from: Data(contentsOf: #require(files.first)))
+    #expect(archive.primary?.source == .whisper)
+    #expect(archive.appleFailure != nil && archive.apple == nil)
+    #expect(archive.captionSource == nil && archive.captions.isEmpty)
+  }
+
+  @Test(arguments: [false, true]) func adapterSelectionSurvivesFailureAndRetryWithoutAppleOrWhisper(changeModel: Bool) async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("adapter.wav")
+    try writeAudioFixture(to: source)
+    let database = try ProductionDatabase(url: paths.database)
+    let adapter = ImportAdapterSpy()
+    let importer = ProductionImportService(database: database, paths: paths, usesSpeechFallback: false,
+      transcriptionAdapters: TranscriptionAdapterRegistry([adapter]))
+    let job = try await importer.submit(.localAudio(url: source, securityScoped: false, titleOverride: nil),
+      transcriptionEngine: "test-adapter", transcriptionModelID: "test-model", compareWithApple: false)
+    for _ in 0..<200 {
+      if try await importer.importJobs().contains(where: { $0.id == job.id && $0.phase == .failed }) { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    let stored = try #require(try await database.unfinishedImportJobs().first)
+    #expect(stored.inputJSON.contains("test-adapter") && stored.inputJSON.contains("test-model"))
+    await adapter.allowSuccess()
+    let nextModel = changeModel ? "test-model-2" : "test-model"
+    try await importer.retry(jobID: job.id, replacementSelection: changeModel
+      ? TranscriptionSelection(engineID: "test-adapter", modelID: nextModel) : nil)
+    for _ in 0..<200 {
+      if try await database.lesson(id: job.lessonID).lifecycle == .ready { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(try await database.lesson(id: job.lessonID).lifecycle == .ready)
+    #expect(await adapter.models == ["test-model", nextModel])
+    let sentences = try await ProductionPracticeService(database: database, paths: paths).preparedSentences(lessonID: job.lessonID)
+    #expect(sentences.first?.baseline.source == .parakeet)
+    #expect(sentences.first?.baseline.transcription?.model == nextModel)
+    #expect(sentences.first?.baseline.reconciliation?.whisperModel == nil)
+  }
+
+  @Test func reimportingCancelledSourceResumesItsJobAndPreservesReadyLesson() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("reimport.wav")
+    try writeAudioFixture(to: source)
+    let db = try ProductionDatabase(url: paths.database)
+    let engine = AppleImportEngineSpy()
+    await engine.suspendTranscription()
+    let service = ProductionImportService(database: db, paths: paths, usesSpeechFallback: false, audioTranscriber: engine)
+    let request = ProductionImportRequest.localAudio(url: source, securityScoped: false, titleOverride: "Reimport")
+    let first = try await service.submit(request, localeIdentifier: "en-US")
+    for _ in 0..<200 {
+      if await engine.events.count == 2 { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    await service.cancel(jobID: first.id)
+    for _ in 0..<200 {
+      if try await service.importJobs().contains(where: { $0.id == first.id && $0.phase == .cancelled }) { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    await engine.allowSuccess()
+    let second = try await service.submit(request, localeIdentifier: "en-GB")
+    #expect(first.id == second.id && first.lessonID == second.lessonID)
+    #expect(first.runToken != second.runToken)
+    for _ in 0..<200 {
+      if try await db.lesson(id: first.lessonID).lifecycle == .ready { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(try await db.lessonCount() == 1)
+    #expect(try await db.lesson(id: first.lessonID).lifecycle == .ready)
+    #expect(await engine.events == ["prepare:en-US", "transcribe:en-US", "prepare:en-US", "transcribe:en-US"])
+    do { _ = try await service.submit(request); Issue.record("A ready lesson must not be replaced") }
+    catch let error as ProductionImportError { #expect(error == .duplicateIdentity) }
+  }
+
+  @Test func retryWaitsForOldDecoderToFinishCancellation() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("retry-wait.wav")
+    try writeAudioFixture(to: source)
+    let db = try ProductionDatabase(url: paths.database)
+    let id = try await db.registerEngineRelease(engineKey: WhisperModelCatalog.engineKey, version: "large-v3", capabilityJSON: "{}")
+    try await db.setEngineInstallationStatus(releaseID: id, status: "installed", relativePath: "Packages/test")
+    let whisper = RestartWhisperSpy()
+    let apple = AppleImportEngineSpy()
+    await apple.allowSuccess()
+    let service = ProductionImportService(database: db, paths: paths, usesSpeechFallback: false, transcriber: whisper, audioTranscriber: apple)
+    let first = try await service.submit(.localAudio(url: source, securityScoped: false, titleOverride: "Restart"), whisperModel: "large")
+    for _ in 0..<200 {
+      if await whisper.calls == 1 { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    let restarted = try await service.retry(jobID: first.id)
+    #expect(restarted.runToken != first.runToken)
+    for _ in 0..<200 {
+      if try await db.lesson(id: first.lessonID).lifecycle == .ready { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(try await db.lesson(id: first.lessonID).lifecycle == .ready)
+    #expect(await whisper.calls == 2)
+    #expect(await whisper.maximumActive == 1)
+    #expect(try await db.importAttempts(jobID: first.id).map(\.status) == ["cancelled", "succeeded"])
+  }
+
+  @Test func cancellingAppleTranscriptionMarksTheImportCancelled() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let source = root.appendingPathComponent("apple-cancel.wav")
+    try writeAudioFixture(to: source)
+    let database = try ProductionDatabase(url: paths.database)
+    let engine = AppleImportEngineSpy()
+    await engine.suspendTranscription()
+    let importer = ProductionImportService(database: database, paths: paths, audioTranscriber: engine)
+    let job = try await importer.submit(.localAudio(url: source, securityScoped: false, titleOverride: nil))
+    for _ in 0..<200 {
+      if await engine.events.count == 2 { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(await engine.events.count == 2)
+    await importer.cancel(jobID: job.id)
+    var cancelled = false
+    for _ in 0..<200 {
+      cancelled = try await importer.importJobs().contains { $0.id == job.id && $0.phase == .cancelled }
+      if cancelled { break }
+      try await Task.sleep(for: .milliseconds(20))
+    }
+    #expect(cancelled)
+    #expect(try await database.lesson(id: job.lessonID).lifecycle != .ready)
+  }
+
   private func preparedPracticeFixture(root: URL) async throws -> (
     paths: BackendPaths, database: ProductionDatabase, target: ProductionPracticeTarget
   ) {
@@ -993,4 +1429,73 @@ private struct RecoveryManifest: Encodable {
   let title: String
   let author: String?
   let assets: [MediaAsset]
+}
+
+private actor AppleImportEngineSpy: AudioTranscriptTranscribing {
+  private(set) var events: [String] = []
+  private var failing = true
+  private var suspended = false
+  func suspendTranscription() { suspended = true }
+  func allowSuccess() { failing = false; suspended = false }
+  func prepare(localeIdentifier: String) { events.append("prepare:\(localeIdentifier)") }
+  func transcribe(audioURL: URL, localeIdentifier: String, onProgress: @escaping @Sendable (Double) -> Void) async throws -> AudioTranscription {
+    events.append("transcribe:\(localeIdentifier)")
+    if suspended { try await Task.sleep(for: .seconds(30)) }
+    if failing { throw SpeechAnalyzerPreparationError.assetsUnavailable }
+    onProgress(1)
+    return AudioTranscription(
+      words: [TimedWord(text: " Hello", start: 0, end: 0.04), TimedWord(text: " world.", start: 0.05, end: 0.05)],
+      source: .appleSpeechAnalyzer,
+      provenance: TranscriptionProvenance(engine: "Apple SpeechAnalyzer", model: "SpeechTranscriber", localeIdentifier: localeIdentifier, runtimeVersion: "test OS"))
+  }
+}
+
+private actor CombinedWhisperSpy: WhisperWordTranscribing {
+  private(set) var variants: [WhisperModelVariant] = []
+  func transcribe(audioURL: URL, variant: WhisperModelVariant, onProgress: @escaping @Sendable (Double) -> Void) async throws -> [TimedWord] {
+    variants.append(variant)
+    onProgress(1)
+    return [TimedWord(text: "Hello", start: 0, end: 0.04), TimedWord(text: "world.", start: 0.05, end: 0.09)]
+  }
+}
+
+private actor RestartWhisperSpy: WhisperWordTranscribing {
+  private(set) var calls = 0
+  private(set) var maximumActive = 0
+  private var active = 0
+  func transcribe(audioURL: URL, variant: WhisperModelVariant, onProgress: @escaping @Sendable (Double) -> Void) async throws -> [TimedWord] {
+    calls += 1
+    active += 1
+    maximumActive = max(maximumActive, active)
+    defer { active -= 1 }
+    if calls == 1 {
+      do { try await Task.sleep(for: .seconds(30)) }
+      catch {
+        // Model cleanup need not complete immediately when cancellation is requested.
+        await Task.detached { try? await Task.sleep(for: .milliseconds(150)) }.value
+        throw CancellationError()
+      }
+    }
+    return [TimedWord(text: "Hello", start: 0, end: 0.04), TimedWord(text: "world.", start: 0.05, end: 0.09)]
+  }
+}
+
+private actor ImportAdapterSpy: TranscriptionAdapter {
+  nonisolated let engineID = "test-adapter"
+  private var failing = true
+  private(set) var models: [String] = []
+  func allowSuccess() { failing = false }
+  func validate(modelID: String) throws {
+    guard ["test-model", "test-model-2"].contains(modelID) else { throw TranscriptionAdapterError.unsupportedModel(modelID) }
+  }
+  nonisolated func provenance(modelID: String, locale: String) -> TranscriptionProvenance {
+    TranscriptionProvenance(engine: "test-adapter", model: modelID, localeIdentifier: locale, runtimeVersion: "test")
+  }
+  func transcribe(audioURL: URL, modelID: String, locale: String,
+    onProgress: @escaping @Sendable (Double) -> Void) async throws -> AudioTranscription {
+    models.append(modelID)
+    if failing { throw TranscriptionAdapterError.emptyTranscript }
+    return AudioTranscription(words: [TimedWord(text: "Hello", start: 0, end: 0.04), TimedWord(text: "world.", start: 0.05, end: 0.09)],
+      source: .parakeet, provenance: provenance(modelID: modelID, locale: locale))
+  }
 }

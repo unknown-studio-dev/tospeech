@@ -8,6 +8,8 @@ final class ProductionLibraryBootstrap {
   var practiceService: ProductionPracticeService?
   var practiceController: ProductionPracticeController?
   var shadowing: ProductionShadowingModel?
+  var transcriptionModels: WhisperModelManager?
+  var parakeetModels: ParakeetModelManager?
   var error: String?
 
   init(previewFixtures: Bool) {
@@ -21,6 +23,8 @@ final class ProductionLibraryBootstrap {
       practiceService = nil
       practiceController = nil
       shadowing = nil
+      transcriptionModels = nil
+      parakeetModels = nil
       error = nil
       return
     }
@@ -29,9 +33,18 @@ final class ProductionLibraryBootstrap {
       try paths.prepare()
       let database = try ProductionDatabase(url: paths.database)
       let ipaDictionary = try? OfflineIPADictionary.bundled()
+      let transcriber = AppleSpeechAnalyzerTranscriber()
+      let whisper = WhisperCaptionTranscriber(database: database, paths: paths)
+      let parakeet = ParakeetTranscriptionAdapter(database: database, paths: paths)
+      parakeetModels = ParakeetModelManager(adapter: parakeet)
+      let adapters = TranscriptionAdapterRegistry([
+        WhisperTranscriptionAdapter(transcriber: whisper, database: database), parakeet
+      ])
+      transcriptionModels = WhisperModelManager(database: database, transcriber: whisper)
       let library = ProductionLibraryModel(
         service: ProductionImportService(
-          database: database, paths: paths, ipaDictionary: ipaDictionary))
+          database: database, paths: paths, usesSpeechFallback: false, audioTranscriber: transcriber, transcriptionAdapters: adapters,
+          ipaDictionary: ipaDictionary))
       model = library
       let practice = ProductionPracticeService(database: database, paths: paths)
       practiceService = practice
@@ -43,13 +56,15 @@ final class ProductionLibraryBootstrap {
         ipaPreparer: ipaDictionary.map {
           IPAAnnotationPreparer(database: database, dictionary: $0)
         },
-        wordTimingPreparer: AppleSpeechWordTimingPreparer(service: practice))
+        wordTimingPreparer: AppleSpeechWordTimingPreparer(service: practice, audioTranscriber: transcriber))
       error = nil
     } catch {
       model = nil
       practiceService = nil
       practiceController = nil
       shadowing = nil
+      transcriptionModels = nil
+      parakeetModels = nil
       self.error = error.localizedDescription
     }
   }
@@ -103,6 +118,8 @@ struct EchoLabApp: App {
             retryProductionLibrary: productionLibrary.reload
           ).environment(store).frame(minWidth: 1000, minHeight: 680)
             .environment(\.locale, store.preferences.language.locale)
+            .environment(\.whisperModelManager, productionLibrary.transcriptionModels)
+            .environment(\.parakeetModelManager, productionLibrary.parakeetModels)
             .toolbar(removing: .title)
             .preferredColorScheme(.dark).tint(EchoTheme.accent)
             .background(

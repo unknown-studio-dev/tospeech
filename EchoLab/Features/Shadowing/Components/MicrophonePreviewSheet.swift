@@ -19,7 +19,7 @@ struct MicrophonePreviewSheet: View {
       VStack(alignment: .leading, spacing: 20) {
         Image(systemName: "mic.badge.plus").font(EchoFont.body(size: 36)).foregroundStyle(
           EchoTheme.muted)
-        Text(
+        EchoLocalizedText(
           runtime == nil
             ? "The app listens to the source first, then records a separate take. This preview does not request or use your real microphone."
             : "The app listens to the complete source first, then records a separate take using the selected microphone."

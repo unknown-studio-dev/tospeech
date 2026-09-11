@@ -1,3 +1,8 @@
+> 2026-09-11 correction: Apple-only import was a misinterpretation, superseded by
+> the user-required YouTube captions + selected Whisper + Apple Speech pipeline.
+> See `../docs/DECISIONS.md`. Earlier Apple-only validation below applies only to
+> that adapter, not to the combined pipeline.
+
 # Native implementation handoff — 2026-09-10
 
 This began as the SwiftUI UI migration and now includes production Library B1
@@ -302,3 +307,50 @@ Word-highlight and Library failure correction:
 - `xcodegen generate` and the full native test command pass: **89 tests in 7 suites,
   0 failures**. New coverage locks observed-range alignment/order and proves helper
   diagnostics such as HTTP 429/cookies cannot leak through failure presentation.
+
+Import progress presentation lifecycle correction:
+
+- The URL/file sheet now finishes dismissal before presenting the progress sheet,
+  so two native sheets never compete on the same Library host.
+- Background polling refreshes job data without replacing the Library with its
+  initial-loading state. The coordinator retains the watched job identity across
+  the atomic `succeeded` transition and maps it directly from progress to ready.
+- A persistence-backed coordinator test verifies that the watched sheet keeps the
+  same job identity while the database atomically removes the succeeded job from
+  the unfinished queue and exposes the ready lesson.
+- The complete native suite passes: **90 tests in 7 suites, 0 failures**.
+
+## Combined transcript correction — 2026-09-11
+
+The user's required YouTube + Whisper + Apple combination supersedes the earlier
+Apple-only interpretation. Whisper model management and selection are restored;
+Apple uses SpeechAnalyzer/SpeechTranscriber on macOS 26. New imports snapshot
+both the selected Whisper variant and Apple locale, save raw source outputs and
+per-word reconciliation provenance, and flag discrepancies without invented
+confidence. See `docs/combined-transcript-2026-09-11/README.md` for concrete tests,
+real-audio probe results, screenshots and limitations. Existing lessons/takes
+remain unchanged.
+
+## Parakeet transcript adapter and UI correction — 2026-09-11
+
+168 tests/16 suites passed for the adapter, optional Apple, provenance and retry
+changes. A real 498.97-second source completed both standalone recognition and
+isolated production import with Parakeet alone. Final Settings correction puts
+Parakeet in the existing model card list (no separate dropdown); build and EN/VI
+app-owned renders passed. See `docs/parakeet-adapter-2026-09-11/README.md` for
+artifacts, measured scope and known timestamp limitations.
+
+## Observed word timing availability — 2026-09-12
+
+The current North Wind and Sun lesson has 816 tokens with stored word intervals;
+236 carry transcript/timing review flags. Production playback and highlighting
+previously rejected these flags as if intervals were missing. They now use valid
+intervals while retaining review warnings. Missing or invalid ranges still play
+sentence context; overlapping ranges do not select an arbitrary highlighted word.
+
+The full native suite passes: **171 tests in 17 suites**. A read-only audit of the
+existing lesson finds 816 usable intervals and 814 unambiguous midpoint highlights
+(two overlap). EN/VI Word sheet renders show the review warning. All 38 current
+segment revision IDs are unchanged; no recognition or reimport was performed.
+This verifies interval availability, not acoustic alignment accuracy. Raw ASR
+timestamp limitations recorded above remain unresolved.

@@ -3,7 +3,13 @@ import Observation
 
 @MainActor @Observable
 final class ProductionPracticeController {
+  typealias SourcePlayback = @MainActor (
+    ProductionPracticeTarget, Double, @escaping @MainActor @Sendable () -> Void
+  ) throws -> Void
   private let service: ProductionPracticeService
+  private let playSource: SourcePlayback
+  /// Emitted only after a complete listen with repeat=1, never before capture.
+  var onSingleListenCompleted: (@MainActor (UUID, Bool) -> Void)?
   private var target: ProductionPracticeTarget?
   private var policy: ProductionCapturePolicy?
   private var sourceSpeed = 1.0
@@ -35,10 +41,15 @@ final class ProductionPracticeController {
   var sourceSeekRange: ClosedRange<TimeInterval>? {
     guard let target else { return nil }
     return Double(target.startFrame) / Double(target.sampleRate)
-      ... Double(target.endFrame) / Double(target.sampleRate)
+      ... Double(target.playbackEndFrame) / Double(target.sampleRate)
   }
 
-  init(service: ProductionPracticeService) { self.service = service }
+  init(service: ProductionPracticeService, playSource: SourcePlayback? = nil) {
+    self.service = service
+    self.playSource = playSource ?? { target, speed, completion in
+      try service.play(target, speed: speed, onCompletion: completion)
+    }
+  }
 
   func configure(
     target: ProductionPracticeTarget, sourceSpeed: Double,
@@ -99,8 +110,8 @@ final class ProductionPracticeController {
     error = nil
     phase = .listening
     do {
-      try service.play(target, speed: sourceSpeed) { [weak self] in
-        self?.sourceFinished()
+      try playSource(target, sourceSpeed) { [weak self] in
+        self?.sourceFinished(revisionID: target.segmentRevisionID)
       }
       startTicker()
     } catch {
@@ -236,7 +247,7 @@ final class ProductionPracticeController {
   func seekSource(to seconds: TimeInterval) {
     guard let target, canSeekSource else { return }
     let requested = Int((seconds * Double(target.sampleRate)).rounded())
-    let frame = min(target.endFrame - 1, max(target.startFrame, requested))
+    let frame = min(target.playbackEndFrame - 1, max(target.startFrame, requested))
     do {
       try service.player.seek(to: frame)
       sourcePosition = Double(frame) / Double(target.sampleRate)
@@ -267,11 +278,11 @@ final class ProductionPracticeController {
     beginCountdown()
   }
 
-  private func sourceFinished() {
-    guard phase == .listening else { return }
+  private func sourceFinished(revisionID: UUID) {
+    guard phase == .listening, target?.segmentRevisionID == revisionID else { return }
     stopTicker()
     canResumeSource = false
-    if let target { sourcePosition = Double(target.endFrame) / Double(target.sampleRate) }
+    if let target { sourcePosition = Double(target.playbackEndFrame) / Double(target.sampleRate) }
     listened = true
     if captureAfterSource || (repeatEnabled && autoRecord) {
       captureAfterSource = false
@@ -281,6 +292,9 @@ final class ProductionPracticeController {
       startSourceRound()
     } else {
       phase = .paused
+      if repeatCount == 1, target?.scope == .sentence {
+        onSingleListenCompleted?(revisionID, repeatEnabled)
+      }
     }
   }
 
@@ -293,7 +307,9 @@ final class ProductionPracticeController {
     sourcePosition = Double(target.startFrame) / Double(target.sampleRate)
     phase = .listening
     do {
-      try service.play(target, speed: sourceSpeed) { [weak self] in self?.sourceFinished() }
+      try playSource(target, sourceSpeed) { [weak self] in
+        self?.sourceFinished(revisionID: target.segmentRevisionID)
+      }
       startTicker()
     } catch {
       fail(error)

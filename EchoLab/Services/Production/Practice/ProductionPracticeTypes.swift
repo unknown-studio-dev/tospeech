@@ -13,7 +13,10 @@ struct ProductionPracticeTarget: Codable, Equatable, Sendable {
   let text: String
   let scope: PracticeScope
   let wordIDs: [String]
+  /// Listening context only; immutable sentence and word timing remain unchanged.
+  var sourcePlaybackEndFrame: Int? = nil
 
+  var playbackEndFrame: Int { sourcePlaybackEndFrame ?? endFrame }
   var frameCount: Int { endFrame - startFrame }
   var duration: TimeInterval { Double(frameCount) / Double(sampleRate) }
   var snapshot: ProductionPracticeTargetSnapshot {
@@ -21,13 +24,31 @@ struct ProductionPracticeTarget: Codable, Equatable, Sendable {
       lessonID: lessonID, lessonGeneration: lessonGeneration, segmentID: segmentID,
       segmentRevisionID: segmentRevisionID, audioAssetID: audioAssetID,
       sampleRate: sampleRate, startFrame: startFrame, endFrame: endFrame,
-      text: text, scope: scope, wordIDs: wordIDs)
+      text: text, scope: scope, wordIDs: wordIDs,
+      sourcePlaybackEndFrame: sourcePlaybackEndFrame)
   }
 
   func validate() throws {
     guard lessonGeneration >= 1, sampleRate > 0, startFrame >= 0,
-      endFrame > startFrame, !text.isEmpty
+      endFrame > startFrame, playbackEndFrame >= endFrame, !text.isEmpty
     else { throw ProductionPracticeError.invalidTarget }
+  }
+}
+
+enum SentencePlaybackBoundary {
+  /// ASR word ends can clip a final consonant. Keep at most 250 ms of source
+  /// context, without extending into the next sentence or past EOF. This is a
+  /// playback margin, not an assertion that ASR timestamps are verified silence.
+  static func endFrame(
+    sentenceEnd: Int, sampleRate: Int, audioFrameCount: Int,
+    nextSentenceStart: Int?, hasTimingOverride: Bool
+  ) -> Int {
+    guard !hasTimingOverride, sampleRate > 0, audioFrameCount >= sentenceEnd else {
+      return sentenceEnd
+    }
+    let limit = min(audioFrameCount, nextSentenceStart ?? audioFrameCount)
+    let available = max(0, limit - sentenceEnd)
+    return sentenceEnd + min(sampleRate / 4, available)
   }
 }
 
@@ -142,6 +163,7 @@ struct ProductionPracticeTargetSnapshot: Codable, Equatable, Sendable {
   let text: String
   let scope: PracticeScope
   let wordIDs: [String]
+  var sourcePlaybackEndFrame: Int? = nil
 }
 
 struct ProductionCapturePolicy: Equatable, Sendable {

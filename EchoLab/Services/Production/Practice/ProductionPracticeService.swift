@@ -102,19 +102,15 @@ final class ProductionPracticeService {
     }.value
   }
 
-  /// A word with verified boundaries is played exactly; otherwise the learner
-  /// hears its sentence context. This preview never marks a sentence listened,
+  /// An observed word interval is playable even when flagged for review;
+  /// missing/invalid intervals use sentence context. This never marks a sentence listened,
   /// so recording still requires a full source listen.
   func preview(
     _ token: TranscriptWordToken, in target: ProductionPracticeTarget, speed: Double = 1
   ) throws {
     try target.validate()
-    let start = token.startFrame ?? target.startFrame
-    let end = token.endFrame ?? target.endFrame
-    guard start >= target.startFrame, end > start, end <= target.endFrame else {
-      throw ProductionPracticeError.invalidPlaybackRange
-    }
-    try player.play(url: target.audioURL, startFrame: start, endFrame: end, speed: speed) {}
+    let range = ProductionWordTiming.previewRange(for: token, in: target)
+    try player.play(url: target.audioURL, startFrame: range.lowerBound, endFrame: range.upperBound, speed: speed) {}
   }
 
   func preview(_ span: AudioSpan, in target: ProductionPracticeTarget, speed: Double = 1) throws {
@@ -142,7 +138,7 @@ final class ProductionPracticeService {
     try target.validate()
     try player.play(
       url: target.audioURL, startFrame: target.startFrame,
-      endFrame: target.endFrame, speed: take.sourceSpeed
+      endFrame: target.playbackEndFrame, speed: take.sourceSpeed
     ) { [weak self] in
       do { try self?.playTake(take) }
       catch {
@@ -160,7 +156,7 @@ final class ProductionPracticeService {
     listenedRevisionID = nil
     try player.play(
       url: target.audioURL, startFrame: target.startFrame,
-      endFrame: target.endFrame, speed: speed
+      endFrame: target.playbackEndFrame, speed: speed
     ) { [weak self] in
       self?.listenedRevisionID = target.segmentRevisionID
       onCompletion()

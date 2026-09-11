@@ -12,8 +12,12 @@ struct RecordingModelsSettingsView: View {
         recording
         SettingsSection(title: "Mỗi lượt, một bản thu",
           subtitle: "Không phát audio nguồn cùng lúc với mic. Chuyển model không làm mất bản thu hay kết quả cũ.", titleSize: 16) {}
+        AppleSpeechTranscriptionSection()
       }
-      models
+      VStack(alignment: .leading, spacing: 32) {
+        TranscriptionModelsSection()
+        models
+      }
     }
     .confirmationDialog("Xóa gói model?", isPresented: Binding(
       get: { removeCandidate != nil }, set: { if !$0 { removeCandidate = nil } })

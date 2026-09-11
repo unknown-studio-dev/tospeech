@@ -291,6 +291,8 @@ private struct ImportPreparationStepRow: View {
 
 private struct ImportPreparationStepIndicator: View {
   let state: ImportPreparationStepState
+  @Environment(\.accessibilityReduceMotion) private var reduceMotion
+  @State private var spinning = false
 
   var body: some View {
     Group {
@@ -304,8 +306,12 @@ private struct ImportPreparationStepIndicator: View {
           Circle().strokeBorder(EchoTheme.border, lineWidth: 1.5)
           Circle().trim(from: 0.08, to: 0.72)
             .stroke(EchoTheme.accent, style: StrokeStyle(lineWidth: 2, lineCap: .round))
-            .rotationEffect(.degrees(-90))
+            .rotationEffect(.degrees(spinning ? 270 : -90))
+            .animation(
+              reduceMotion ? nil : .linear(duration: 0.9).repeatForever(autoreverses: false),
+              value: spinning)
         }
+        .onAppear { if !reduceMotion { spinning = true } }
       case .pending:
         Circle().strokeBorder(EchoTheme.border, lineWidth: 1.5)
       }
