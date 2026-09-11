@@ -1,0 +1,70 @@
+name: EchoLab
+options:
+  bundleIdPrefix: studio.unknown
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    ARCHS: arm64
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+targets:
+  EchoLab:
+    type: application
+    platform: macOS
+    dependencies:
+      - sdk: libsqlite3.tbd
+      - sdk: Speech.framework
+      - sdk: Translation.framework
+      - sdk: WebKit.framework
+    preBuildScripts:
+      - name: Check shared UI component usage
+        script: bash "${SRCROOT}/scripts/check-ui-components.sh"
+        basedOnDependencyAnalysis: false
+    postBuildScripts:
+      - name: Stage verified import toolchain
+        script: bash "${SRCROOT}/scripts/stage-toolchain.sh"
+        basedOnDependencyAnalysis: false
+    sources:
+      - path: EchoLab
+        excludes: [Resources]
+      - path: EchoLab/Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: studio.unknown.EchoLab
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: EchoLab
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: EchoLab records your shadowing takes when you explicitly start recording.
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: EchoLab uses on-device speech recognition to prepare transcript and word timing for imported lessons.
+        ENABLE_APP_SANDBOX: YES
+        ENABLE_HARDENED_RUNTIME: YES
+        SWIFT_STRICT_CONCURRENCY: complete
+    entitlements:
+      path: EchoLab/App/EchoLab.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        com.apple.security.files.user-selected.read-only: true
+        com.apple.security.network.client: true
+        com.apple.security.device.audio-input: true
+  EchoLabTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources: [EchoLabTests]
+    dependencies:
+      - target: EchoLab
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  EchoLab:
+    build:
+      targets:
+        EchoLab: all
+    test:
+      targets: [EchoLabTests]

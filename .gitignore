@@ -1,0 +1,19 @@
+# macOS metadata
+.DS_Store
+
+# Xcode build products and per-user workspace state
+build/
+DerivedData/
+*.xcresult
+**/xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
+*.moved-aside
+
+# Swift Package Manager build output
+.build/
+
+# Locally generated previews and downloaded import toolchain
+screenshots/
+vendor/
