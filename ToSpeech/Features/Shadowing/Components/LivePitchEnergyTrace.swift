@@ -98,7 +98,7 @@ struct LivePitchEnergyTrace: View {
         for p in env.dropFirst() { path.addLine(to: .init(x: p.x, y: mid - p.y * amp)) }
         for p in env.reversed() { path.addLine(to: .init(x: p.x, y: mid + p.y * amp)) }
         path.closeSubpath()
-        context.fill(path, with: .color((dim ? EchoTheme.secondaryText : EchoTheme.focus).opacity(dim ? 0.22 : 0.4)))
+        context.fill(path, with: .color((dim ? EchoTheme.accent : EchoTheme.focus).opacity(dim ? 0.22 : 0.4)))
       }
     }
     if showPitch {
@@ -106,7 +106,7 @@ struct LivePitchEnergyTrace: View {
         guard seg.allSatisfy({ $0.x <= (CGFloat((ReviewSignalScale.fraction(time: upTo, duration: duration) ?? 1)) * size.width) + 0.5 }) else { continue }
         var path = Path(); path.move(to: seg[0])
         for p in seg.dropFirst() { path.addLine(to: p) }
-        context.stroke(path, with: .color(dim ? EchoTheme.secondaryText.opacity(0.5) : EchoTheme.accent),
+        context.stroke(path, with: .color(dim ? EchoTheme.accent.opacity(0.5) : EchoTheme.focus),
           style: .init(lineWidth: dim ? 2 : 2.5, lineCap: .round, dash: dim ? [5, 4] : []))
       }
     }
