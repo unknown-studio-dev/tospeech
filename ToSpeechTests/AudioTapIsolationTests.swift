@@ -15,7 +15,7 @@ struct AudioTapIsolationTests {
     defer { try? FileManager.default.removeItem(at: url) }
     let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1))
     let writer = try CaptureWriter(file: AVAudioFile(forWriting: url, settings: format.settings),
-      url: url, thresholdDB: -42)
+      url: url, thresholdDB: -42, nativeSampleRate: 16_000, channelCount: 1)
     let tap = writer.makeAudioTap()
     try await Task.detached {
       Self.assertBackgroundThread()
@@ -41,7 +41,7 @@ struct AudioTapIsolationTests {
     defer { try? FileManager.default.removeItem(at: url) }
     let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1))
     let writer = try CaptureWriter(file: AVAudioFile(forWriting: url, settings: format.settings),
-      url: url, thresholdDB: -42)
+      url: url, thresholdDB: -42, nativeSampleRate: 16_000, channelCount: 1)
     let tap = writer.makeAudioTap()
     _ = writer.finish()
     try await Task.detached {

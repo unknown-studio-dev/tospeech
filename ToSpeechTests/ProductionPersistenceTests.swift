@@ -1175,7 +1175,8 @@ struct ProductionPersistenceTests {
       AVAudioFormat(
         standardFormatWithSampleRate: 44_100, channels: 1))
     let file = try AVAudioFile(forWriting: url, settings: format.settings)
-    let writer = CaptureWriter(file: file, url: url, thresholdDB: -42)
+    let writer = CaptureWriter(file: file, url: url, thresholdDB: -42,
+      nativeSampleRate: 44_100, channelCount: 1)
     let buffer = try #require(
       AVAudioPCMBuffer(
         pcmFormat: format, frameCapacity: 4_410))

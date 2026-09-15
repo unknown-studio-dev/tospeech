@@ -47,7 +47,8 @@ struct ContentMatchingTests {
     let url = FileManager.default.temporaryDirectory.appendingPathComponent("capture-\(UUID()).caf")
     defer { try? FileManager.default.removeItem(at: url) }
     let format = try #require(AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1))
-    let writer = try CaptureWriter(file: AVAudioFile(forWriting: url, settings: format.settings), url: url, thresholdDB: -42)
+    let writer = try CaptureWriter(file: AVAudioFile(forWriting: url, settings: format.settings), url: url, thresholdDB: -42,
+      nativeSampleRate: 16_000, channelCount: 1)
     let buffer = try #require(AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 4_000))
     buffer.frameLength = 4_000
     for index in 0..<4_000 { buffer.floatChannelData![0][index] = sin(Float(index) * 0.2) * 0.2 }
