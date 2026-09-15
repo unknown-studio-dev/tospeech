@@ -4,8 +4,8 @@ actor PhoneticXeusPackage {
   static let revision = "8d83dee94817a07dc150f87d08f7e0ee01bdb66d"
   static let weightHash = "ad58bf20a60e9d0380327bd8b2d0e8e90a9b8de2adccbfb479f9b21ea85eda18"
   static let runtimeHash = "4e479a3d14fbdad167e0077004200228103faf5b2cbdb5e6e265829690f0343b"
-  static let evidencePolicy = "xeus-uk-ctc-evidence-v5-units"
-  static let mappingPolicy = "xeus-uk-inventory-v3"
+  static let evidencePolicy = "xeus-uk-decision-v6-word-gated"
+  static let mappingPolicy = "xeus-uk-inventory-v4"
   static let installationIdentity = "PhoneticXeus weights · \(revision) · \(weightHash)"
   static let provenance = "PhoneticXeus · UK Experimental · \(revision) · \(weightHash) · torch-2.10.0-cpu-fp32 · \(evidencePolicy) · \(mappingPolicy) · \(UKPhoneInventory.parsingPolicy) · runtime \(runtimeHash)"
   /// A bundled helper update does not invalidate unchanged checkpoint bytes.
