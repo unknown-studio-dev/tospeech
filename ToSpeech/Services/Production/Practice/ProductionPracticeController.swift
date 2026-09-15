@@ -1,3 +1,4 @@
+import AVFAudio
 import Foundation
 import Observation
 
@@ -40,6 +41,10 @@ final class ProductionPracticeController {
   private(set) var error: ProductionPracticeError?
   private(set) var lastTake: ProductionStoredTake?
   private(set) var round = 1
+  private(set) var referenceDeliveryTrack: DeliveryTrack?
+  private(set) var liveDeliveryTrack: DeliveryTrack?
+  private var referencePrecomputeID: UUID?
+  var currentTargetDuration: Double? { target?.duration }
 
   var hasListened: Bool { listened }
   var isRepeating: Bool { repeatEnabled }
@@ -98,7 +103,31 @@ final class ProductionPracticeController {
     canResumeSource = false
     lastTake = nil
     error = nil
+    liveDeliveryTrack = nil
     phase = .idle
+    precomputeReference(for: target)
+  }
+
+  /// Source-side contour for the sentence span, using the shared DSP. Pure so it
+  /// can run off the main actor and be unit-tested from a fixture file.
+  nonisolated static func referenceTrack(target: ProductionPracticeTarget) throws -> DeliveryTrack {
+    let file = try AVAudioFile(forReading: target.audioURL)
+    let start = Double(target.startFrame) / Double(target.sampleRate)
+    let end = Double(target.endFrame) / Double(target.sampleRate)
+    return try AcousticDeliveryAnalyzer.track(samples: CoreMLWordAligner.samples(file: file, start: start, end: end))
+  }
+
+  private func precomputeReference(for target: ProductionPracticeTarget) {
+    let requestID = UUID()
+    referencePrecomputeID = requestID
+    referenceDeliveryTrack = nil
+    Task { [weak self] in
+      let track = await Task.detached(priority: .utility) {
+        try? Self.referenceTrack(target: target)
+      }.value
+      guard let self, self.referencePrecomputeID == requestID else { return }
+      self.referenceDeliveryTrack = track
+    }
   }
 
   func setSourceSpeed(_ value: Double) {
@@ -254,6 +283,7 @@ final class ProductionPracticeController {
         self.listened = false
         self.canResumeSource = false
         self.phase = .paused
+        self.liveDeliveryTrack = nil
       } catch {
         self.fail(error)
       }
@@ -409,6 +439,7 @@ final class ProductionPracticeController {
       listened = false
       canResumeSource = false
       phase = .feedback
+      liveDeliveryTrack = nil
     }
   }
 
@@ -482,6 +513,7 @@ final class ProductionPracticeController {
         return
       }
       inputLevelDB = service.recorder.levelDB
+      liveDeliveryTrack = service.recorder.liveTrack
       if elapsed >= policy.maximumDuration {
         finishRecording(reachedDurationLimit: true)
         return
