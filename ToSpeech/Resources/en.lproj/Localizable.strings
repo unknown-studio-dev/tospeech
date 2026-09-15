@@ -1027,9 +1027,7 @@
 "assessment.activate" = "Use this model";
 "assessment.remove" = "Remove package";
 "assessment.buddy_details" = "Local phoneme recognition with native ONNX Runtime. Supports dictionary variants of UK/US English. No calibrated overall, stress or intonation score. RAM and M1 performance are not benchmarked.";
-"assessment.unavailable" = "Local integration unavailable";
 "assessment.blocker.phone" = "Public source and weights lack a verified redistribution license. The published scorer needs its custom Whisper, alignment and feature pipeline.";
-"assessment.blocker.compact" = "Fabio Suizu: proprietary API/demo; a downloadable model and local SDK have not been verified.";
 "assessment.error.model_missing" = "Install the matching Buddy English v1 package in Settings, then retry. No other engine was used.";
 "assessment.error.checksum" = "Audio or model verification failed. Keep the take and check the package before retrying.";
 "assessment.error.busy" = "The model is in use. Try again after assessment finishes.";
@@ -1162,7 +1160,7 @@
 
 // UK reference pilot
 "assessment.uk.installed" = "Installed · UK pilot";
-"assessment.uk.size" = "About 1.27 GB models + shared runtime";
+"assessment.uk.size" = "About 1.27 GB download";
 "assessment.uk.details" = "Local XLSR encoder, UK vowel/focus/stress heads, SwiftF0 pitch, and British IPA generation. Experimental: nine vowel classes, with unverified phones left neutral. Rhythm and linking retain source comparisons; no calibrated overall grade.";
 "assessment.uk.error.accent" = "Select British English (UK) to use this model.";
 "assessment.uk.error.timing" = "The reference needs word timing. Align the transcript before UK assessment.";
@@ -1375,7 +1373,7 @@
 "Dữ liệu cục bộ" = "Local data";
 "Kiểm tra thư mục và cơ sở dữ liệu" = "Check folders and database";
 "Nhận dạng giọng nói" = "Speech recognition";
-"Cài engine transcript đang chọn" = "Install the selected transcript engine";
+"Cài engine transcript đang chọn" = "Install the transcript engine and word alignment";
 "Chuẩn bị gói tiếng Anh trên máy" = "Prepare the on-device English package";
 "Chuẩn bị gói dịch offline" = "Prepare the offline translation package";
 "Đánh giá phát âm" = "Pronunciation assessment";

@@ -1,13 +1,12 @@
 import Foundation
 
 enum EngineID: String, CaseIterable, Codable, Identifiable, Sendable {
-  case phone, buddy, compact, ukReference, phoneticXeus
+  case phone, buddy, ukReference, phoneticXeus
   var id: String { rawValue }
   var title: String {
     switch self {
     case .phone: "Phone Accentedness Scorer"
     case .buddy: "Buddy Pronunciation"
-    case .compact: "Compact pronunciation engine"
     case .ukReference: "UK Reference"
     case .phoneticXeus: "PhoneticXeus · UK Experimental"
     }

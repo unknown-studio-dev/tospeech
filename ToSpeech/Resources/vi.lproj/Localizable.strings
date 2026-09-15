@@ -1031,9 +1031,7 @@
 "assessment.activate" = "Dùng model này";
 "assessment.remove" = "Xóa gói model";
 "assessment.buddy_details" = "Nhận dạng âm vị local bằng ONNX Runtime native. Chấp nhận biến thể từ điển UK/US. Chưa có điểm tổng, trọng âm hoặc ngữ điệu được hiệu chuẩn. Chưa benchmark RAM và hiệu năng M1.";
-"assessment.unavailable" = "Chưa thể tích hợp local";
 "assessment.blocker.phone" = "Nguồn và weights chưa có giấy phép phân phối xác minh được. Cần pipeline Whisper, alignment và acoustic feature riêng.";
-"assessment.blocker.compact" = "Fabio Suizu: API/demo độc quyền; chưa xác minh được model tải về và SDK local.";
 "assessment.error.model_missing" = "Cài đúng gói Buddy English v1 trong Cài đặt rồi thử lại. Không dùng engine thay thế.";
 "assessment.error.checksum" = "Xác minh audio/model thất bại. Bản thu được giữ lại; kiểm tra gói model trước khi thử lại.";
 "assessment.error.busy" = "Model đang được dùng. Thử lại sau khi đánh giá xong.";
@@ -1166,7 +1164,7 @@
 
 // UK reference pilot
 "assessment.uk.installed" = "Đã cài · thử nghiệm UK";
-"assessment.uk.size" = "Khoảng 1,27 GB model + runtime dùng chung";
+"assessment.uk.size" = "Tải khoảng 1,27 GB";
 "assessment.uk.details" = "XLSR local, head UK nhận diện nguyên âm/nhấn câu/trọng âm, SwiftF0 và bộ tạo IPA Anh–Anh. Thử nghiệm: chín nhóm nguyên âm; âm chưa xác minh giữ trung tính. Nhịp và nối âm vẫn có đối chiếu mẫu; chưa có điểm tổng đã hiệu chuẩn.";
 "assessment.uk.error.accent" = "Chọn giọng Anh–Anh (UK) để dùng model này.";
 "assessment.uk.error.timing" = "Câu mẫu chưa có đủ mốc thời gian từng từ. Căn lại lời thoại trước khi chấm UK.";
@@ -1381,7 +1379,7 @@
 "Dữ liệu cục bộ" = "Dữ liệu cục bộ";
 "Kiểm tra thư mục và cơ sở dữ liệu" = "Kiểm tra thư mục và cơ sở dữ liệu";
 "Nhận dạng giọng nói" = "Nhận dạng giọng nói";
-"Cài engine transcript đang chọn" = "Cài engine transcript đang chọn";
+"Cài engine transcript đang chọn" = "Cài engine transcript và căn chỉnh từ";
 "Chuẩn bị gói tiếng Anh trên máy" = "Chuẩn bị gói tiếng Anh trên máy";
 "Chuẩn bị gói dịch offline" = "Chuẩn bị gói dịch offline";
 "Đánh giá phát âm" = "Đánh giá phát âm";

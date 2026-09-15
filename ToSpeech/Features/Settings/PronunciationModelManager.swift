@@ -6,6 +6,8 @@ final class PronunciationModelManager {
   let phonePackage: PhoneScorerPackage?
   let ukPackage: UKReferencePackage?
   let xeusPackage: PhoneticXeusPackage?
+  /// False when this build carries no PhoneticXeus runtime (Release): the card is not shown.
+  private(set) var xeusAvailable = false
   private(set) var xeusInstalled = false
   private(set) var xeusInstalling = false
   private(set) var xeusFailure: String?
@@ -25,6 +27,7 @@ final class PronunciationModelManager {
     self.package = package; self.phonePackage = phonePackage; self.ukPackage = ukPackage; self.xeusPackage = xeusPackage
   }
   func refresh() async {
+    xeusAvailable = await xeusPackage?.runtimeAvailable() ?? false
     xeusInstalled = await xeusPackage?.installed() ?? false
     ukInstalled = await ukPackage?.installed() ?? false
     isInstalled = await package.installed()

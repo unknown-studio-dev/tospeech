@@ -616,7 +616,7 @@ struct PracticeLifecycleTests {
     let id = try #require(store.takes.first?.id)
     store.requestAssessment(takeID: id)
     let requested = try #require(store.takes.first?.assessments.last)
-    store.activateEngine(.compact)
+    store.activateEngine(.buddy)
     #expect(store.preferences.activeEngine == .phone)
     #expect(requested.engine == .phone)
     store.cancelAssessments()

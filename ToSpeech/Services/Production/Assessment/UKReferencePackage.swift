@@ -3,18 +3,31 @@ import Foundation
 actor UKReferencePackage {
   static let provenance = "UK Reference · XLSR 2c733782da5604684829819a5eb744c193fe9398 · UK heads v1 · SwiftF0 64700fce · ONNX Runtime 1.24.2" + " · " + UKReferenceEvidence.policy + " · " + UKReferenceQuality.policy + " · " + UKVoiceActivity.policy + " · " + UKPhoneInventory.parsingPolicy + " · package " + manifestHash
   // Pinned only by the explicit freeze script after model verification.
-  static let manifestHash = "f0f09be146b80e4c6ffaad5cac7f6ad1c561742e78529f2e9566feadf875006d"
+  static let manifestHash = "01ddd3df99ff926fe569b85f04efc5d90280a9d24f678906804aa1591e7b8252"
   let directory: URL
   private let bundled: URL?
-  /// `verify` hashes every file in `checksums.json`, `encoder.onnx` (1,26 GB) included, and
+  /// `verify` hashes every file in `checksums.json`, `pytorch_model.bin` (1,26 GB) included, and
   /// `validate()` runs before every assessment — twice per PhoneticXeus job. This package owns the
   /// installed copy, so it keeps each hash until `stat` says the file changed.
   private let checksums = ModelChecksumCache()
-  init(paths: BackendPaths, bundled: URL? = Bundle.main.resourceURL?.appendingPathComponent("UKReference")) {
+  /// `encoder.onnx` is a 440 KB graph whose initializers point into the upstream checkpoint
+  /// (`scripts/assessment/externalize_uk_encoder.py`), so the app downloads the original
+  /// `pytorch_model.bin` (1,26 GB) from Hugging Face instead of shipping a converted copy.
+  /// Release bundles leave it out; `checksums.json` pins its hash with the rest of the package.
+  static let weights = "pytorch_model.bin"
+  static let weightsURL = URL(string: "https://huggingface.co/facebook/wav2vec2-xlsr-53-espeak-cv-ft/resolve/2c733782da5604684829819a5eb744c193fe9398/pytorch_model.bin")!
+  private let weightsSource: URL
+  init(paths: BackendPaths, bundled: URL? = Bundle.main.resourceURL?.appendingPathComponent("UKReference"),
+    weightsSource: URL = weightsURL) {
     directory = paths.packages.appendingPathComponent("UKReference/v1")
     self.bundled = bundled
+    self.weightsSource = weightsSource
   }
-  func installed() -> Bool { FileManager.default.fileExists(atPath: directory.appendingPathComponent("verified.txt").path) }
+  /// A marker from an older package layout (self-contained `encoder.onnx`) means "not installed":
+  /// onboarding and Settings then offer the download instead of failing every assessment.
+  func installed() -> Bool {
+    (try? String(contentsOf: directory.appendingPathComponent("verified.txt"), encoding: .utf8)) == Self.provenance
+  }
   func validate() throws -> URL {
     guard installed() else { throw BuddyError.modelMissing }
     try Self.verify(directory, cache: checksums)
@@ -31,14 +44,25 @@ actor UKReferencePackage {
     guard let expected = hashes["espeak-ng"], try BuddyModelPackage.checksum(executable) == expected else { throw BuddyError.checksum }
     return executable
   }
-  func install() throws {
-    guard let bundled else { throw BuddyError.modelMissing }
-    try Self.verify(bundled)
+  func install() async throws {
+    guard let bundled, FileManager.default.fileExists(atPath: bundled.appendingPathComponent("checksums.json").path)
+    else { throw BuddyError.modelMissing }
     let fm = FileManager.default, parent = directory.deletingLastPathComponent()
     try fm.createDirectory(at: parent, withIntermediateDirectories: true)
     let staging = parent.appendingPathComponent(UUID().uuidString)
     defer { try? fm.removeItem(at: staging) }
     try fm.copyItem(at: bundled, to: staging)
+    let weights = staging.appendingPathComponent(Self.weights)
+    if !fm.fileExists(atPath: weights.path) {
+      try Task.checkCancellation()
+      let configuration = URLSessionConfiguration.ephemeral
+      configuration.timeoutIntervalForRequest = 120; configuration.timeoutIntervalForResource = 3600
+      let session = URLSession(configuration: configuration)
+      defer { session.invalidateAndCancel() }
+      let (temporary, response) = try await session.download(from: weightsSource)
+      if let http = response as? HTTPURLResponse, http.statusCode != 200 { throw BuddyError.download }
+      try fm.moveItem(at: temporary, to: weights)
+    }
     try Self.verify(staging)
     try Task.checkCancellation()
     try Data(Self.provenance.utf8).write(to: staging.appendingPathComponent("verified.txt"), options: .atomic)
@@ -56,7 +80,7 @@ actor UKReferencePackage {
     guard FileManager.default.fileExists(atPath: manifestURL.path) else { throw BuddyError.modelMissing }
     guard try checksum(manifestURL) == manifestHash else { throw BuddyError.checksum }
     let hashes = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL))
-    for name in ["encoder.onnx", "vad.onnx", "vocab.json", "uk-vowels.json", "uk-focus.json", "uk-stress.json", "uk-boundary.json", "espeak-ng", "pitch.onnx", "espeak-ng-data/en_dict"] {
+    for name in ["encoder.onnx", weights, "vad.onnx", "vocab.json", "uk-vowels.json", "uk-focus.json", "uk-stress.json", "uk-boundary.json", "espeak-ng", "pitch.onnx", "espeak-ng-data/en_dict"] {
       guard hashes[name] != nil else { throw BuddyError.checksum }
     }
     for (name, hash) in hashes {

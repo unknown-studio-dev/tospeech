@@ -159,9 +159,12 @@ Model licenses are separate from the libraries that run them.
   see [PHONE-NOTICE.txt](scripts/assessment/PHONE-NOTICE.txt).
 - **UK Reference** — one package, five parts, staged by
   [stage-uk-reference.sh](scripts/xcode/stage-uk-reference.sh) with a pinned manifest:
-  - `encoder.onnx`: frozen [facebook/wav2vec2-xlsr-53-espeak-cv-ft](https://huggingface.co/facebook/wav2vec2-xlsr-53-espeak-cv-ft)
-    (revision `2c733782da5604684829819a5eb744c193fe9398`), exported by
-    [export_uk_reference.py](scripts/assessment/export_uk_reference.py).
+  - `encoder.onnx` + `pytorch_model.bin`: [facebook/wav2vec2-xlsr-53-espeak-cv-ft](https://huggingface.co/facebook/wav2vec2-xlsr-53-espeak-cv-ft)
+    (revision `2c733782da5604684829819a5eb744c193fe9398`). The graph is exported by
+    [export_uk_reference.py](scripts/assessment/export_uk_reference.py) and rewritten by
+    [externalize_uk_encoder.py](scripts/assessment/externalize_uk_encoder.py) to read its
+    weights from the unmodified upstream checkpoint, which the app downloads from Hugging Face
+    at onboarding and verifies by hash.
     [Apache-2.0](vendor/uk-reference/XLSR-APACHE-2.0.txt).
   - `uk-vowels.json`, `uk-stress.json`, `uk-focus.json`, `uk-boundary.json`:
     small heads trained by ToSpeech ([train_uk_heads.py](scripts/assessment/train_uk_heads.py))

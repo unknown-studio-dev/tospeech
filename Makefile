@@ -28,7 +28,7 @@ APP_PW         ?=
 
 XCB = xcodebuild -project "$(PROJECT)" -scheme "$(SCHEME)" -destination "$(DEST)" -derivedDataPath "$(DERIVED)"
 
-.PHONY: help gen bump build run test components render clean release sign notarize
+.PHONY: help gen bump build run test components render clean release install sign notarize dmg
 
 help:
 	@echo "ToSpeech — make targets:"
@@ -41,8 +41,10 @@ help:
 	@echo "  make render      Build + export SwiftUI view PNGs, then exit"
 	@echo "  make clean       Remove the .build derived-data directory"
 	@echo "  make release     Build Release"
+	@echo "  make install     Release build + copy ToSpeech.app into /Applications (replaces existing)"
 	@echo "  make sign        Release build + Developer ID sign every embedded Mach-O + verify"
 	@echo "  make notarize    Sign + notarize + staple  (NOTARY_PROFILE=... | APPLE_ID=... APP_PW=...)"
+	@echo "  make dmg         Notarize + build the drag-to-Applications DMG users download, notarized + stapled"
 
 gen:
 	@command -v xcodegen >/dev/null || { echo "✗ xcodegen not installed (brew install xcodegen)"; exit 1; }
@@ -93,6 +95,15 @@ release:
 	$(XCB) -configuration Release build
 	@echo "▶ Release app: $(RELEASE_APP)"
 
+# Local install for testing the Release build like a user would; distribution still
+# goes through notarize + zip/dmg.
+install: release
+	app="$(RELEASE_APP)"
+	pkill -x ToSpeech 2>/dev/null || true
+	rm -rf "/Applications/ToSpeech.app"
+	/usr/bin/ditto "$$app" "/Applications/ToSpeech.app"
+	@echo "▶ Installed: /Applications/ToSpeech.app"
+
 # Sign every embedded Mach-O inside-out (libs → helpers, xeus-helper with the
 # Python hardened-runtime exceptions), then seal the app. Re-signs correctly
 # regardless of what the Xcode stage-*.sh phases did.
@@ -138,3 +149,26 @@ notarize: sign
 	spctl -a -vvv -t exec "$$app"
 	rm -f "$$zip"
 	echo "▶ Done: signed + notarized + stapled → $$app"
+
+# What users download: a DMG with ToSpeech.app and an Applications shortcut. They drag
+# the app across and launch it from Applications; nothing runs from Downloads.
+# Attach the DMG and version.json to the GitHub release tagged v<version>.
+dmg: notarize
+	app="$(RELEASE_APP)"
+	version="$$(sed -nE 's/.*"version": "([^"]+)".*/\1/p' version.json)"
+	dmg="$${app%/*}/ToSpeech-$$version.dmg"
+	stage="$$(mktemp -d)"
+	/usr/bin/ditto "$$app" "$$stage/ToSpeech.app"
+	ln -s /Applications "$$stage/Applications"
+	rm -f "$$dmg"
+	hdiutil create -volname "ToSpeech" -srcfolder "$$stage" -ov -format UDZO -quiet "$$dmg"
+	rm -rf "$$stage"
+	codesign --force --timestamp -s "$(DEV_ID)" "$$dmg"
+	if [ -n "$(NOTARY_PROFILE)" ]; then
+	  xcrun notarytool submit "$$dmg" --keychain-profile "$(NOTARY_PROFILE)" --wait
+	else
+	  xcrun notarytool submit "$$dmg" --apple-id "$(APPLE_ID)" --team-id "$(TEAM_ID)" --password "$(APP_PW)" --wait
+	fi
+	xcrun stapler staple "$$dmg"
+	spctl -a -vv -t open --context context:primary-signature "$$dmg" || true
+	echo "▶ DMG: $$dmg"

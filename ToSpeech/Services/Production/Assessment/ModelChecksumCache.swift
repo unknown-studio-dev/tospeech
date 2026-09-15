@@ -4,7 +4,7 @@ import Foundation
 /// Remembers the SHA-256 of a model file so one process hashes it once per file version.
 ///
 /// Package integrity is checked before every assessment, and the files are large: PhoneticXeus'
-/// `model.safetensors` is 2,3 GB and the UK package's `encoder.onnx` 1,26 GB, so re-hashing them per
+/// `model.safetensors` is 2,3 GB and the UK package's `pytorch_model.bin` 1,26 GB, so re-hashing them per
 /// job cost ≈3 s of every job's latency (latency plan, W7). The bytes of a file cannot change
 /// without its size, modification time or identity (device + inode) changing, so each hash is kept
 /// against that stamp and recomputed as soon as `stat` disagrees — a replaced, repaired or tampered

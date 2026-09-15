@@ -18,4 +18,11 @@ for name, expected in json.loads((root/'checksums.json').read_text()).items():
 PY
 DEST="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/UKReference"
 mkdir -p "$DEST"
-rsync -a --delete "$SOURCE/" "$DEST/"
+# encoder.onnx reads its weights from the upstream checkpoint, which the app downloads
+# from Hugging Face at onboarding (UKReferencePackage.weightsURL). Release leaves the
+# 1,26 GB file out of the bundle; Debug keeps it so development and tests stay offline.
+if [ "${CONFIGURATION:-}" = Release ]; then
+  rsync -a --delete --delete-excluded --exclude 'pytorch_model.bin' "$SOURCE/" "$DEST/"
+else
+  rsync -a --delete "$SOURCE/" "$DEST/"
+fi

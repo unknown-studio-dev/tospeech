@@ -9,6 +9,7 @@ a = p.parse_args()
 native = Path(__file__).resolve().parents[2]
 required = [
     "encoder.onnx",
+    "pytorch_model.bin",
     "vad.onnx",
     "pitch.onnx",
     "vocab.json",

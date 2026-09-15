@@ -1,7 +1,7 @@
 {
   "version": "0.1.0",
   "build": "1",
-  "notes": "",
+  "notes": "First release. UK Reference weights now download from Hugging Face at onboarding; the app bundle is 507 MB.",
   "minOS": "26.0",
   "downloadURL": "https://github.com/unknown-studio-dev/tospeech/releases/latest"
 }

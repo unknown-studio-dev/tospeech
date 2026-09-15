@@ -253,6 +253,7 @@
 		B2BE669F29A85F1D3856B279 /* StoredLesson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65ECA806499386D083A5E450 /* StoredLesson.swift */; };
 		B457354A9BB9F9A9AB2F72B1 /* PhoneScorerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A1220B22879E51BD4E0EFD /* PhoneScorerAdapter.swift */; };
 		B4926F0B58A87AE7637A0FEE /* UKPhonemes-placeholder-provenance.json in Resources */ = {isa = PBXBuildFile; fileRef = B9C9A7EDDE51929C1B14C058 /* UKPhonemes-placeholder-provenance.json */; };
+		B601D5B98D905914CF9DD9AB /* UKReferenceDownloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6870A33AB9CD2E0671DA250 /* UKReferenceDownloadTests.swift */; };
 		B6193A759FD70182330318A8 /* EchoBrand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0445A0CF8E0BEFF673A90C06 /* EchoBrand.swift */; };
 		B67B9E715B2AC583F10F7408 /* ImportSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55690FFD8EEB82AF1C19D3EC /* ImportSheet.swift */; };
 		B6E6C11E4389FC24906C6C9F /* EchoTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97A3510E42D3F03082C7C2F8 /* EchoTheme.swift */; };
@@ -727,6 +728,7 @@
 		F5D81815211D8B1F47CD47ED /* ProgressBackendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressBackendTests.swift; sourceTree = "<group>"; };
 		F5EA58D527121EA63A34B483 /* UKPhoneme_26.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_26.wav; sourceTree = "<group>"; };
 		F5FF87040B60D83BD50A18E5 /* EchoDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDialog.swift; sourceTree = "<group>"; };
+		F6870A33AB9CD2E0671DA250 /* UKReferenceDownloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UKReferenceDownloadTests.swift; sourceTree = "<group>"; };
 		F7D71DDF5BAA7DFD1AE406CB /* DeepFilterRecordingRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepFilterRecordingRenderer.swift; sourceTree = "<group>"; };
 		F810258B6C4BEBE14EA10559 /* EchoPlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPlaybackControls.swift; sourceTree = "<group>"; };
 		F836121DCE0D59D3E9125DE2 /* CachedWordAligner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedWordAligner.swift; sourceTree = "<group>"; };
@@ -1410,6 +1412,7 @@
 				D17B5C5A6C9427D277E13E79 /* TranscriptionAdapterTests.swift */,
 				79DC662ECBD018672252EE3B /* TranslationLanguageTests.swift */,
 				EBDCFFC351FF355FFB478BC3 /* UKPhonemeAudioPlayerTests.swift */,
+				F6870A33AB9CD2E0671DA250 /* UKReferenceDownloadTests.swift */,
 				945A9EDCF2B47BFDD08D988B /* UKReferenceTests.swift */,
 				A893883D7830C4AAC601D86D /* UKSoundCoachingTests.swift */,
 				515A8A0998608C87EC5FD5A8 /* WordAlignmentPreparationTests.swift */,
@@ -1791,7 +1794,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${SRCROOT}/scripts/xcode/stage-phoneticxeus.sh\"";
+			shellScript = "[ \"$CONFIGURATION\" = Release ] || bash \"${SRCROOT}/scripts/xcode/stage-phoneticxeus.sh\"";
 		};
 		79E044FB2C2EF67E1CF98636 /* Stage Phone Scorer package */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1921,6 +1924,7 @@
 				7B25FBCF6593861199EFB3AA /* TranscriptionAdapterTests.swift in Sources */,
 				A284399B8D4CC947CF9E4932 /* TranslationLanguageTests.swift in Sources */,
 				EB2F2A30E67509F38D4933BE /* UKPhonemeAudioPlayerTests.swift in Sources */,
+				B601D5B98D905914CF9DD9AB /* UKReferenceDownloadTests.swift in Sources */,
 				A484292EB08BF03759AD7FFF /* UKReferenceTests.swift in Sources */,
 				35FC34017ABE5E8BCD0C7412 /* UKSoundCoachingTests.swift in Sources */,
 				07DDD1999DDB1602BB19F4A2 /* WordAlignmentPreparationTests.swift in Sources */,

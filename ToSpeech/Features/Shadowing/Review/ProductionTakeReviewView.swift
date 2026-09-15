@@ -782,7 +782,7 @@ struct ProductionTakeReviewView<Source: View>: View {
           }
         }
       } else if job?.isPending != true {
-        EchoLocalizedText([EngineID.buddy, .phone, .ukReference, .phoneticXeus].contains(store.preferences.productionAssessmentEngine ?? .compact) ? "assessment.empty_active" : "assessment.empty")
+        EchoLocalizedText(store.preferences.productionAssessmentEngine != nil ? "assessment.empty_active" : "assessment.empty")
           .font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.secondaryText)
       }
       if evidence == nil {
@@ -933,7 +933,7 @@ struct ProductionTakeReviewView<Source: View>: View {
 
   @ViewBuilder private var assessAction: some View {
     if eligible {
-      if [EngineID.buddy, .phone, .ukReference, .phoneticXeus].contains(store.preferences.productionAssessmentEngine ?? .compact) {
+      if store.preferences.productionAssessmentEngine != nil {
         EchoButton(history.isEmpty ? "assessment.start" : "assessment.rerun", symbol: "waveform", kind: history.isEmpty ? .primary : .secondary) {
           selectedJobID = nil; runtime.onAssess?()
         }.disabled(history.contains(where: \.isPending))

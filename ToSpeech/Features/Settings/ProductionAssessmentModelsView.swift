@@ -16,24 +16,44 @@ struct ProductionAssessmentModelsView: View {
           .disabled(store.preferences.productionAssessmentEngine == nil || manager.isBusy())
       }
       EchoLocalizedText("assessment.models_intro").font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.secondaryText)
-      ModelCardView(title: "PhoneticXeus · UK Experimental",
-        statusLine: copy(manager.xeusReady ? "assessment.xeus.installed" : "assessment.xeus.size"),
-        isActive: store.preferences.productionAssessmentEngine == .phoneticXeus,
-        activeLabel: copy("assessment.active"), errorText: manager.xeusFailure.map(copy)) {
-        if manager.xeusInstalling {
+      ModelCardView(title: "UK Reference · UK", statusLine: copy(manager.ukInstalled ? "assessment.uk.installed" : "assessment.uk.size"),
+        isActive: store.preferences.productionAssessmentEngine == .ukReference, activeLabel: copy("assessment.active"),
+        errorText: manager.ukFailure.map(copy)) {
+        if manager.ukInstalling {
           EchoLoading(title: "assessment.installing")
-          EchoButton("Cancel", kind: .ghost) { manager.cancelXeus() }
-        } else if !manager.xeusReady {
-          EchoButton("assessment.install") { manager.installXeus() }
+        } else if !manager.ukInstalled {
+          EchoButton("assessment.install") { manager.installUK() }
         } else {
-          EchoButton("assessment.activate", kind: .primary) { store.preferences.productionAssessmentEngine = .phoneticXeus }
-            .disabled(store.preferences.productionAssessmentEngine == .phoneticXeus || manager.isBusy() || store.preferences.accent != .uk)
-          EchoButton("assessment.remove", kind: .ghost) { removingEngine = .phoneticXeus; confirmingRemoval = true }
-            .disabled(manager.isBusy() || store.preferences.productionAssessmentEngine == .phoneticXeus)
+          EchoButton("assessment.activate", kind: .primary) { store.preferences.productionAssessmentEngine = .ukReference }
+            .disabled(store.preferences.productionAssessmentEngine == .ukReference || manager.isBusy() || store.preferences.accent != .uk)
+          EchoButton("assessment.remove", kind: .ghost) { removingEngine = .ukReference; confirmingRemoval = true }
+            .disabled(manager.isBusy() || store.preferences.productionAssessmentEngine == .ukReference || manager.xeusInstalled)
         }
       } footer: {
-        EchoLocalizedText("assessment.xeus.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
+        EchoLocalizedText("assessment.uk.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
         if store.preferences.accent != .uk { EchoLocalizedText("assessment.uk.error.accent").font(EchoFont.metadata) }
+      }
+      // Release builds ship without the PhoneticXeus runtime; offering a download that cannot work would mislead.
+      if manager.xeusAvailable {
+        ModelCardView(title: "PhoneticXeus · UK Experimental",
+          statusLine: copy(manager.xeusReady ? "assessment.xeus.installed" : "assessment.xeus.size"),
+          isActive: store.preferences.productionAssessmentEngine == .phoneticXeus,
+          activeLabel: copy("assessment.active"), errorText: manager.xeusFailure.map(copy)) {
+          if manager.xeusInstalling {
+            EchoLoading(title: "assessment.installing")
+            EchoButton("Cancel", kind: .ghost) { manager.cancelXeus() }
+          } else if !manager.xeusReady {
+            EchoButton("assessment.install") { manager.installXeus() }
+          } else {
+            EchoButton("assessment.activate", kind: .primary) { store.preferences.productionAssessmentEngine = .phoneticXeus }
+              .disabled(store.preferences.productionAssessmentEngine == .phoneticXeus || manager.isBusy() || store.preferences.accent != .uk)
+            EchoButton("assessment.remove", kind: .ghost) { removingEngine = .phoneticXeus; confirmingRemoval = true }
+              .disabled(manager.isBusy() || store.preferences.productionAssessmentEngine == .phoneticXeus)
+          }
+        } footer: {
+          EchoLocalizedText("assessment.xeus.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
+          if store.preferences.accent != .uk { EchoLocalizedText("assessment.uk.error.accent").font(EchoFont.metadata) }
+        }
       }
       ModelCardView(title: "Buddy · English v1", statusLine: copy(manager.isInstalled ? "assessment.installed" : "assessment.download_size"),
         isActive: store.preferences.productionAssessmentEngine == .buddy, activeLabel: copy("assessment.active"),
@@ -68,13 +88,6 @@ struct ProductionAssessmentModelsView: View {
         EchoLocalizedText("assessment.phone_scorer.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
         if store.preferences.accent == .uk {
           EchoLocalizedText("assessment.phone_scorer.accent").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.caution)
-        }
-      }
-      ForEach([EngineID.compact]) { engine in
-        ModelCardView(title: engine.title, statusLine: copy("assessment.unavailable"), isActive: false, activeLabel: "") {
-          EmptyView()
-        } footer: {
-          EchoLocalizedText("assessment.blocker.\(engine.rawValue)").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.muted)
         }
       }
     }

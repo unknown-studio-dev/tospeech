@@ -24,8 +24,11 @@ actor PhoneticXeusPackage {
     directory = paths.packages.appendingPathComponent("PhoneticXeus/\(Self.revision)")
     self.bundled = bundled
   }
+  /// Release builds ship without the 355 MB Python runtime; Settings hides the engine then.
+  func runtimeAvailable() -> Bool { (try? helper()) != nil }
   func helper() throws -> URL {
-    guard let bundled else { throw PhoneticXeusError.runtimeMissing }
+    guard let bundled, FileManager.default.fileExists(atPath: bundled.appendingPathComponent("checksums.json").path)
+    else { throw PhoneticXeusError.runtimeMissing }
     guard try BuddyModelPackage.checksum(bundled.appendingPathComponent("checksums.json")) == Self.runtimeHash else { throw BuddyError.checksum }
     let executable = bundled.appendingPathComponent("xeus-helper")
     guard FileManager.default.isExecutableFile(atPath: executable.path) else { throw PhoneticXeusError.runtimeMissing }

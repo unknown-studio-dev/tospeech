@@ -14,11 +14,5 @@ enum ModelFixtures {
       details:
         "Needs a calibrated scorer, a verified local bundle and license review. Not available for installation yet.",
       available: false, status: .unavailable),
-    ModelPackage(
-      id: .compact, subtitle: "Fabio Suizu · proprietary candidate",
-      footprint: "17 MB claimed · local SDK unverified",
-      details:
-        "No verified local SDK, downloadable weights or redistribution rights. This is not an available integration.",
-      available: false, status: .unavailable),
   ]
 }
