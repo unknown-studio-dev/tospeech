@@ -27,9 +27,21 @@ if [ -d "$res" ]; then
   while IFS= read -r -d '' f; do
     case "$f" in *.dylib|*.so|*.abi3.so) continue ;; esac
     file -b "$f" 2>/dev/null | grep -q 'Mach-O' || continue
-    if [ "$(basename "$f")" = "xeus-helper" ]; then echo "   py   $f"; sign_one "$ENT_PY" "$f"
-    else echo "   exec $f"; sign_one "$ENT_HELPER" "$f"; fi
+    case "$(basename "$f")" in
+      xeus-helper|yt-dlp_macos) echo "   py   $f"; sign_one "$ENT_PY" "$f" ;;   # PyInstaller: needs library-validation off
+      *) echo "   exec $f"; sign_one "$ENT_HELPER" "$f" ;;
+    esac
   done < <(find "$res" -type f -print0)
+fi
+# Re-signing changed the tool bytes; the app refuses tools whose hash differs from this
+# manifest (BundledImportToolchain), so pin the signed hashes (same format as stage-toolchain.sh).
+tools="$res/Tools"
+if [ -d "$tools" ]; then
+  hash() { shasum -a 256 "$1" | awk '{print $1}'; }
+  printf '{\n  "yt-dlp": "%s",\n  "ffmpeg": "%s",\n  "ffprobe": "%s",\n  "qjs": "%s"\n}\n' \
+    "$(hash "$tools/yt-dlp/yt-dlp_macos")" "$(hash "$tools/ffmpeg")" "$(hash "$tools/ffprobe")" "$(hash "$tools/qjs")" \
+    > "$res/Toolchain.runtime.json"
+  echo "▶ Toolchain.runtime.json re-pinned to signed tools"
 fi
 echo "▶ Sealing app…"
 sign_one "$ENT_APP" "$APP"
