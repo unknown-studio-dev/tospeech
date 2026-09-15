@@ -14,11 +14,14 @@ class OkayFixtureTests(unittest.TestCase):
         result = assemble_from_logits(self.lp, self.lp, VOCAB, self.request, 2.72, 2.72)
         rows = [p for w in result['words'] for p in w['phones']]
         self.assertEqual(len(rows), 16)
-        self.assertEqual(sum(r['status'] == 'correct' for r in rows), 15)
+        # 'əʊ' in "Okay" is referenceUnmapped (its source realization isn't licensed); the hard
+        # per-word mask now grays its whole word ('k' and 'eɪ' too), not just the offending unit.
+        self.assertEqual(sum(r['status'] == 'correct' for r in rows), 13)
         unmapped = [r for r in rows if r['status'] != 'correct']
-        self.assertEqual([(r['expected'], r['reason']) for r in unmapped], [('əʊ', 'referenceUnmapped')])
+        self.assertEqual([(r['expected'], r['reason']) for r in unmapped],
+                          [('əʊ', 'referenceNotConfident'), ('k', 'referenceNotConfident'), ('eɪ', 'referenceNotConfident')])
         self.assertEqual(result['policy'], 'xeus-uk-ctc-evidence-v5-units')
-        self.assertEqual(result['mapping'], 'xeus-uk-inventory-v3')
+        self.assertEqual(result['mapping'], 'xeus-uk-inventory-v4')
 
     def test_assemble_contract_fields_and_head_summary(self):
         from runtime import assemble_from_logits
@@ -159,7 +162,9 @@ class StageATests(unittest.TestCase):
         rows=[p for w in result['words'] for p in w['phones']]
         self.assertEqual(len(rows),1)
         self.assertEqual(rows[0]['status'],'uncertain')
-        self.assertEqual(rows[0]['reason'],'referenceWeak')
+        # The per-unit gate would say 'referenceWeak', but this word's only unit fails the hard
+        # per-word native competence mask too, which takes over the reason unconditionally.
+        self.assertEqual(rows[0]['reason'],'referenceNotConfident')
         self.assertEqual(rows[0]['licence'],'weak')
 
     def test_degenerate_source_row_is_weak_not_graded(self):
@@ -199,8 +204,48 @@ class StageATests(unittest.TestCase):
         row=[p for w in assemble_from_logits(src,take,v,request,.08,.08)['words'] for p in w['phones']][0]
         self.assertEqual(row['takeStatus'],'correct')       # the take itself is fine …
         self.assertEqual(row['status'],'uncertain')         # … but the reference cannot license it
-        self.assertEqual(row['reason'],'referenceWeak')
+        # Superseded by the hard per-word native competence mask (this word's only unit isn't
+        # native-confirmed), which reports the unified reason instead of the per-unit 'referenceWeak'.
+        self.assertEqual(row['reason'],'referenceNotConfident')
         self.assertEqual(row['licence'],'weak')
+
+    def _assemble_word_case(self):
+        # A two-unit word ('θ' then 's'). Source unit 1 is blank-dominated / ambiguous (same
+        # weak-evidence shape as test_weak_reference_blocks_take_with_reason), so its Stage A
+        # row never reaches 'correct' and its licence is demoted to 'weak'. Source unit 2 is a
+        # clean, confident 's' (Stage A licences it 'accepted' and grades it 'correct'). The
+        # take is irrelevant/blank for unit 1 and confidently says the confusable 'ʃ' for unit 2
+        # (would be graded likelyIncorrect on its own, since 'ʃ' is nowhere else in the audio,
+        # forced alignment must anchor unit 2's take there).
+        from runtime import assemble_from_logits
+        v = self.vocab(**{'θ': 4, 's': 5, 'ʃ': 6})
+        src = self.lp([
+            {0: .999},                # leading blank
+            {0: .997, 4: .002},       # unit 1 ('θ'): blank-dominated, ambiguous -> not correct
+            {0: .997, 4: .002},
+            {0: .999},                # separator blank
+            {5: .99},                  # unit 2 ('s'): confident, correct
+            {0: .999},                 # trailing blank
+        ])
+        take = self.lp([
+            {0: .999},
+            {0: .999},                 # unit 1 take: irrelevant, will be masked regardless
+            {0: .999},
+            {0: .999},
+            {6: .98, 5: .001},        # unit 2 take: confident, confusable 'ʃ' for expected 's'
+            {6: .95, 5: .001},
+            {0: .999},
+        ])
+        request = {'words': [{'id': 'w0', 'text': 'test', 'variants': [['θ', 's']]}]}
+        return assemble_from_logits(src, take, v, request, len(src) * .02, len(take) * .02)
+
+    def test_word_mask_grays_whole_word_when_native_unit_not_confident(self):
+        # A two-unit word where the SOURCE cannot confirm unit 2 must yield NO red
+        # on the TAKE for either unit, even if the take unit 1 looks wrong.
+        result = self._assemble_word_case()  # helper builds a 2-phone word, source weak on phone 2
+        phones = result['words'][0]['phones']
+        self.assertTrue(all(p['status'] != 'likelyIncorrect' for p in phones))
+        self.assertTrue(any(p['reason'] == 'referenceNotConfident' for p in phones))
 
     def test_cannot_distinguish_always_overrides_a_correct_take(self):
         # The reference says [æ] for BATH /ɑː/ — a competitor the CTC labels collapse — and no head is
@@ -216,9 +261,19 @@ class StageATests(unittest.TestCase):
              for p in w['phones'] if p['expected']=='ɑː'][0]
         self.assertEqual(row['licence'],'cannotDistinguish')
         self.assertEqual(row['takeStatus'],'correct')
-        self.assertEqual((row['status'],row['reason']),('uncertain','modelCannotDistinguish'))
+        # Superseded by the hard per-word native competence mask (this word's only unit isn't
+        # native-confirmed), which reports the unified reason instead of 'modelCannotDistinguish'.
+        self.assertEqual((row['status'],row['reason']),('uncertain','referenceNotConfident'))
 
     def test_assemble_with_synthetic_head_reports_summary_and_contrast(self):
+        # NOTE: a 'head' licence is granted only when the SOURCE row's own raw CTC status is
+        # already NOT 'correct' (that's the entire reason the head is consulted at all — see
+        # stage_a's skip condition `row['status']=='correct' ... continue`). So a head-licensed
+        # unit can never satisfy the hard per-word native competence mask's `status=='correct'`
+        # requirement, and this word (all one unit, 'ɑː') is always masked to
+        # uncertain/referenceNotConfident on the TAKE regardless of the head's uk/us decision.
+        # This test now asserts what still differs (licence, contrast decision, head summary,
+        # source-side diagnostic) rather than the take-side verdict, which the mask supersedes.
         from runtime import assemble_from_logits
         from uk_contrast_head import ContrastHead
         import tempfile
@@ -236,20 +291,21 @@ class StageATests(unittest.TestCase):
             ht=np.zeros((T,8)); ht[:,0]=1.0
             result=assemble_from_logits(src,take,v,request,T*.02,T*.02,hidden_source=hs,hidden_take=ht,head=head)
             row=[p for w in result['words'] for p in w['phones'] if p['expected']=='ɑː'][0]
-            self.assertEqual(row['licence'],'head'); self.assertEqual(row['status'],'correct')
-            self.assertEqual(row['reason'],'contrastHead'); self.assertEqual(row['contrast']['decision'],'uk')
-            self.assertEqual(row['diagnostic']['state'],'SUPPORTED_BY_CONTRAST_HEAD')
+            self.assertEqual(row['licence'],'head'); self.assertEqual(row['contrast']['decision'],'uk')
+            self.assertEqual((row['status'],row['reason']),('uncertain','referenceNotConfident'))
             self.assertEqual(result['contrastHead']['layer'],12)
 
             ht=np.zeros((T,8)); ht[:,0]=-1.0
             result=assemble_from_logits(src,take,v,request,T*.02,T*.02,hidden_source=hs,hidden_take=ht,head=head)
             row=[p for w in result['words'] for p in w['phones'] if p['expected']=='ɑː'][0]
-            self.assertEqual(row['status'],'likelyIncorrect'); self.assertEqual(row['closestPhone'],'æ')
-            self.assertEqual(row['diagnostic']['state'],'LIKELY_PRONUNCIATION_DIFFERENCE_BY_HEAD')
+            self.assertEqual(row['contrast']['decision'],'us')
+            self.assertEqual((row['status'],row['reason']),('uncertain','referenceNotConfident'))
+            self.assertNotEqual(row['status'],'likelyIncorrect')  # never red: masked, not accused
 
         result=assemble_from_logits(src,take,v,request,T*.02,T*.02,hidden_source=hs,hidden_take=ht,head=None)
         row=[p for w in result['words'] for p in w['phones'] if p['expected']=='ɑː'][0]
-        self.assertEqual(row['reason'],'modelCannotDistinguish')
+        self.assertEqual(row['licence'],'cannotDistinguish')
+        self.assertEqual(row['reason'],'referenceNotConfident')
         self.assertEqual(row['diagnostic']['state'],'MODEL_CANNOT_DISTINGUISH')
 
 if __name__ == '__main__': unittest.main()

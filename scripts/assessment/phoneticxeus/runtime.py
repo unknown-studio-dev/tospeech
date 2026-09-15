@@ -171,6 +171,17 @@ def assemble_from_logits(source,take,vocab,request,source_duration,take_duration
         # The head could not be consulted for this unit at all: no take-side verdict is licensed,
         # not even a `correct` one from the raw CTC scorer that the head exists to overrule.
         elif lic=='cannotDistinguish': row['status']='uncertain'; row['reason']='modelCannotDistinguish'
+    # Hard per-word native competence mask: a word may show a red phone only if the
+    # native reference confirmed EVERY unit of that word. Otherwise the whole word is
+    # ungradeable for the learner (never an accusation).
+    from collections import defaultdict
+    word_units=defaultdict(list)
+    for i,u in enumerate(units): word_units[u.word].append(i)
+    for wid,idxs in word_units.items():
+        native_ok=all(a['rows'][i]['status']=='correct' and a['licences'][i] in ('accepted','classD','head') for i in idxs)
+        if native_ok: continue
+        for i in idxs:
+            take_rows[i]['status']='uncertain'; take_rows[i]['reason']='referenceNotConfident'
     source_phones=expand_rows(units,a['rows']); take_phones=expand_rows(units,take_rows)
     reference,details=diagnostics(source,take,source_phones,take_phones,words,selected,vocab,source_duration,take_duration)
     results=[]; cursor=0
