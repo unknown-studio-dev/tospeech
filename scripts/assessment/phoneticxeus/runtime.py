@@ -174,14 +174,23 @@ def assemble_from_logits(source,take,vocab,request,source_duration,take_duration
     # Hard per-word native competence mask: a word may show a red phone only if the
     # native reference confirmed EVERY unit of that word. Otherwise the whole word is
     # ungradeable for the learner (never an accusation).
+    # A 'head' licence is only ever assigned when the raw CTC status is NOT 'correct'
+    # (that's why the head was consulted at all), so 'correct' cannot be required of it;
+    # the head's own arbitration (a 'head' licence at all) is the confidence signal there.
     from collections import defaultdict
+    def _native_ok(i):
+        lic=a['licences'][i]
+        if lic=='accepted': return a['rows'][i]['status']=='correct'
+        return lic in ('classD','head')
     word_units=defaultdict(list)
     for i,u in enumerate(units): word_units[u.word].append(i)
     for wid,idxs in word_units.items():
-        native_ok=all(a['rows'][i]['status']=='correct' and a['licences'][i] in ('accepted','classD','head') for i in idxs)
-        if native_ok: continue
+        if all(_native_ok(i) for i in idxs): continue
+        # Only overwrite rows that would otherwise show green/red; already-uncertain rows
+        # (referenceWeak/referenceUnmapped/modelCannotDistinguish) keep their specific reason.
         for i in idxs:
-            take_rows[i]['status']='uncertain'; take_rows[i]['reason']='referenceNotConfident'
+            if take_rows[i]['status'] in ('correct','likelyIncorrect'):
+                take_rows[i]['status']='uncertain'; take_rows[i]['reason']='referenceNotConfident'
     source_phones=expand_rows(units,a['rows']); take_phones=expand_rows(units,take_rows)
     reference,details=diagnostics(source,take,source_phones,take_phones,words,selected,vocab,source_duration,take_duration)
     results=[]; cursor=0
