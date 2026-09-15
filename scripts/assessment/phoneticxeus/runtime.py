@@ -124,7 +124,7 @@ def stage_a(source, units, vocab, duration, head=None, hidden=None):
 
 def apply_head_take(units, rows, licences, head, hidden):
     for i,(u,row) in enumerate(zip(units,rows)):
-        if len(u.display)!=1 or u.display[0] not in CONTRASTS_FOR or row['status']=='correct': continue
+        if len(u.display)!=1 or u.display[0] not in CONTRASTS_FOR or row['status']=='correct' or licences[i]=='classD': continue
         if row.get('closestPhone') not in COMPETITORS[u.display[0]]: continue
         pooled=_pooled(hidden,row,head)
         if head is None or pooled is None: row['status']='uncertain'; row['reason']='modelCannotDistinguish'; continue

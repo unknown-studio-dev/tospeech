@@ -148,6 +148,39 @@ class StageATests(unittest.TestCase):
         out=apply_head_take(units,[dict(r) for r in rows],licences,None,None)
         self.assertEqual((out[2]['status'],out[2]['reason']),('uncertain','modelCannotDistinguish'))
 
+    def test_apply_head_take_never_flips_a_classd_licensed_unit(self):
+        # A classD licence means the SOURCE realized this unit's accent-dependent variant —
+        # stage_a's own head consultation already skips classD units entirely (never lets the
+        # head override a classD-licensed source row: runtime.py's `... or licences[i]=='classD':
+        # continue`). apply_head_take must mirror that skip on the TAKE side too. Without it, a
+        # classD-licensed unit's raw-uncertain take row could be flipped straight to
+        # 'likelyIncorrect' by the head — and since the corrected per-word mask trusts a classD
+        # licence on its own (no status=='correct' requirement), the per-word mask would never
+        # catch this flip: a narrow, uncaught path to a red phone on native audio.
+        from runtime import apply_head_take
+        from evidence import build_units
+        from uk_contrast_head import ContrastHead
+        import tempfile
+        from test_head import synthetic_head
+        v=self.vocab(**{'ɡ':4,'ɹ':5,'ɑː':6,'ɑ':7,'æ':8,'s':9})
+        units=build_units([('w',['g','ɹ','ɑː','s'])],v)
+        # Unit 2 ('ɑː') take is raw-'uncertain' (e.g. from an ambiguous, non-confusable
+        # substitution the raw scorer abstained on) with a closestPhone inside the contrast's
+        # own competitor set — exactly the shape that would otherwise route into head
+        # consultation.
+        rows=[dict(status='correct'),dict(status='correct'),
+              dict(status='uncertain',reason='ambiguousSubstitution',closestPhone='æ',windowStart=2,windowEnd=4),
+              dict(status='correct')]
+        licences=['accepted','accepted','classD','accepted']
+        with tempfile.TemporaryDirectory() as t:
+            head=ContrastHead.load(synthetic_head(t))
+            hidden=np.zeros((6,8)); hidden[2:4,0]=-1.0  # feature that would decide 'us' if consulted
+            out=apply_head_take(units,[dict(r) for r in rows],licences,head,hidden)
+        self.assertEqual(out[2]['status'],'uncertain')
+        self.assertNotEqual(out[2]['status'],'likelyIncorrect')  # never red: the head was never consulted
+        self.assertEqual(out[2]['reason'],'ambiguousSubstitution')  # untouched, not overwritten
+        self.assertNotIn('contrast',out[2])  # confirms the head-consultation branch was skipped
+
     def test_weak_reference_blocks_take_with_reason(self):
         # 'θ' is barely present anywhere (blank dominates every frame): the discovered
         # realization is empty (accepted-shaped, no contradicting evidence) but the
