@@ -30,6 +30,16 @@ struct LocalizationTests {
     #expect(
       EchoLocalization.string(
         "import.presentation.ready.start", locale: Locale(identifier: "vi")) == "Bắt đầu luyện")
+    #expect(
+      EchoLocalization.string("Giới thiệu", locale: Locale(identifier: "en")) == "About")
+    #expect(
+      EchoLocalization.format(
+        "Đã có bản %@.", locale: Locale(identifier: "en"), arguments: ["0.2.0"])
+        == "Version 0.2.0 is available.")
+    #expect(
+      EchoLocalization.format(
+        "Đã có bản %@.", locale: Locale(identifier: "vi"), arguments: ["0.2.0"])
+        == "Đã có bản 0.2.0.")
   }
 
   @Test func languagePreferenceRoundTripsAndOldSnapshotsRemainDecodable() throws {

@@ -98,6 +98,7 @@ struct ToSpeechApp: App {
   @State private var store: EchoStore
   @Environment(\.openWindow) private var openWindow
   @State private var productionLibrary: ProductionLibraryBootstrap
+  @State private var updateChecker = AppUpdateChecker()
   init() {
     let process = ProcessInfo.processInfo
     let runningTests =
@@ -149,6 +150,7 @@ struct ToSpeechApp: App {
             .environment(\.locale, store.preferences.language.locale)
             .environment(\.parakeetModelManager, productionLibrary.parakeetModels)
             .environment(\.pronunciationModelManager, productionLibrary.pronunciationModels)
+            .environment(\.appUpdateChecker, productionLibrary.usesPreviewFixtures ? nil : updateChecker)
             .toolbar(removing: .title)
             .preferredColorScheme(.dark).tint(EchoTheme.accent)
             .background(
@@ -173,6 +175,11 @@ struct ToSpeechApp: App {
     .windowResizability(.contentMinSize)
     .defaultSize(width: EchoMetrics.windowSize.width, height: EchoMetrics.windowSize.height)
     .commands {
+      CommandGroup(replacing: .appInfo) {
+        Button(store.preferences.language == .english ? "About ToSpeech" : "Giới thiệu ToSpeech") {
+          showAboutPanel(english: store.preferences.language == .english)
+        }
+      }
       CommandGroup(replacing: .appSettings) {
         Button(store.preferences.language == .english ? "Settings…" : "Cài đặt…") {
           guard productionLibrary.usesPreviewFixtures || store.preferences.hasCompletedOnboarding else { return }
@@ -231,5 +238,22 @@ struct ToSpeechApp: App {
 
   private var rendersPreviews: Bool {
     ProcessInfo.processInfo.arguments.contains("--render-previews")
+  }
+
+  /// Version and copyright come from the Info.plist automatically; credits add the author
+  /// and a link to the studio. The panel stays static — the live update check lives in
+  /// Settings, per the "check & notify only" scope.
+  private func showAboutPanel(english: Bool) {
+    let font = NSFont.systemFont(ofSize: 11)
+    let credits = NSMutableAttributedString(
+      string: (english ? "By " : "Bởi ") + AppInfo.author + "\n", attributes: [.font: font])
+    credits.append(NSAttributedString(
+      string: "unknownstudio.dev", attributes: [.link: AppInfo.studioURL, .font: font]))
+    let paragraph = NSMutableParagraphStyle()
+    paragraph.alignment = .center
+    credits.addAttribute(
+      .paragraphStyle, value: paragraph, range: NSRange(location: 0, length: credits.length))
+    NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
+    NSApp.activate(ignoringOtherApps: true)
   }
 }

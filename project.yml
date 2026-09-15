@@ -11,6 +11,7 @@ settings:
     ARCHS: arm64
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGN_STYLE: Manual
+    DEVELOPMENT_TEAM: Y8DVMS7BH2
 packages:
   ONNXRuntime:
     url: https://github.com/microsoft/onnxruntime-swift-package-manager
@@ -90,9 +91,12 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.unknownstudio.tospeech
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_CFBundleDisplayName: ToSpeech
+        INFOPLIST_KEY_NSHumanReadableCopyright: "© 2026 Unknown Studio (pirumu)"
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
         INFOPLIST_KEY_NSMicrophoneUsageDescription: ToSpeech records your shadowing takes when you explicitly start recording.
         INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToSpeech uses on-device speech recognition to prepare transcript and word timing for imported lessons.
@@ -106,6 +110,7 @@ targets:
           ENABLE_HARDENED_RUNTIME: NO
         Release:
           ENABLE_HARDENED_RUNTIME: YES
+          CODE_SIGN_IDENTITY: "Developer ID Application"
     entitlements:
       path: ToSpeech/App/ToSpeech.entitlements
       properties:
@@ -138,6 +143,13 @@ targets:
         HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/ThirdParty/RubberBand"
         CLANG_CXX_LANGUAGE_STANDARD: c++17
         GCC_OPTIMIZATION_LEVEL: 3
+      configs:
+        # Embedded helper must be hardened + Developer ID signed for notarization.
+        Debug:
+          ENABLE_HARDENED_RUNTIME: NO
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
+          CODE_SIGN_IDENTITY: "Developer ID Application"
 
 schemes:
   ToSpeech:

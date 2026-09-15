@@ -1526,3 +1526,15 @@
 "translation.error.unsupported" = "Translating English into the chosen language is not supported on this Mac.";
 "translation.error.not_ready" = "The translation package for the chosen language is not ready.";
 "translation.error.mismatch" = "Translation returned a response that could not be matched to its sentence.";
+
+"Giới thiệu" = "About";
+"Phiên bản, tác giả và cập nhật." = "Version, author and updates.";
+"Phiên bản" = "Version";
+"Tác giả" = "Author";
+"Ghé UnknownStudio" = "Visit UnknownStudio";
+"Đang kiểm tra bản mới…" = "Checking for updates…";
+"Bạn đang dùng bản mới nhất." = "You're on the latest version.";
+"Đã có bản %@." = "Version %@ is available.";
+"Không kiểm tra được bản mới." = "Couldn't check for updates.";
+"Tải bản mới" = "Download update";
+"Kiểm tra bản mới" = "Check for updates";

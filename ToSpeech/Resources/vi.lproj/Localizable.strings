@@ -1532,3 +1532,15 @@
 "translation.error.unsupported" = "Mac này không hỗ trợ dịch tiếng Anh sang ngôn ngữ đã chọn.";
 "translation.error.not_ready" = "Gói dịch cho ngôn ngữ đã chọn chưa sẵn sàng.";
 "translation.error.mismatch" = "Kết quả dịch không khớp được với câu tương ứng.";
+
+"Giới thiệu" = "Giới thiệu";
+"Phiên bản, tác giả và cập nhật." = "Phiên bản, tác giả và cập nhật.";
+"Phiên bản" = "Phiên bản";
+"Tác giả" = "Tác giả";
+"Ghé UnknownStudio" = "Ghé UnknownStudio";
+"Đang kiểm tra bản mới…" = "Đang kiểm tra bản mới…";
+"Bạn đang dùng bản mới nhất." = "Bạn đang dùng bản mới nhất.";
+"Đã có bản %@." = "Đã có bản %@.";
+"Không kiểm tra được bản mới." = "Không kiểm tra được bản mới.";
+"Tải bản mới" = "Tải bản mới";
+"Kiểm tra bản mới" = "Kiểm tra bản mới";

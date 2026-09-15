@@ -55,6 +55,7 @@
 		224FAB27E4EB062ACB6D250C /* PreviewRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC96776A9171BFDB4EABEA1 /* PreviewRepository.swift */; };
 		229EDBBE18ECBFE65789611D /* ImportPreparationPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7619C2877B830CC537E /* ImportPreparationPresentation.swift */; };
 		2388EF6A500B138E0B0A809D /* UKPhoneme_20.wav in Resources */ = {isa = PBXBuildFile; fileRef = EB43143B4A369C1046954E58 /* UKPhoneme_20.wav */; };
+		23E995FAE8ADFB1216878A0B /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA84211602B2D47851E085 /* AppInfo.swift */; };
 		265947A505A823202EB94124 /* CaptureWriterLiveSamplesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0E4C39FBDCC24707C91323 /* CaptureWriterLiveSamplesTests.swift */; };
 		26F497EAFE3DC62A73940578 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BFF10BD0D2EC4A7A73892149 /* Icons.xcassets */; };
 		2753B46F1A06D56B2C952E6F /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 4CCFB5C5B0F4AD7DA7DE7DB8 /* README.md */; };
@@ -218,6 +219,7 @@
 		94972AE7F6E41B4017EC7077 /* UKPhoneme_02.wav in Resources */ = {isa = PBXBuildFile; fileRef = D31091BCCAC08CAC9E3B201F /* UKPhoneme_02.wav */; };
 		950133201F848501FF2FD1C0 /* UKPhoneme_18.wav in Resources */ = {isa = PBXBuildFile; fileRef = C9B004071C5C784CB3197559 /* UKPhoneme_18.wav */; };
 		95A0B78CFB127000ECDF2728 /* EchoPlaybackControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F810258B6C4BEBE14EA10559 /* EchoPlaybackControls.swift */; };
+		95AD49966D9000737E29C64A /* AppUpdateCheckerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 092633C70A9D8B7C3D377C06 /* AppUpdateCheckerTests.swift */; };
 		963E5DA576C548E12D69F1A3 /* AppRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFCE0792E8B5CC96559BFCB /* AppRootView.swift */; };
 		987B2842ECFDD408B33025C4 /* UKPhoneme_07.wav in Resources */ = {isa = PBXBuildFile; fileRef = 621BBBB059CDA7045918A3DC /* UKPhoneme_07.wav */; };
 		98AFCB16AC18C4F9846D1A0D /* ContentMatchingJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E74C5AEAC039136A3970CBD /* ContentMatchingJob.swift */; };
@@ -231,6 +233,7 @@
 		A0576909481C1394A619F630 /* UKDeliveryReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D8BD1FF82B838BA652CC1D5 /* UKDeliveryReviewView.swift */; };
 		A07D5F2ED22F048B230F573E /* WordPronunciationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC7AFDEF4919215A809A59A4 /* WordPronunciationView.swift */; };
 		A284399B8D4CC947CF9E4932 /* TranslationLanguageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DC662ECBD018672252EE3B /* TranslationLanguageTests.swift */; };
+		A30CC789B7EB3004BA87C62E /* AppUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D9F26893D46057E2DF2F28 /* AppUpdateChecker.swift */; };
 		A3CE4967607DEFBA825F27AF /* IPAAnnotationPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B3071F1A7F058E1755B5917 /* IPAAnnotationPreparer.swift */; };
 		A484292EB08BF03759AD7FFF /* UKReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945A9EDCF2B47BFDD08D988B /* UKReferenceTests.swift */; };
 		A52C245F905E114062EAF0CE /* PronunciationDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F32E2456FAED236B354B729F /* PronunciationDisplay.swift */; };
@@ -390,6 +393,7 @@
 		0798AEA6B0BF98A4B1444C4C /* UKReferencePackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UKReferencePackage.swift; sourceTree = "<group>"; };
 		07F1BAA68A18E8E3F0790E4D /* SpeechPaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechPaceTests.swift; sourceTree = "<group>"; };
 		089CCAC168ADDE3DE5491B1B /* UKPhoneme_13.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_13.wav; sourceTree = "<group>"; };
+		092633C70A9D8B7C3D377C06 /* AppUpdateCheckerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateCheckerTests.swift; sourceTree = "<group>"; };
 		0961AAD0504053F4BEBCD473 /* DeepFilterNet-MIT.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "DeepFilterNet-MIT.txt"; sourceTree = "<group>"; };
 		0BC60A83FC2CDD2A0AD100D6 /* PreviewSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewSnapshot.swift; sourceTree = "<group>"; };
 		0C57E314B75BDEF97156BAFB /* PronunciationCoverage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationCoverage.swift; sourceTree = "<group>"; };
@@ -537,6 +541,7 @@
 		65ECA806499386D083A5E450 /* StoredLesson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoredLesson.swift; sourceTree = "<group>"; };
 		661F1F9E8074BEC3BCD47F80 /* UKPhoneme_35.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_35.wav; sourceTree = "<group>"; };
 		6710C66B5228A03A576AC618 /* story.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = story.jpg; sourceTree = "<group>"; };
+		68D9F26893D46057E2DF2F28 /* AppUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpdateChecker.swift; sourceTree = "<group>"; };
 		6927CA68A057E5B8ECBA7C7A /* EchoSeekSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoSeekSlider.swift; sourceTree = "<group>"; };
 		6B3747B86D989C0513B3944C /* UKPhoneme_42.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_42.wav; sourceTree = "<group>"; };
 		6C19498C32362525714BC65E /* Translation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Translation.framework; path = System/Library/Frameworks/Translation.framework; sourceTree = SDKROOT; };
@@ -577,6 +582,7 @@
 		8243A067A9EEF793A80CC4F6 /* ImportJobBanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportJobBanner.swift; sourceTree = "<group>"; };
 		8308FF7A8D6CC15CE17A2C25 /* UKPhoneme_29.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_29.wav; sourceTree = "<group>"; };
 		839855B7CFBBD44029DF05F9 /* UKPhoneme_05.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_05.wav; sourceTree = "<group>"; };
+		84BA84211602B2D47851E085 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
 		858EC011B3240A49C6767BA5 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		8610F734BC61401E7C27217A /* DictationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationView.swift; sourceTree = "<group>"; };
 		87575D93C139EF31BC4DEE60 /* ContentMatchingFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMatchingFixtures.swift; sourceTree = "<group>"; };
@@ -787,6 +793,7 @@
 		01831E02585AF6006E3A0899 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				84BA84211602B2D47851E085 /* AppInfo.swift */,
 				9C68BD4C439F8A3833C8AF08 /* AppLifecycle.swift */,
 				DEFCE0792E8B5CC96559BFCB /* AppRootView.swift */,
 				9DF653B866266DCB3063283D /* ToSpeech.entitlements */,
@@ -1179,6 +1186,7 @@
 			isa = PBXGroup;
 			children = (
 				1A1768A279F481E7DE599D86 /* AppleSpeechTranscriptionSection.swift */,
+				68D9F26893D46057E2DF2F28 /* AppUpdateChecker.swift */,
 				B58E33C590960434B5B0D899 /* GeneralSettingsView.swift */,
 				0FDE0FD95303C5D8F2F385D1 /* ModelCardView.swift */,
 				4BBD11DC2FC919738040BCFB /* ModelPackageCard.swift */,
@@ -1351,6 +1359,7 @@
 			isa = PBXGroup;
 			children = (
 				A889EB2FB23CED85F1B36F76 /* AppleReferenceSpeechTests.swift */,
+				092633C70A9D8B7C3D377C06 /* AppUpdateCheckerTests.swift */,
 				4BB386D480A32346FA5FAA04 /* AudioFirstPreparationTests.swift */,
 				2AE1E44EDCB2D376DCEB7F5A /* AudioTapIsolationTests.swift */,
 				DE0E4C39FBDCC24707C91323 /* CaptureWriterLiveSamplesTests.swift */,
@@ -1562,12 +1571,15 @@
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					13D95EB36E83FC68AA7165E6 = {
+						DevelopmentTeam = Y8DVMS7BH2;
 						ProvisioningStyle = Manual;
 					};
 					8D3B6326060E55A6C60C3789 = {
+						DevelopmentTeam = Y8DVMS7BH2;
 						ProvisioningStyle = Manual;
 					};
 					EE5F08D2E54E8AB41ABA0149 = {
+						DevelopmentTeam = Y8DVMS7BH2;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -1855,6 +1867,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				95AD49966D9000737E29C64A /* AppUpdateCheckerTests.swift in Sources */,
 				BFE37FEF406E3C4A46A51D2D /* AppleReferenceSpeechTests.swift in Sources */,
 				C405E32D81183D595BD5879F /* AudioFirstPreparationTests.swift in Sources */,
 				895EDF456F89EAF143AC1C10 /* AudioTapIsolationTests.swift in Sources */,
@@ -1918,9 +1931,11 @@
 			files = (
 				4B0E4457F6B5700F1B07845E /* AcousticDeliveryAnalyzer.swift in Sources */,
 				B7E3BF93D7AD5B54B3069824 /* AlignedTranscriptPreparation.swift in Sources */,
+				23E995FAE8ADFB1216878A0B /* AppInfo.swift in Sources */,
 				C7B09C26756CEE717E0BBB54 /* AppLanguage.swift in Sources */,
 				E9DC675BBAA3160285BBF19D /* AppLifecycle.swift in Sources */,
 				963E5DA576C548E12D69F1A3 /* AppRootView.swift in Sources */,
+				A30CC789B7EB3004BA87C62E /* AppUpdateChecker.swift in Sources */,
 				0165C311F70A342BA9298D73 /* AppleReferenceSpeechPlayer.swift in Sources */,
 				06BA9D04D5C4BF985AC95039 /* AppleSpeechAnalyzerTranscriber.swift in Sources */,
 				318CDB8DE1F6DD81EBE1CFAE /* AppleSpeechCaptionTranscriber.swift in Sources */,
@@ -2167,18 +2182,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ToSpeech/App/ToSpeech.entitlements;
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ToSpeech;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Unknown Studio (pirumu)";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToSpeech records your shadowing takes when you explicitly start recording.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToSpeech uses on-device speech recognition to prepare transcript and word timing for imported lessons.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unknownstudio.tospeech;
 				SDKROOT = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -2223,6 +2242,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = Y8DVMS7BH2;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2250,17 +2270,20 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ToSpeech/App/ToSpeech.entitlements;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ToSpeech;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "© 2026 Unknown Studio (pirumu)";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "ToSpeech records your shadowing takes when you explicitly start recording.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "ToSpeech uses on-device speech recognition to prepare transcript and word timing for imported lessons.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MARKETING_VERSION = 0.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.unknownstudio.tospeech;
 				SDKROOT = macosx;
 				SWIFT_STRICT_CONCURRENCY = complete;
@@ -2271,7 +2294,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CODE_SIGN_IDENTITY = "Developer ID Application";
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/ThirdParty/RubberBand";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2339,6 +2364,7 @@
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = Y8DVMS7BH2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -2372,6 +2398,7 @@
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GCC_OPTIMIZATION_LEVEL = 3;
 				HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/ThirdParty/RubberBand";
 				LD_RUNPATH_SEARCH_PATHS = (

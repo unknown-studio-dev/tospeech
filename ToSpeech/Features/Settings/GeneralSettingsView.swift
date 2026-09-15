@@ -2,13 +2,15 @@ import SwiftUI
 
 struct GeneralSettingsView: View {
   @Environment(EchoStore.self) private var store
+  @Environment(\.appUpdateChecker) private var updateChecker
+  @Environment(\.openURL) private var openURL
   @State private var confirmsReset = false
   @State private var offeredLanguages: [TranslationLanguage] = []
 
   var body: some View {
     SettingsColumns(composition: .general) {
       VStack(alignment: .leading, spacing: 24) { languages; levelPreset; reading }
-      VStack(alignment: .leading, spacing: 24) { video; localData }
+      VStack(alignment: .leading, spacing: 24) { video; localData; about }
     }
     .confirmationDialog("Khôi phục dữ liệu mẫu?", isPresented: $confirmsReset) {
       Button("Khôi phục", role: .destructive) { store.restoreDemo() } // native-control: confirmation
@@ -111,6 +113,56 @@ struct GeneralSettingsView: View {
         confirmsReset = true
       }
     }
+  }
+
+  private var about: some View {
+    SettingsSection(title: "Giới thiệu", subtitle: "Phiên bản, tác giả và cập nhật.", spacing: 12) {
+      SettingsPreferenceRow(title: "Phiên bản") {
+        Text(verbatim: "\(AppInfo.version) (\(AppInfo.build))")
+          .font(EchoFont.body(size: 16)).foregroundStyle(EchoTheme.secondaryText)
+          .accessibilityLabel(Text(verbatim: "\(AppInfo.displayName) \(AppInfo.version)"))
+      }
+      SettingsPreferenceRow(title: "Tác giả") {
+        Text(verbatim: AppInfo.author)
+          .font(EchoFont.body(size: 16)).foregroundStyle(EchoTheme.secondaryText)
+      }
+      help(AppInfo.copyright)
+      EchoButton("Ghé UnknownStudio", symbol: "arrow.up.right", kind: .secondary, size: .regular) {
+        openURL(AppInfo.studioURL)
+      }
+      if let updateChecker {
+        Divider().overlay(EchoTheme.raised)
+        updateStatus(updateChecker)
+      }
+    }
+  }
+
+  @ViewBuilder private func updateStatus(_ checker: AppUpdateChecker) -> some View {
+    VStack(alignment: .leading, spacing: 12) {
+      switch checker.state {
+      case .idle, .checking:
+        EmptyView()
+      case .upToDate:
+        help("Bạn đang dùng bản mới nhất.")
+      case .available(let info):
+        EchoLocalizedText(EchoCopy("Đã có bản %@.", arguments: [.raw(info.version)]))
+          .font(EchoFont.body(size: 16))
+        EchoButton("Tải bản mới", symbol: "arrow.down.circle", kind: .primary, size: .regular) {
+          openURL(URL(string: info.downloadURL) ?? AppInfo.releasesURL)
+        }
+      case .failed:
+        EchoLocalizedText("Không kiểm tra được bản mới.")
+          .font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.danger)
+      }
+      EchoButton(
+        "Kiểm tra bản mới", symbol: "arrow.clockwise", kind: .secondary, size: .regular,
+        state: checker.state == .checking ? .loading("Đang kiểm tra bản mới…") : .idle
+      ) {
+        Task { await checker.check() }
+      }
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .task { await checker.checkOnAppear() }
   }
 
   private func help(_ text: String) -> some View {
