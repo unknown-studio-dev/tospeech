@@ -29,6 +29,18 @@ CONDITIONAL = {
     'ɪ':[['i'],['ə']], 'i':[['ɪ']], 'ʊ':[['u'],['ə']], 'u':[['ʊ']],
     'dʒ':[['t','ʃ'],['t͡ʃ']], 'ɹ':[['ə˞'],['ɜ˞']]}
 PAIRS = {('ə','ɹ'):[['ɜ˞'],['ə˞'],['ɛ','ɹ'],['ɹ']], ('ɜː','ɹ'):[['ɜ˞'],['ə˞']]}
+# Real, acoustically confusable substitutions for RP L2 learners. `likelyIncorrect`
+# fires ONLY when the model's preferred competitor is in the expected phone's set.
+# Symmetric pairs below are expanded into both directions at import.
+_CONFUSION_PAIRS = [
+    ('θ','s'),('θ','f'),('θ','t'),('ð','d'),('ð','z'),('ð','v'),
+    ('v','w'),('v','f'),('b','v'),('p','f'),('w','ɹ'),
+    ('l','ɹ'),('ʃ','s'),('ʒ','z'),('ʒ','dʒ'),('tʃ','ʃ'),('tʃ','t'),('dʒ','ʒ'),('dʒ','j'),
+    ('ŋ','n'),('ɪ','iː'),('æ','e'),('æ','ʌ'),('ʌ','ɑː'),('ʊ','uː'),('ɒ','ɔː'),('ɒ','əʊ'),('e','ɜː'),
+    ('z','s'),('d','t'),('b','p'),('ɡ','k'),('v','f')]
+CONFUSION = {}
+for _a,_b in _CONFUSION_PAIRS:
+    CONFUSION.setdefault(_a,set()).add(_b); CONFUSION.setdefault(_b,set()).add(_a)
 
 def _dedupe(seqs): return [list(s) for s in dict.fromkeys(tuple(s) for s in seqs)]
 def _nasal(seq, vocab):
@@ -279,7 +291,10 @@ def assess_units(lp, units, allowed, vocab, duration, thresholds=THRESHOLDS, ste
         elif alternative_log>max(expected_log,deletion_log)+thresholds['competitor']:
             competitor=candidates[observed]; _,other=path(window,competitor,True)
             strength=min(float(np.exp(window[a:b,t]).mean()) for t,(a,b) in zip(competitor,other)) if other else 0
-            if strength>=thresholds['strength']: status='likelyIncorrect'; reason=None
+            expected_symbols={s for s in unit.display}
+            confusable=any(observed in CONFUSION.get(sym,()) for sym in expected_symbols)
+            if strength>=thresholds['strength'] and confusable: status='likelyIncorrect'; reason=None
+            elif strength>=thresholds['strength']: status='uncertain'; reason='ambiguousSubstitution'
         output.append(dict(status=status,reason=reason,start=lo*step,end=min(duration,hi*step),
             emissionStart=begin*step,emissionEnd=min(duration,end*step),windowStart=int(lo),windowEnd=int(hi),
             expectedProbability=support,expectedTokenProbability=min(best),expectedLogLikelihood=expected_log,

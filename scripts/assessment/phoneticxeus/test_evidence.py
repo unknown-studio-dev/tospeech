@@ -201,4 +201,18 @@ class CTCEvidenceTests(unittest.TestCase):
         v=self.vocab428(**{'θ':4,'s':5})
         self.assertEqual(assess_phones(self.lp([{0:.95,5:.05},{5:.98,4:.001},{5:.95,4:.001},{0:.99}]),['θ'],v,.08)[0]['status'],'likelyIncorrect')
         self.assertEqual(assess_phones(self.lp([{4:.39,5:.41,0:.2}]*5),['θ'],v,.1)[0]['status'],'uncertain')
+    def test_confusion_gate_flags_only_confusable_substitutions(self):
+        from evidence import assess_phones, CONFUSION
+        # v/w is a confusion pair; θ→(random x99) is not.
+        self.assertIn('w', CONFUSION['v'])
+        v=self.vocab428(**{'v':4,'w':5})
+        # strong, sustained /w/ where /v/ was expected -> real confusable error
+        lp=self.lp([{0:.99},{5:.98,4:.001},{5:.98,4:.001},{0:.99}])
+        self.assertEqual(assess_phones(lp,['v'],v,.08)[0]['status'],'likelyIncorrect')
+        # strong competitor that is NOT in the confusion set -> abstain, not wrong
+        v2=self.vocab428(**{'v':4})  # x99 is a generic non-confusable token id 99
+        lp2=self.lp([{0:.99},{99:.98,4:.001},{99:.98,4:.001},{0:.99}])
+        row=assess_phones(lp2,['v'],v2,.08)[0]
+        self.assertEqual(row['status'],'uncertain')
+        self.assertEqual(row['reason'],'ambiguousSubstitution')
 if __name__=='__main__':unittest.main()
