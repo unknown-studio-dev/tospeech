@@ -116,7 +116,7 @@ class CTCEvidenceTests(unittest.TestCase):
         vocab={f'x{i}':i for i in range(428)}; vocab['<blank>']=0; vocab.update(names); return vocab
     def test_class_a_length_never_emitted_is_accepted_without_merging_quality(self):
         from evidence import accepted, MAPPING
-        self.assertEqual(MAPPING,'xeus-uk-inventory-v3')
+        self.assertEqual(MAPPING,'xeus-uk-inventory-v4')
         v=self.vocab428(**{'iː':4,'i':5,'ɪ':6,'uː':7,'u':8,'ʊ':9,'ɑː':10,'ɑ':11,'ɒ':12,'ʌ':13,'ɔː':14,'ɔ':15})
         self.assertIn([5],accepted('iː',v)); self.assertNotIn([6],accepted('iː',v))
         self.assertIn([8],accepted('uː',v)); self.assertNotIn([9],accepted('uː',v))
@@ -215,4 +215,13 @@ class CTCEvidenceTests(unittest.TestCase):
         row=assess_phones(lp2,['v'],v2,.08)[0]
         self.assertEqual(row['status'],'uncertain')
         self.assertEqual(row['reason'],'ambiguousSubstitution')
+    def test_weak_form_and_length_never_incorrect(self):
+        from evidence import assess_phones, conditional, MAPPING
+        self.assertEqual(MAPPING,'xeus-uk-inventory-v4')
+        # unstressed full vowel realized as schwa (weak form) -> accepted, not wrong
+        v=self.vocab428(**{'ʊ':4,'ə':5})  # target /ʊ/ (as in weak 'you'), said as schwa
+        lp=self.lp([{0:.99},{5:.98,4:.001},{5:.95,4:.001},{0:.99}])
+        self.assertNotEqual(assess_phones(lp,['ʊ'],v,.08)[0]['status'],'likelyIncorrect')
+        # Also verify the conditional whitelist table was extended
+        self.assertIn([v['ə']], conditional('ʊ', v))
 if __name__=='__main__':unittest.main()

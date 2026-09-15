@@ -4,7 +4,7 @@ import itertools
 import numpy as np
 
 POLICY = 'xeus-uk-ctc-evidence-v5-units'
-MAPPING = 'xeus-uk-inventory-v3'
+MAPPING = 'xeus-uk-inventory-v4'
 THRESHOLDS = dict(support=.30, margin=math.log(4), entropy=.55, competitor=math.log(6), strength=.65)
 # These are tokenization/spelling alternatives, never LOT/PALM or rhoticity merges.
 DIPHTHONGS = {'ɛə':['ɛ','ə'], 'eɪ':['e','ɪ'], 'aɪ':['a','ɪ'], 'ɔɪ':['ɔ','ɪ'], 'əʊ':['ə','ʊ'],
@@ -26,7 +26,7 @@ CONDITIONAL = {
     'ʊə':[['ʊ','ɹ'],['u','ɹ'],['ʊ'],['u','ə'],['ʊ','ə']],
     'ɑː':[['ɑ','ɹ']], 'ɔː':[['ɔ','ɹ'],['ʊ','ɹ'],['ʊ','ə'],['o','ɹ'],['o']], 'ɜː':[['ɜ˞'],['ə˞'],['ɜ','ɹ']],
     'ə':[['ɜ˞'],['ə˞'],['ɐ'],['ʌ'],['ɪ'],['ʊ'],['ɜ']], 'ɐ':[['ʌ'],['ə']], 'ʌ':[['ɐ'],['ə']],
-    'ɪ':[['i'],['ə']], 'i':[['ɪ']], 'ʊ':[['u'],['ə']], 'u':[['ʊ']],
+    'ɪ':[['i'],['ə']], 'i':[['ɪ'],['ə']], 'ʊ':[['u'],['ə']], 'u':[['ʊ'],['ə']], 'ɒ':[['ə']], 'e':[['ə'],['ɛ']],
     'dʒ':[['t','ʃ'],['t͡ʃ']], 'ɹ':[['ə˞'],['ɜ˞']]}
 PAIRS = {('ə','ɹ'):[['ɜ˞'],['ə˞'],['ɛ','ɹ'],['ɹ']], ('ɜː','ɹ'):[['ɜ˞'],['ə˞']]}
 # Real, acoustically confusable substitutions for RP L2 learners. `likelyIncorrect`
