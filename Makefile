@@ -3,7 +3,6 @@
 
 SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
-.ONESHELL:
 .DEFAULT_GOAL := help
 
 PROJECT     := ToSpeech.xcodeproj
@@ -98,77 +97,24 @@ release:
 # Local install for testing the Release build like a user would; distribution still
 # goes through notarize + zip/dmg.
 install: release
-	app="$(RELEASE_APP)"
 	pkill -x ToSpeech 2>/dev/null || true
 	rm -rf "/Applications/ToSpeech.app"
-	/usr/bin/ditto "$$app" "/Applications/ToSpeech.app"
+	/usr/bin/ditto "$(RELEASE_APP)" "/Applications/ToSpeech.app"
 	@echo "▶ Installed: /Applications/ToSpeech.app"
 
-# Sign every embedded Mach-O inside-out (libs → helpers, xeus-helper with the
-# Python hardened-runtime exceptions), then seal the app. Re-signs correctly
-# regardless of what the Xcode stage-*.sh phases did.
+# Signing / notarization / packaging live in scripts/release (macOS make is 3.81, no
+# .ONESHELL). Each target is one command so the Makefile stays the entry point.
 sign: release
-	app="$(RELEASE_APP)"
-	res="$$app/Contents/Resources"
-	security find-identity -v -p codesigning | grep -qF "$(DEV_ID)" || { echo "✗ signing identity not found: $(DEV_ID)"; exit 1; }
-	codesign_one() { codesign --force --timestamp --options runtime -s "$(DEV_ID)" --entitlements "$$1" "$$2"; }
-	echo "▶ Signing embedded Mach-O (inside-out)…"
-	if [ -d "$$res" ]; then
-	  while IFS= read -r -d '' f; do echo "   lib  $$f"; codesign_one "$(ENT_HELPER)" "$$f"; done \
-	    < <(find "$$res" -type f \( -name '*.dylib' -o -name '*.so' -o -name '*.abi3.so' \) -print0)
-	  while IFS= read -r -d '' f; do
-	    case "$$f" in *.dylib|*.so|*.abi3.so) continue ;; esac
-	    file -b "$$f" 2>/dev/null | grep -q 'Mach-O' || continue
-	    if [ "$$(basename "$$f")" = "xeus-helper" ]; then echo "   py   $$f"; codesign_one "$(ENT_PY)" "$$f"
-	    else echo "   exec $$f"; codesign_one "$(ENT_HELPER)" "$$f"; fi
-	  done < <(find "$$res" -type f -print0)
-	fi
-	echo "▶ Sealing app…"
-	codesign_one "$(ENT_APP)" "$$app"
-	codesign --verify --strict --verbose=2 "$$app"
-	codesign -dv --verbose=4 "$$app" 2>&1 | grep -E 'Authority|TeamIdentifier|flags' || true
-	echo "   (Gatekeeper check — expected to fail until notarized + stapled:)"
-	spctl -a -vvv -t exec "$$app" || true
-	echo "▶ Signed: $$app"
+	APP="$(RELEASE_APP)" DEV_ID="$(DEV_ID)" ENT_APP="$(ENT_APP)" ENT_HELPER="$(ENT_HELPER)" ENT_PY="$(ENT_PY)" \
+	  bash scripts/release/sign.sh
 
 notarize: sign
-	app="$(RELEASE_APP)"
-	zip="$${app%.app}.zip"
-	echo "▶ Zipping for notarization…"
-	/usr/bin/ditto -c -k --keepParent "$$app" "$$zip"
-	if [ -n "$(NOTARY_PROFILE)" ]; then
-	  xcrun notarytool submit "$$zip" --keychain-profile "$(NOTARY_PROFILE)" --wait
-	elif [ -n "$(APPLE_ID)" ] && [ -n "$(APP_PW)" ]; then
-	  xcrun notarytool submit "$$zip" --apple-id "$(APPLE_ID)" --team-id "$(TEAM_ID)" --password "$(APP_PW)" --wait
-	else
-	  echo "✗ set NOTARY_PROFILE=<profile>  (or  APPLE_ID=<id> APP_PW=<app-specific-password>)"; rm -f "$$zip"; exit 1
-	fi
-	echo "▶ Stapling…"
-	xcrun stapler staple "$$app"
-	xcrun stapler validate "$$app"
-	spctl -a -vvv -t exec "$$app"
-	rm -f "$$zip"
-	echo "▶ Done: signed + notarized + stapled → $$app"
+	TEAM_ID="$(TEAM_ID)" NOTARY_PROFILE="$(NOTARY_PROFILE)" APPLE_ID="$(APPLE_ID)" APP_PW="$(APP_PW)" \
+	  bash scripts/release/notarize.sh "$(RELEASE_APP)"
 
-# What users download: a DMG with ToSpeech.app and an Applications shortcut. They drag
-# the app across and launch it from Applications; nothing runs from Downloads.
 # Attach the DMG and version.json to the GitHub release tagged v<version>.
-dmg: notarize
-	app="$(RELEASE_APP)"
-	version="$$(sed -nE 's/.*"version": "([^"]+)".*/\1/p' version.json)"
-	dmg="$${app%/*}/ToSpeech-$$version.dmg"
-	stage="$$(mktemp -d)"
-	/usr/bin/ditto "$$app" "$$stage/ToSpeech.app"
-	ln -s /Applications "$$stage/Applications"
-	rm -f "$$dmg"
-	hdiutil create -volname "ToSpeech" -srcfolder "$$stage" -ov -format UDZO -quiet "$$dmg"
-	rm -rf "$$stage"
-	codesign --force --timestamp -s "$(DEV_ID)" "$$dmg"
-	if [ -n "$(NOTARY_PROFILE)" ]; then
-	  xcrun notarytool submit "$$dmg" --keychain-profile "$(NOTARY_PROFILE)" --wait
-	else
-	  xcrun notarytool submit "$$dmg" --apple-id "$(APPLE_ID)" --team-id "$(TEAM_ID)" --password "$(APP_PW)" --wait
-	fi
-	xcrun stapler staple "$$dmg"
-	spctl -a -vv -t open --context context:primary-signature "$$dmg" || true
-	echo "▶ DMG: $$dmg"
+dmg: sign
+	APP="$(RELEASE_APP)" DEV_ID="$(DEV_ID)" TEAM_ID="$(TEAM_ID)" \
+	  VERSION="$$(sed -nE 's/.*"version": "([^"]+)".*/\1/p' version.json)" \
+	  NOTARY_PROFILE="$(NOTARY_PROFILE)" APPLE_ID="$(APPLE_ID)" APP_PW="$(APP_PW)" \
+	  bash scripts/release/dmg.sh
