@@ -3,7 +3,7 @@ import math
 import itertools
 import numpy as np
 
-POLICY = 'xeus-uk-ctc-evidence-v5-units'
+POLICY = 'xeus-uk-decision-v6-word-gated'
 MAPPING = 'xeus-uk-inventory-v4'
 THRESHOLDS = dict(support=.30, margin=math.log(4), entropy=.55, competitor=math.log(6), strength=.65)
 # These are tokenization/spelling alternatives, never LOT/PALM or rhoticity merges.
@@ -316,3 +316,11 @@ def assess_phones(lp, phones, vocab, duration, step=.02):
         raise ValueError('unsupported target phone(s): '+repr([p for p in phones if not accepted(p,vocab)]))
     rows=assess_units(lp,units,[u.allowed for u in units],vocab,duration,step=step)
     return [{k:v for k,v in r.items() if k not in ('unitID','shared')} for r in expand_rows(units,rows)]
+
+def coverage(rows):
+    """Coverage metrics: total phones, scored (correct+likelyIncorrect), and coverage fraction."""
+    total=len(rows); correct=sum(r['status']=='correct' for r in rows)
+    incorrect=sum(r['status']=='likelyIncorrect' for r in rows)
+    scored=correct+incorrect
+    return dict(total=total,scored=scored,correct=correct,incorrect=incorrect,
+                unassessed=total-scored,coverage=(scored/total if total else 0.0))

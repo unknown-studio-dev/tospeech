@@ -224,4 +224,12 @@ class CTCEvidenceTests(unittest.TestCase):
         self.assertNotEqual(assess_phones(lp,['ʊ'],v,.08)[0]['status'],'likelyIncorrect')
         # Also verify the conditional whitelist table was extended
         self.assertIn([v['ə']], conditional('ʊ', v))
+    def test_coverage_counts_scored_fraction(self):
+        from evidence import coverage, POLICY
+        self.assertEqual(POLICY,'xeus-uk-decision-v6-word-gated')
+        rows=[{'status':'correct'},{'status':'likelyIncorrect'},{'status':'uncertain'},{'status':'correct'}]
+        c=coverage(rows)
+        self.assertEqual(c['total'],4); self.assertEqual(c['scored'],3)
+        self.assertEqual(c['correct'],2); self.assertEqual(c['incorrect'],1)
+        self.assertEqual(c['unassessed'],1); self.assertAlmostEqual(c['coverage'],0.75)
 if __name__=='__main__':unittest.main()

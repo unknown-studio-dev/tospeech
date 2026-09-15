@@ -5,7 +5,7 @@ import argparse, json, sys, time, resource
 from pathlib import Path
 import numpy as np
 from evidence import (assess_units, expand_rows, greedy, align_variants, align_units, build_units, encode,
-                      POLICY, MAPPING, THRESHOLDS)
+                      POLICY, MAPPING, THRESHOLDS, coverage as coverage_fn)
 from reference import diagnostics, REFERENCE_POLICY
 from uk_contrast_head import ContrastHead, HEAD_FILE, COMPETITORS, US_LABEL, CONTRASTS_FOR
 import serve
@@ -202,7 +202,7 @@ def assemble_from_logits(source,take,vocab,request,source_duration,take_duration
         results.append(dict(id=word['id'],phones=rows,variant=variant))
     return dict(revision=REVISION,policy=POLICY,mapping=MAPPING,referencePolicy=REFERENCE_POLICY,device=device,dtype='float32',
         duration=take_duration,sourceDuration=source_duration,sourceShape=list(source.shape),takeShape=list(take.shape),
-        inferenceSeconds=inferred,words=results,reference=reference,contrastHead=head.summary() if head else None,
+        inferenceSeconds=inferred,words=results,coverage=coverage_fn([r for w in results for r in w['phones']]),reference=reference,contrastHead=head.summary() if head else None,
         thresholds={k:round(v,6) for k,v in THRESHOLDS.items()},
         sourceRecognizedPhones=greedy(source,inverse,.02,source_duration),recognizedPhones=greedy(take,inverse,.02,take_duration),
         peakRSS=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)

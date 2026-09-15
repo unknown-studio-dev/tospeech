@@ -22,7 +22,7 @@ class OkayFixtureTests(unittest.TestCase):
         unmapped = [r for r in rows if r['status'] != 'correct']
         self.assertEqual([(r['expected'], r['reason']) for r in unmapped],
                           [('əʊ', 'referenceUnmapped'), ('k', 'referenceNotConfident'), ('eɪ', 'referenceNotConfident')])
-        self.assertEqual(result['policy'], 'xeus-uk-ctc-evidence-v5-units')
+        self.assertEqual(result['policy'], 'xeus-uk-decision-v6-word-gated')
         self.assertEqual(result['mapping'], 'xeus-uk-inventory-v4')
 
     def test_assemble_contract_fields_and_head_summary(self):
