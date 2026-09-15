@@ -171,6 +171,10 @@ final class CaptureWriter: @unchecked Sendable {
   private let channelCount: Int
   private var monoSamples: [Float] = []
   private let maxLiveSamples: Int   // ~35s cap
+  // Trim only once the buffer overshoots the cap by this much slack, so the
+  // O(n) removeFirst shift happens at most once per ~5s instead of on every
+  // tap callback (audio thread stays cheap).
+  private let liveSampleTrimThreshold: Int
 
   init(file: AVAudioFile, url: URL, thresholdDB: Float, nativeSampleRate: Double, channelCount: Int) {
     self.file = file
@@ -179,6 +183,7 @@ final class CaptureWriter: @unchecked Sendable {
     self.nativeSampleRate = nativeSampleRate
     self.channelCount = max(1, channelCount)
     self.maxLiveSamples = Int(nativeSampleRate * 35)
+    self.liveSampleTrimThreshold = maxLiveSamples + Int(nativeSampleRate * 5)
   }
 
   /// AVAudioEngine invokes its tap on an audio queue. Construct the closure
@@ -219,7 +224,7 @@ final class CaptureWriter: @unchecked Sendable {
       mono.append(acc / Float(channelCount))
     }
     monoSamples.append(contentsOf: mono)
-    if monoSamples.count > maxLiveSamples {
+    if monoSamples.count > liveSampleTrimThreshold {
       monoSamples.removeFirst(monoSamples.count - maxLiveSamples)
     }
   }
