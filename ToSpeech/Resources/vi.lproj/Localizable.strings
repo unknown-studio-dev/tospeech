@@ -987,6 +987,9 @@
 "word.reference.unavailable" = "Chưa có audio phát âm tham khảo.";
 "word.reference.apple" = "Apple · Giọng tổng hợp";
 "word.reference.stop" = "Dừng phát âm tham khảo";
+"word.remove" = "Xoá từ";
+"word.remove.title" = "Xoá từ này khỏi câu?";
+"word.remove.message" = "Dùng khi transcript sinh thừa từ, ví dụ lặp ảo. Audio và timing các từ khác giữ nguyên. Bản thu cũ vẫn dùng câu cũ.";
 "word.reference.missing.uk" = "Máy chưa có giọng Anh–Anh khả dụng. Thêm giọng English (UK) trong Cài đặt hệ thống macOS → Trợ năng → Đọc & nói (Read & Speak), rồi thử lại.";
 "word.reference.missing.us" = "Máy chưa có giọng Anh–Mỹ khả dụng. Thêm giọng English (US) trong Cài đặt hệ thống macOS → Trợ năng → Đọc & nói (Read & Speak), rồi thử lại.";
 "word.reference.failed" = "Không phát được giọng Apple. Kiểm tra giọng đã cài trong cài đặt macOS rồi thử lại.";
@@ -1297,8 +1300,8 @@
 
 // PhoneticXeus UK experimental
 "assessment.xeus.installed" = "Local · FP32 · Thử nghiệm";
-"assessment.xeus.size" = "Tải ~3,6 GB · kèm UK Reference · Local · UK thử nghiệm";
-"assessment.xeus.details" = "Bằng chứng CTC cho nguyên âm và phụ âm UK; chưa có điểm tổng được hiệu chuẩn. Âm chưa chắc giữ trung tính. Cài kèm UK Reference (VAD, IPA, nhịp điệu, cao độ); không đổi model ngầm. Xóa gói sẽ gỡ cả UK Reference.";
+"assessment.xeus.size" = "Tải ~3,6 GB · XEUS + UK Reference · Local";
+"assessment.xeus.details" = "Một gói cho giọng Anh–Anh: PhoneticXeus chấm từng nguyên âm và phụ âm; UK Reference đo VAD, IPA, nhịp điệu và cao độ. Cả hai chạy dưới XEUS, cài và gỡ cùng nhau, không tách rời. Chưa có điểm tổng hiệu chuẩn; âm chưa chắc giữ trung tính.";
 "assessment.xeus.uk_required" = "Cài UK Reference để dùng VAD, IPA và nhánh nhịp điệu hiện có.";
 "assessment.xeus.runtime_missing" = "Bản build thiếu runtime PhoneticXeus đã đóng gói.";
 "assessment.xeus.invalid_evidence" = "PhoneticXeus trả bằng chứng không hợp lệ hoặc quá thời gian.";

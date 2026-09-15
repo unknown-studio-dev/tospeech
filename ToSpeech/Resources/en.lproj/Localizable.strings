@@ -983,6 +983,9 @@
 "word.reference.unavailable" = "Reference audio is not available.";
 "word.reference.apple" = "Apple · Synthesized voice";
 "word.reference.stop" = "Stop reference pronunciation";
+"word.remove" = "Remove word";
+"word.remove.title" = "Remove this word from the sentence?";
+"word.remove.message" = "Use this for a word the transcript invented, such as a phantom repeat. The audio and the other words' timing stay as they are. Earlier recordings keep the old sentence.";
 "word.reference.missing.uk" = "No British English voice is available. Add an English (UK) voice in macOS System Settings → Accessibility → Read & Speak, then try again.";
 "word.reference.missing.us" = "No American English voice is available. Add an English (US) voice in macOS System Settings → Accessibility → Read & Speak, then try again.";
 "word.reference.failed" = "Could not play the Apple voice. Check the voices installed in macOS Settings and try again.";
@@ -1293,8 +1296,8 @@
 
 // PhoneticXeus UK experimental
 "assessment.xeus.installed" = "Local · FP32 · Experimental";
-"assessment.xeus.size" = "~3.6 GB download · includes UK Reference · Local · UK experimental";
-"assessment.xeus.details" = "CTC evidence for UK vowels and consonants; no calibrated overall grade. Uncertain phones stay neutral. Installs UK Reference alongside (VAD, IPA, rhythm and pitch); no silent model fallback. Removing the package removes UK Reference too.";
+"assessment.xeus.size" = "~3.6 GB download · XEUS + UK Reference · Local";
+"assessment.xeus.details" = "One package for British English: PhoneticXeus grades every vowel and consonant; UK Reference measures voice activity, IPA, rhythm and pitch. Both run under XEUS, install and uninstall together, and are never used apart. No calibrated overall grade; uncertain phones stay neutral.";
 "assessment.xeus.uk_required" = "Install UK Reference for VAD, IPA and the existing delivery branch.";
 "assessment.xeus.runtime_missing" = "This build is missing the packaged PhoneticXeus runtime.";
 "assessment.xeus.invalid_evidence" = "PhoneticXeus returned invalid evidence or timed out.";
