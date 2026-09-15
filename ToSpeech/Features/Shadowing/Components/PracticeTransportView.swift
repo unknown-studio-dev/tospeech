@@ -194,10 +194,19 @@ struct PracticeTransportView: View {
         Text(EchoFormat.decimal(elapsed) + "s")
           .font(EchoFont.body(size: 18, design: .monospaced))
       }
+      if let productionModel {
+        LivePitchEnergyTrace(
+          reference: productionModel.controller.referenceDeliveryTrack,
+          live: productionModel.controller.liveDeliveryTrack,
+          elapsed: elapsed,
+          sentenceDuration: productionModel.controller.currentTargetDuration)
+          .frame(height: 66 * contentScale)
+      } else {
+        inputMeter   // preview route keeps the simple capsule meter
+      }
       HStack(alignment: .center, spacing: 24) {
         Image(systemName: "mic").font(.system(size: 24)).foregroundStyle(EchoTheme.danger)
           .frame(width: 40, height: 42).accessibilityHidden(true)
-        inputMeter
         Text(verbatim: captureDetail)
           .font(EchoFont.body(size: 11)).foregroundStyle(EchoTheme.secondaryText)
         Spacer()
