@@ -1507,6 +1507,10 @@
 "practice.error.capture_write" = "The recording could not be written: %@";
 "practice.error.persistence" = "The take could not be saved: %@";
 "practice.error.recovery" = "Take recovery is required: %@";
+"practice.trace.pitch" = "Pitch";
+"practice.trace.energy" = "Energy";
+"practice.trace.both" = "Both";
+"practice.trace.axis" = "Pitch and energy versus the original sentence";
 "The production Library could not be initialized." = "The production Library could not be initialized.";
 "Production Library unavailable" = "Production Library unavailable";
 "Prepare a sentence before practicing" = "Prepare a sentence before practicing";

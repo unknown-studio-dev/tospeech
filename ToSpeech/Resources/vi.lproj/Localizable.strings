@@ -1513,6 +1513,10 @@
 "practice.error.capture_write" = "Không ghi được bản thu: %@";
 "practice.error.persistence" = "Không lưu được bản thu: %@";
 "practice.error.recovery" = "Cần khôi phục bản thu: %@";
+"practice.trace.pitch" = "Cao độ";
+"practice.trace.energy" = "Nhịp";
+"practice.trace.both" = "Cả hai";
+"practice.trace.axis" = "Cao độ và nhịp so với câu gốc";
 "The production Library could not be initialized." = "Không khởi tạo được Thư viện.";
 "Production Library unavailable" = "Thư viện chưa sẵn sàng";
 "Prepare a sentence before practicing" = "Chuẩn bị câu trước khi luyện";
