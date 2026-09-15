@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <!-- PhoneticXeus xeus-helper embeds CPython, which loads many third-party
+       .dylib/.so at runtime and uses executable memory. Under hardened runtime
+       those need explicit exceptions or the helper crashes on launch. It still
+       inherits the app's sandbox container. -->
+  <key>com.apple.security.app-sandbox</key><true/>
+  <key>com.apple.security.inherit</key><true/>
+  <key>com.apple.security.cs.disable-library-validation</key><true/>
+  <key>com.apple.security.cs.allow-unsigned-executable-memory</key><true/>
+</dict></plist>

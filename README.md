@@ -229,13 +229,13 @@ downloaded in-app or staged at build time.
 scripts/toolchain/fetch-toolchain.sh      # yt-dlp, FFmpeg, QuickJS
 bash scripts/alignment/prepare.sh          # wav2vec2 -> Core ML (needs uv)
 bash scripts/audio/fetch-deepfilternet.sh  # DeepFilterNet3
-scripts/run.sh build && scripts/run.sh run
+make build && make run
 ```
 
 Xcode 26+, Apple Silicon Mac. Phone Scorer, UK Reference and PhoneticXeus have their own
 preparation scripts under `scripts/assessment/`. ASR and Buddy models are downloaded
-in-app from Settings → Recording & models. `scripts/run.sh test` runs the tests and
-`scripts/run.sh gen` regenerates the project from `project.yml`.
+in-app from Settings → Recording & models. `make test` runs the tests and
+`make gen` regenerates the project from `project.yml`.
 
 ## Status and license
 

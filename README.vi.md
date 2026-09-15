@@ -154,12 +154,12 @@ Model nào cũng ghim revision và checksum; tải về hoặc build đều xác
 scripts/toolchain/fetch-toolchain.sh      # yt-dlp, FFmpeg, QuickJS
 bash scripts/alignment/prepare.sh          # wav2vec2 -> Core ML (cần uv)
 bash scripts/audio/fetch-deepfilternet.sh  # DeepFilterNet3
-scripts/run.sh build && scripts/run.sh run
+make build && make run
 ```
 
 Xcode 26+, Mac Apple Silicon. Gói Phone Scorer, UK Reference và PhoneticXeus có script
 chuẩn bị riêng trong `scripts/assessment/`. Model ASR và Buddy tải trong app ở
-Cài đặt → Ghi âm & models. `scripts/run.sh test` chạy test, `scripts/run.sh gen` tạo lại
+Cài đặt → Ghi âm & models. `make test` chạy test, `make gen` tạo lại
 project từ `project.yml`.
 
 ## Trạng thái và giấy phép
