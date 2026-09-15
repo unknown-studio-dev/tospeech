@@ -28,7 +28,7 @@ struct PitchTracePlot {
         if !current.isEmpty { segments.append(current); current = [] }
         previousTime = nil; continue
       }
-      if let previousTime, frame.time - previousTime > 0.06, current.count > 1 {
+      if let previousTime, frame.time - previousTime > 0.06, !current.isEmpty {
         segments.append(current); current = []
       }
       let normalized = min(1, max(0, (semi + 12) / 24))

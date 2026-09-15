@@ -13,9 +13,9 @@ struct PitchTracePlotTests {
   func pitchAxis() {
     let t = track([
       .init(time: 0, relativeDB: -5, pitchSemitones: 12),
-      .init(time: 1, relativeDB: -5, pitchSemitones: -12),
-    ], duration: 1)
-    let plot = PitchTracePlot(track: t, duration: 1, size: .init(width: 100, height: 80))
+      .init(time: 0.05, relativeDB: -5, pitchSemitones: -12),
+    ], duration: 0.05)
+    let plot = PitchTracePlot(track: t, duration: 0.05, size: .init(width: 100, height: 80))
     let seg = plot.pitchSegments().first!
     #expect(abs(seg.first!.y - 0) < 0.5)      // +12 → y≈0 (top)
     #expect(abs(seg.last!.y - 80) < 0.5)      // -12 → y≈height (bottom)
@@ -41,5 +41,17 @@ struct PitchTracePlotTests {
     ], duration: 0.02)
     let plot = PitchTracePlot(track: t, duration: 0.02, size: .init(width: 100, height: 80))
     #expect(plot.pitchSegments().flatMap { $0 }.count == 1)
+  }
+
+  @Test("Energy envelope maps -40dB to 0 and 0dB to 1")
+  func energyEnvelope() {
+    let t = track([
+      .init(time: 0, relativeDB: -40, pitchSemitones: nil),
+      .init(time: 0.05, relativeDB: 0, pitchSemitones: nil),
+    ], duration: 0.05)
+    let plot = PitchTracePlot(track: t, duration: 0.05, size: .init(width: 100, height: 80))
+    let env = plot.energyEnvelope()
+    #expect(abs(env.first!.y - 0) < 0.01)     // -40dB → amplitude≈0
+    #expect(abs(env.last!.y - 1) < 0.01)      // 0dB → amplitude≈1
   }
 }
