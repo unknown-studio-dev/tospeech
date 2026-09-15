@@ -17,38 +17,22 @@ struct ProductionAssessmentModelsView: View {
       }
       EchoLocalizedText("assessment.models_intro").font(EchoFont.body(size: 14)).foregroundStyle(EchoTheme.secondaryText)
       ModelCardView(title: "PhoneticXeus · UK Experimental",
-        statusLine: copy(manager.xeusInstalled ? "assessment.xeus.installed" : "assessment.xeus.size"),
+        statusLine: copy(manager.xeusReady ? "assessment.xeus.installed" : "assessment.xeus.size"),
         isActive: store.preferences.productionAssessmentEngine == .phoneticXeus,
         activeLabel: copy("assessment.active"), errorText: manager.xeusFailure.map(copy)) {
         if manager.xeusInstalling {
           EchoLoading(title: "assessment.installing")
           EchoButton("Cancel", kind: .ghost) { manager.cancelXeus() }
-        } else if !manager.xeusInstalled {
+        } else if !manager.xeusReady {
           EchoButton("assessment.install") { manager.installXeus() }
         } else {
           EchoButton("assessment.activate", kind: .primary) { store.preferences.productionAssessmentEngine = .phoneticXeus }
-            .disabled(store.preferences.productionAssessmentEngine == .phoneticXeus || manager.isBusy() || store.preferences.accent != .uk || !manager.ukInstalled)
+            .disabled(store.preferences.productionAssessmentEngine == .phoneticXeus || manager.isBusy() || store.preferences.accent != .uk)
           EchoButton("assessment.remove", kind: .ghost) { removingEngine = .phoneticXeus; confirmingRemoval = true }
             .disabled(manager.isBusy() || store.preferences.productionAssessmentEngine == .phoneticXeus)
         }
       } footer: {
         EchoLocalizedText("assessment.xeus.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
-        if !manager.ukInstalled { EchoLocalizedText("assessment.xeus.uk_required").font(EchoFont.metadata) }
-        if store.preferences.accent != .uk { EchoLocalizedText("assessment.uk.error.accent").font(EchoFont.metadata) }
-      }
-      ModelCardView(title: "UK Reference · British English", statusLine: copy(manager.ukInstalled ? "assessment.uk.installed" : "assessment.uk.size"),
-        isActive: store.preferences.productionAssessmentEngine == .ukReference, activeLabel: copy("assessment.active"),
-        errorText: manager.ukFailure.map(copy)) {
-        if manager.ukInstalling { EchoLoading(title: "assessment.installing") }
-        else if !manager.ukInstalled { EchoButton("assessment.install") { manager.installUK() } }
-        else {
-          EchoButton("assessment.activate", kind: .primary) { store.preferences.productionAssessmentEngine = .ukReference }
-            .disabled(store.preferences.productionAssessmentEngine == .ukReference || manager.isBusy() || store.preferences.accent != .uk)
-          EchoButton("assessment.remove", kind: .ghost) { removingEngine = .ukReference; confirmingRemoval = true }
-            .disabled(manager.isBusy() || store.preferences.productionAssessmentEngine == .ukReference)
-        }
-      } footer: {
-        EchoLocalizedText("assessment.uk.details").font(EchoFont.body(size: 12)).foregroundStyle(EchoTheme.secondaryText)
         if store.preferences.accent != .uk { EchoLocalizedText("assessment.uk.error.accent").font(EchoFont.metadata) }
       }
       ModelCardView(title: "Buddy · English v1", statusLine: copy(manager.isInstalled ? "assessment.installed" : "assessment.download_size"),

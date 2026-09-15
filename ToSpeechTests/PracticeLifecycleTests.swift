@@ -144,7 +144,7 @@ struct PracticeLifecycleTests {
     #expect(playback.targets.count == 2)
   }
 
-  @Test func productionPauseFailureAndMultipleRepeatsDoNotAutoAdvance() async throws {
+  @Test func productionPauseAndFailureDoNotAutoAdvance() async throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent("Sequence-\(UUID())")
     defer { try? FileManager.default.removeItem(at: root) }
     let playback = SequencePlaybackSpy()
@@ -165,19 +165,108 @@ struct PracticeLifecycleTests {
     #expect(playback.targets.count == 1)
     playback.failure = nil
 
+
+  }
+
+  @Test(arguments: [false, true])
+  func threeRoundsAdvanceToNextSentenceAndResetItsRound(loopButton: Bool) async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("SequenceThree-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let playback = SequencePlaybackSpy()
+    let model = try await sequenceModel(root: root, playback: playback)
     var preferences = Preferences()
-    preferences.repeats = 2
+    preferences.repeats = 3
+    preferences.autoRecord = false
+    preferences.speed = 0.75
+    model.applyPreferences(preferences)
+    let first = try #require(model.targets.first)
+    let last = try #require(model.targets.last)
+
+    if loopButton { model.listenLoop() } else { model.listen() }
+    for index in 0..<6 {
+      #expect(model.selectedTarget == (index < 3 ? first : last))
+      #expect(model.controller.phase == .listening)
+      #expect(model.controller.round == index % 3 + 1)
+      #expect(playback.targets.count == index + 1)
+      playback.completions[index]()
+      if index == 2 {
+        // A late callback from the previous sentence cannot skip the new sentence.
+        playback.completions[2]()
+        #expect(model.controller.round == 1)
+        #expect(playback.targets.count == 4)
+      }
+    }
+    #expect(model.selectedTarget == last)
+    #expect(model.controller.phase == .paused)
+    #expect(model.controller.round == 3)
+    #expect(playback.targets.count == 6)
+    #expect(playback.speeds == Array(repeating: 0.75, count: 6))
+    #expect(model.takes.isEmpty)
+  }
+
+  @Test func previewThreeRoundsAdvanceToNextSentence() throws {
+    let store = store()
+    store.preferences.repeats = 3
+    store.preferences.autoRecord = false
+    let sentences = try #require(store.selectedLesson?.sentences)
+    store.selectSentence(sentences[0].id)
+    store.practice.playSentence()
+    for round in 1...3 {
+      #expect(store.selectedSentenceID == sentences[0].id)
+      #expect(store.practice.round == round)
+      store.practice.sourceFinished()
+    }
+    #expect(store.selectedSentenceID == sentences[1].id)
+    #expect(store.practice.round == 1)
+    #expect(store.practice.phase == .listening)
+    _ = store.practice.interrupt()
+  }
+
+  @Test(arguments: [false, true])
+  func threeListenOnlyRoundsAndRestartHonorTheSelectedCount(loopButton: Bool) async throws {
+    let root = FileManager.default.temporaryDirectory.appendingPathComponent("ThreeRounds-\(UUID())")
+    defer { try? FileManager.default.removeItem(at: root) }
+    let playback = SequencePlaybackSpy()
+    let model = try await sequenceModel(root: root, playback: playback)
+    let target = try #require(model.targets.last)
+    model.select(target)
+    var preferences = Preferences()
+    preferences.repeats = 3
     preferences.autoRecord = false
     model.applyPreferences(preferences)
-    model.select(first)
-    model.listenLoop()
-    playback.completions[1]()
-    #expect(model.controller.round == 2)
-    #expect(model.selectedTarget == first)
-    playback.completions[2]()
-    #expect(model.controller.phase == .paused)
-    #expect(model.selectedTarget == first)
-    #expect(playback.targets.allSatisfy { $0.segmentRevisionID == first.segmentRevisionID })
+
+    for run in 0..<2 {
+      if loopButton { model.listenLoop() } else { model.listen() }
+      for round in 1...3 {
+        #expect(model.controller.phase == .listening)
+        #expect(model.controller.round == round)
+        #expect(playback.targets.count == run * 3 + round)
+        playback.completions[run * 3 + round - 1]()
+        #expect(model.selectedTarget == target)
+      }
+      #expect(model.controller.phase == .paused)
+      #expect(model.controller.round == 3)
+      #expect(!model.controller.canResumeSource)
+      #expect(model.takes.isEmpty)
+    }
+  }
+
+  @Test func previewPlayHonorsThreeListenOnlyRoundsAndRestart() throws {
+    let store = store()
+    store.preferences.repeats = 3
+    store.preferences.autoRecord = false
+    let selected = try #require(store.selectedLesson?.sentences.last?.id)
+    store.selectSentence(selected)
+    for _ in 0..<2 {
+      store.practice.playSentence()
+      for round in 1...3 {
+        #expect(store.practice.phase == .listening)
+        #expect(store.practice.round == round)
+        store.practice.sourceFinished()
+        #expect(store.selectedSentenceID == selected)
+      }
+      #expect(store.practice.phase == .paused)
+    }
   }
 
   @Test func changingSpeedUpdatesTheCurrentSourceWithoutRestartingIt() async throws {
@@ -194,15 +283,15 @@ struct PracticeLifecycleTests {
     #expect(model.controller.phase == .listening)
   }
 
-  @Test(arguments: [false, true])
-  func ordinaryPlayAndLoopHonorAutomaticRecording(repeating: Bool) async throws {
+  @Test(arguments: [false, true], [1, 3])
+  func ordinaryPlayAndLoopHonorAutomaticRecording(repeating: Bool, repeats: Int) async throws {
     let root = FileManager.default.temporaryDirectory.appendingPathComponent("AutoRecord-\(UUID())")
     defer { try? FileManager.default.removeItem(at: root) }
     let playback = SequencePlaybackSpy()
     let model = try await sequenceModel(root: root, playback: playback, currentAuthorization: { .granted })
     let sentence = try #require(model.selectedTarget)
     var preferences = Preferences()
-    preferences.repeats = 1
+    preferences.repeats = repeats
     preferences.autoRecord = true
     preferences.countdown = 10
     model.applyPreferences(preferences)

@@ -91,4 +91,5 @@ struct Lesson: Identifiable, Codable, Equatable, Sendable {
   var sourceURL: String?
   var createdAt: Date
   var sentences: [LessonSentence]
+  var thumbnailURL: URL? = nil
 }

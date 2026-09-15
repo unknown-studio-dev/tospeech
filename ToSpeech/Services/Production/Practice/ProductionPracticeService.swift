@@ -70,6 +70,10 @@ final class ProductionPracticeService {
       .mapValues(stampingTranslationLanguage)
   }
 
+  func pronunciationJobs(lessonID: UUID) async throws -> [PronunciationJob] {
+    try await database.pronunciationJobs(lessonID: lessonID)
+  }
+
   func recordingByteCounts(_ takes: [ProductionStoredTake]) async -> [UUID: Int64] {
     let directory = paths.finalTakes
     return await Task.detached(priority: .utility) {
@@ -304,11 +308,15 @@ final class ProductionPracticeService {
     guard let handle = activeCapture else { throw ProductionPracticeError.captureNotRunning }
     let artifact = try recorder.finish()
     let classified = artifact.outcome(policy: policy, interrupted: interrupted)
-    let outcome: CaptureOutcome = classified == .complete && reachedDurationLimit ? .earlyStop : classified
+    // With a fixed recording window reaching the limit is the normal end, not an early stop.
+    let outcome: CaptureOutcome =
+      classified == .complete && reachedDurationLimit && !policy.fixedWindow ? .earlyStop : classified
+    // The window is now fixed to the source sentence length, so takes keep their full timing —
+    // no silence trimming. Passing a nil trim policy keeps the retained take exactly as recorded.
     let manifest = TakeCommitManifest(
       handle: handle, assetID: UUID(), checksum: try sha256(artifact.url),
       sampleRate: artifact.sampleRate, frameCount: artifact.frameCount,
-      outcome: outcome, trimPolicy: RecordingSilenceTrimmer.policy)
+      outcome: outcome, trimPolicy: nil)
     pendingManifest = manifest
     do {
       let result = try await commit(manifest)

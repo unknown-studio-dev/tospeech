@@ -8,10 +8,30 @@ enum PhoneAssessmentAvailability: String, Codable, Sendable {
 /// Coverage is separate from correctness. A partially assessed word is never
 /// promoted to an all-correct word simply because its few graded phones match.
 struct PronunciationCoverage {
+  enum Summary: String {
+    case unassessed, partial, focus, matched
+    var title: String { "review.drawer.\(rawValue)" }
+    var symbol: String {
+      switch self {
+      case .unassessed, .partial: "questionmark"
+      case .focus: "waveform.badge.exclamationmark"
+      case .matched: "checkmark"
+      }
+    }
+  }
+
   var counts: [PronunciationQuality: Int] = [:]
   var reasons: [PhoneAssessmentAvailability: Int] = [:]
   var total: Int { counts.values.reduce(0, +) }
   var assessed: Int { total - counts[.unassessed, default: 0] }
+  var summary: Summary {
+    guard assessed > 0 else { return .unassessed }
+    guard assessed == total else { return .partial }
+    if counts[.incorrect, default: 0] > 0 || counts[.nearCorrect, default: 0] > 0 {
+      return .focus
+    }
+    return .matched
+  }
 
   init(_ evidence: PronunciationEvidence) {
     for word in evidence.words {

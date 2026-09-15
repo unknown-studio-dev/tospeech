@@ -8,6 +8,7 @@ final class ProductionLibraryBootstrap {
   var practiceService: ProductionPracticeService?
   var practiceController: ProductionPracticeController?
   var shadowing: ProductionShadowingModel?
+  var progress: ProductionProgressModel?
   var parakeetModels: ParakeetModelManager?
   var pronunciationModels: PronunciationModelManager?
   var error: String?
@@ -23,6 +24,7 @@ final class ProductionLibraryBootstrap {
       practiceService = nil
       practiceController = nil
       shadowing = nil
+      progress = nil
       parakeetModels = nil
       pronunciationModels = nil
       error = nil
@@ -43,13 +45,14 @@ final class ProductionLibraryBootstrap {
       // both accents, in import, backfill and assessment.
       let g2p = UKG2P(package: ukPackage)
       let ipaFallback: IPAFallback = { try await g2p.pronunciation($0, accent: $1) }
-      let library = ProductionLibraryModel(
-        service: ProductionImportService(
-          database: database, paths: paths, usesSpeechFallback: false, audioTranscriber: transcriber, transcriptionAdapters: adapters, wordAligner: aligner,
-          ipaDictionary: ipaDictionary, ipaG2P: g2p))
+      let importer = ProductionImportService(
+        database: database, paths: paths, usesSpeechFallback: false, audioTranscriber: transcriber, transcriptionAdapters: adapters, wordAligner: aligner,
+        ipaDictionary: ipaDictionary, ipaG2P: g2p)
+      let library = ProductionLibraryModel(service: importer)
       model = library
       let practice = ProductionPracticeService(database: database, paths: paths)
       practiceService = practice
+      progress = ProductionProgressModel(importService: importer, practiceService: practice)
       let controller = ProductionPracticeController(service: practice)
       practiceController = controller
       let buddyPackage = BuddyModelPackage(paths: paths)
@@ -78,6 +81,7 @@ final class ProductionLibraryBootstrap {
       practiceService = nil
       practiceController = nil
       shadowing = nil
+      progress = nil
       parakeetModels = nil
       pronunciationModels = nil
       self.error = error.localizedDescription
@@ -143,6 +147,7 @@ struct ToSpeechApp: App {
           AppRootView(
             productionLibrary: productionLibrary.model,
             productionShadowing: productionLibrary.shadowing,
+            productionProgress: productionLibrary.progress,
             usesPreviewLibrary: productionLibrary.usesPreviewFixtures,
             productionLibraryError: productionLibrary.error,
             retryProductionLibrary: productionLibrary.reload

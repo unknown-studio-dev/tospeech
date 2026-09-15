@@ -55,11 +55,12 @@ struct EchoPlaybackControls<Options: View, Status: View, Actions: View>: View {
 /// Same surface and timeline placement for listening, writing and capture states.
 struct EchoTransportBar<Content: View, Timeline: View>: View {
   var minimumHeight: CGFloat = 108
+  var verticalPadding: CGFloat = 20
   @ViewBuilder var content: Content
   @ViewBuilder var timeline: Timeline
   var body: some View {
     VStack(alignment: .leading, spacing: 18) { content }
-      .padding(.horizontal, 24).padding(.vertical, 20)
+      .padding(.horizontal, 24).padding(.vertical, verticalPadding)
       .frame(maxWidth: .infinity, minHeight: minimumHeight, alignment: .leading)
       .background(EchoTheme.surface, in: RoundedRectangle(cornerRadius: EchoMetrics.panelRadius))
       .foregroundStyle(EchoTheme.text)

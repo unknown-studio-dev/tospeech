@@ -3,55 +3,54 @@ import Foundation
 import Testing
 @testable import ToSpeech
 
-@Suite("Pitch trace plot mapping")
+@Suite("Practice waveform overlay alignment")
 struct PitchTracePlotTests {
-  private func track(_ frames: [DeliveryFrame], duration: Double) -> DeliveryTrack {
-    DeliveryTrack(duration: duration, frames: frames, pauses: [], activeSpan: nil)
+  private func track(until end: Double) -> DeliveryTrack {
+    let frames = stride(from: 0.0, through: end, by: 0.02).map {
+      DeliveryFrame(time: $0, relativeDB: $0 < 0.5 ? -20 : -5, pitchSemitones: nil)
+    }
+    return DeliveryTrack(duration: end, frames: frames, pauses: [], activeSpan: nil)
   }
 
-  @Test("Semitone axis maps +12 to top, -12 to bottom")
-  func pitchAxis() {
-    let t = track([
-      .init(time: 0, relativeDB: -5, pitchSemitones: 12),
-      .init(time: 0.05, relativeDB: -5, pitchSemitones: -12),
-    ], duration: 0.05)
-    let plot = PitchTracePlot(track: t, duration: 0.05, size: .init(width: 100, height: 80))
-    let seg = plot.pitchSegments().first!
-    #expect(abs(seg.first!.y - 0) < 0.5)      // +12 → y≈0 (top)
-    #expect(abs(seg.last!.y - 80) < 0.5)      // -12 → y≈height (bottom)
-    #expect(abs(seg.last!.x - 100) < 0.5)     // time=duration → x=width
+  @Test("A partial recording uses the original clock without stretching")
+  func partialCaptureUsesSourceClock() {
+    let source = PracticeWaveformPlot(track: track(until: 2), duration: 2)
+    let recording = PracticeWaveformPlot(track: track(until: 1), duration: 2)
+    for fraction in stride(from: 0.0, through: 0.5, by: 0.01) {
+      #expect(source.amplitude(at: fraction, through: 2) == recording.amplitude(at: fraction, through: 1))
+    }
+    #expect(recording.amplitude(at: 0.75, through: 1) == nil)
   }
 
-  @Test("A gap larger than 0.06s splits the pitch line into segments")
-  func gapSplits() {
-    let t = track([
-      .init(time: 0.0, relativeDB: -5, pitchSemitones: 0),
-      .init(time: 0.02, relativeDB: -5, pitchSemitones: 0),
-      .init(time: 0.5, relativeDB: -5, pitchSemitones: 0),   // >0.06 gap
-    ], duration: 0.5)
-    let plot = PitchTracePlot(track: t, duration: 0.5, size: .init(width: 100, height: 80))
-    #expect(plot.pitchSegments().count == 2)
+  @Test("Live overlay leaves every future column empty")
+  func noFutureBars() {
+    let plot = PracticeWaveformPlot(track: track(until: 2), duration: 2)
+    #expect(plot.amplitude(at: 0.25, through: 0.5) != nil)
+    #expect(plot.amplitude(at: 0.26, through: 0.5) == nil)
+    #expect(plot.amplitude(at: 1, through: 0.5) == nil)
   }
 
-  @Test("Unvoiced frames are excluded from pitch segments")
-  func unvoiced() {
-    let t = track([
-      .init(time: 0, relativeDB: -5, pitchSemitones: nil),
-      .init(time: 0.02, relativeDB: -5, pitchSemitones: 3),
-    ], duration: 0.02)
-    let plot = PitchTracePlot(track: t, duration: 0.02, size: .init(width: 100, height: 80))
-    #expect(plot.pitchSegments().flatMap { $0 }.count == 1)
+  @Test("Shared capsule columns and seeking have the same time coordinates")
+  func columnAlignment() {
+    for width in [704.0, 984, 1504] {
+      let columns = TimingWaveformBarLayout(width: width)
+      for fraction in [0.0, 0.25, 0.5, 0.75, 1] {
+        #expect(abs(columns.fraction(at: columns.x(at: fraction)) - fraction) < 0.0001)
+      }
+      #expect(columns.start >= 10)
+      #expect(columns.x(at: 1) <= width - 10)
+    }
   }
 
-  @Test("Energy envelope maps -40dB to 0 and 0dB to 1")
-  func energyEnvelope() {
-    let t = track([
-      .init(time: 0, relativeDB: -40, pitchSemitones: nil),
-      .init(time: 0.05, relativeDB: 0, pitchSemitones: nil),
-    ], duration: 0.05)
-    let plot = PitchTracePlot(track: t, duration: 0.05, size: .init(width: 100, height: 80))
-    let env = plot.energyEnvelope()
-    #expect(abs(env.first!.y - 0) < 0.01)     // -40dB → amplitude≈0
-    #expect(abs(env.last!.y - 1) < 0.01)      // 0dB → amplitude≈1
+  @Test("Missing or nonfinite signal is not drawn as speech")
+  func missingSignal() {
+    let sparse = DeliveryTrack(duration: 2, frames: [
+      .init(time: 0, relativeDB: .nan, pitchSemitones: nil),
+      .init(time: 1, relativeDB: -20, pitchSemitones: nil),
+    ], pauses: [], activeSpan: nil)
+    let plot = PracticeWaveformPlot(track: sparse, duration: 2)
+    #expect(plot.amplitude(at: 0, through: 2) == nil)
+    #expect(plot.amplitude(at: 0.25, through: 2) == nil)
+    #expect(plot.amplitude(at: 0.5, through: 2) == 0.5)
   }
 }

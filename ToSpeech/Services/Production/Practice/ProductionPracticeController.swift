@@ -16,7 +16,7 @@ final class ProductionPracticeController {
   /// Emitted after durable take commit; UI observation is not the queue trigger.
   var onTakeSaved: (@MainActor (ProductionStoredTake) -> Void)?
   /// Emitted only after a complete listen with repeat=1, never before capture.
-  var onSingleListenCompleted: (@MainActor (UUID, Bool) -> Void)?
+  var onListenSequenceCompleted: (@MainActor (UUID, Bool) -> Void)?
   private var target: ProductionPracticeTarget?
   private var policy: ProductionCapturePolicy?
   private var sourceSpeed = 1.0
@@ -174,7 +174,7 @@ final class ProductionPracticeController {
       return
     }
     stopTicker()
-    if repeating && phase != .paused { round = 1 }
+    round = 1
     repeatEnabled = repeating
     captureAfterSource = thenCapture
     listened = false
@@ -405,8 +405,8 @@ final class ProductionPracticeController {
       startSourceRound()
     } else {
       phase = .paused
-      if repeatCount == 1, target?.scope == .sentence {
-        onSingleListenCompleted?(revisionID, repeatEnabled)
+      if (repeatCount == 1 || repeatEnabled), target?.scope == .sentence {
+        onListenSequenceCompleted?(revisionID, repeatEnabled)
       }
     }
   }
@@ -515,20 +515,15 @@ final class ProductionPracticeController {
       }
       inputLevelDB = service.recorder.levelDB
       liveDeliveryTrack = service.recorder.liveTrack
-      if elapsed >= policy.maximumDuration {
-        finishRecording(reachedDurationLimit: true)
-        return
-      }
-      let speaking = inputLevelDB >= policy.speechThresholdDB
-      if speaking {
-        phase = .recording
-        remaining = policy.trailingSilence
-      } else if phase == .recording {
-        phase = .trailingSilence
-        remaining = policy.trailingSilence
-      } else if phase == .trailingSilence {
-        remaining = max(0, remaining - delta)
-        if remaining == 0 { finishRecording() }
+      switch CaptureTick.decide(
+        phase: phase, elapsed: elapsed, remaining: remaining, delta: delta,
+        levelDB: inputLevelDB, policy: policy)
+      {
+      case .finish(let reachedLimit):
+        finishRecording(reachedDurationLimit: reachedLimit)
+      case .advance(let nextPhase, let nextRemaining):
+        phase = nextPhase
+        remaining = nextRemaining
       }
     default: break
     }

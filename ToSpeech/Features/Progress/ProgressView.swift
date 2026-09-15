@@ -1,7 +1,12 @@
 import SwiftUI
 
 struct LearningProgressView: View {
-  @Environment(EchoStore.self) private var store
+  let lessons: [Lesson]
+  let allTakes: [PracticeTake]
+  var initialLessonID: String? = nil
+  var openTake: (_ lessonID: String, _ sentenceID: String?, _ takeID: String?) -> Void = { _, _, _ in }
+  var goToLibrary: () -> Void = {}
+  var onLessonChange: ((String) -> Void)? = nil
   @Environment(\.locale) private var locale
   @State private var lessonID = ""
   @State private var period = "all"
@@ -13,9 +18,9 @@ struct LearningProgressView: View {
   @State private var profilePresented = false
   @State private var search = ""
 
-  private var lesson: Lesson? { store.lessons.first { $0.id == lessonID } }
+  private var lesson: Lesson? { lessons.first { $0.id == lessonID } }
   private var takes: [PracticeTake] {
-    store.takes.filter {
+    allTakes.filter {
       $0.lessonID == lessonID
         && (period == "all"
           || $0.createdAt >= Date().addingTimeInterval(period == "7" ? -604800 : -2_592_000))
@@ -60,7 +65,7 @@ struct LearningProgressView: View {
     GeometryReader { _ in
       ScrollView {
         VStack(alignment: .leading, spacing: 20) {
-          if store.lessons.isEmpty {
+          if lessons.isEmpty {
             EchoPanel {
               EchoEmptyState(
                 title: "Progress starts with your first lesson",
@@ -86,18 +91,24 @@ struct LearningProgressView: View {
           options: [("all", "All time"), ("30", "Last 30 days"), ("7", "Last 7 days")]
         ).frame(width: 150)
         EchoButton("Continue", symbol: "play.fill", kind: .primary) {
-          if let id = lessonID.nonEmpty { store.openLesson(id) }
+          if let id = lessonID.nonEmpty { openTake(id, nil, nil) }
         }
       }
     }
     .onAppear {
-      if lessonID.isEmpty { lessonID = store.selectedLessonID ?? store.lessons.first?.id ?? "" }
+      if lessonID.isEmpty { lessonID = initialLessonID ?? lessons.first?.id ?? "" }
       if sentenceID.isEmpty { resetFilters() }
+    }
+    .onChange(of: lessons.map(\.id)) { _, ids in
+      if lessonID.isEmpty || !ids.contains(lessonID) {
+        lessonID = initialLessonID ?? lessons.first?.id ?? ""
+        resetFilters()
+      }
     }
   }
   private var returnView: some View {
     EchoButton("Go to Library", symbol: "books.vertical", kind: .secondary) {
-      store.navigate(.library)
+      goToLibrary()
     }
   }
   private var videoBar: some View {
@@ -110,9 +121,9 @@ struct LearningProgressView: View {
   }
 
   @ViewBuilder private var videoBarContent: some View {
-    EchoThumbnail(
-      name: lesson?.thumbnail ?? "conversation", title: lesson?.title ?? "Selected video"
-    ).frame(width: 86, height: 48).clipShape(RoundedRectangle(cornerRadius: 8))
+    videoThumbnail
+      .frame(width: 86, height: 48).clipShape(RoundedRectangle(cornerRadius: 8))
+      .accessibilityLabel(Text(verbatim: lesson?.title ?? ""))
     VStack(alignment: .leading, spacing: 4) {
       Group {
         if let lesson { Text(verbatim: lesson.title) }
@@ -128,9 +139,31 @@ struct LearningProgressView: View {
     Spacer()
     EchoSelect(
       label: "Change video", selection: $lessonID,
-      options: store.lessons.map { ($0.id, $0.title) }
-    ).frame(maxWidth: 240).onChange(of: lessonID) { _, _ in resetFilters() }
+      options: lessons.map { ($0.id, $0.title) }
+    ).frame(maxWidth: 240).onChange(of: lessonID) { _, newValue in
+      resetFilters()
+      onLessonChange?(newValue)
+    }
   }
+  @ViewBuilder private var videoThumbnail: some View {
+    if let url = lesson?.thumbnailURL {
+      AsyncImage(url: url) { image in
+        image.resizable().scaledToFill()
+      } placeholder: {
+        thumbnailPlaceholder
+      }
+    } else if let lesson, !lesson.thumbnail.isEmpty {
+      EchoThumbnail(name: lesson.thumbnail, title: lesson.title)
+    } else {
+      thumbnailPlaceholder
+    }
+  }
+
+  private var thumbnailPlaceholder: some View {
+    Rectangle().fill(EchoTheme.soft).overlay(
+      Image(systemName: "waveform").foregroundStyle(EchoTheme.muted))
+  }
+
   private var stats: some View {
     let minutes = takes.reduce(0) { $0 + $1.duration } / 60
     return ViewThatFits(in: .horizontal) {
@@ -279,7 +312,7 @@ struct LearningProgressView: View {
           LazyVStack(spacing: 6) {
             ForEach(filtered) { take in
               ProgressTakeRow(take: take, result: result(for: take)) {
-                store.openLesson(take.lessonID, sentenceID: take.sentenceID, takeID: take.id)
+                openTake(take.lessonID, take.sentenceID, take.id)
               }
             }
           }.padding(1)
@@ -377,7 +410,75 @@ struct LearningProgressView: View {
   }
   private func openComparable(first: Bool) {
     guard let target = (first ? comparable.first : comparable.last) else { return }
-    store.openLesson(target.lessonID, sentenceID: target.sentenceID, takeID: target.id)
+    openTake(target.lessonID, target.sentenceID, target.id)
+  }
+}
+
+/// Preview/sample-data entry: the Progress screen fed by the in-memory `EchoStore`.
+struct StoreProgressScreen: View {
+  @Environment(EchoStore.self) private var store
+
+  var body: some View {
+    LearningProgressView(
+      lessons: store.lessons,
+      allTakes: store.takes,
+      initialLessonID: store.selectedLessonID,
+      openTake: { id, sentenceID, takeID in
+        store.openLesson(id, sentenceID: sentenceID, takeID: takeID)
+      },
+      goToLibrary: { store.navigate(.library) })
+  }
+}
+
+/// Production entry: the Progress screen fed by real practice history from the
+/// on-device database. Renders a loading placeholder until the first load lands so the
+/// empty state never flashes while data is still arriving.
+struct ProductionProgressScreen: View {
+  @Bindable var model: ProductionProgressModel
+  var shadowing: ProductionShadowingModel?
+  @Environment(EchoStore.self) private var store
+
+  var body: some View {
+    Group {
+      if !model.hasLoaded {
+        EchoPanel {
+          EchoLoading(title: "progress.loading")
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        }
+      } else {
+        LearningProgressView(
+          lessons: model.lessons,
+          allTakes: model.takes,
+          initialLessonID: model.loadedLessonID ?? shadowing?.lesson?.id.uuidString,
+          openTake: openTake,
+          goToLibrary: { store.navigate(.library) },
+          onLessonChange: { id in
+            Task {
+              await model.load(
+                lessonID: id, accent: store.preferences.accent, showLoadingIndicator: false)
+            }
+          })
+      }
+    }
+    .overlay(alignment: .bottom) {
+      if let error = model.error { EchoNotice(copy: error, error: true).padding(30) }
+    }
+    .task {
+      await model.load(
+        lessonID: shadowing?.lesson?.id.uuidString, accent: store.preferences.accent)
+    }
+  }
+
+  /// Row taps and first/latest open the take's sentence inside Shadowing. Landing on
+  /// the specific take's review sheet is view-local state that is not yet exposed, so
+  /// this navigates to the sentence rather than deep-linking the exact take.
+  private func openTake(_ lessonID: String, _ sentenceID: String?, _ takeID: String?) {
+    guard let shadowing, let uuid = UUID(uuidString: lessonID),
+      let summary = model.summaries.first(where: { $0.id == uuid })
+    else { return }
+    shadowing.open(summary, preferences: store.preferences)
+    if let sentenceID { shadowing.selectAndListen(revisionID: sentenceID) }
+    store.navigate(.shadowing)
   }
 }
 

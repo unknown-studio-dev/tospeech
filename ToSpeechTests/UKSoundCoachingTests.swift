@@ -3,6 +3,32 @@ import Testing
 @testable import ToSpeech
 
 @Suite struct UKSoundCoachingTests {
+  @Test func summaryNeverTreatsMissingOrPartialEvidenceAsSuccess() {
+    func coverage(_ qualities: [PronunciationQuality], supported: Bool = true) -> PronunciationCoverage {
+      let phones = qualities.enumerated().map { index, quality in
+        PhoneDifference(id: index, kind: .scored, expected: "a", observed: nil,
+          start: nil, end: nil, quality: quality)
+      }
+      let word = WordPronunciationEvidence(
+        target: .init(id: "w", text: "fixture", variants: [], dictionarySources: [],
+          sourceStart: nil, sourceEnd: nil),
+        referenceIPA: nil, phones: phones, supported: supported)
+      return PronunciationCoverage(.init(words: [word], duration: 1, recognizedPhones: []))
+    }
+
+    let unassessed = coverage(Array(repeating: .unassessed, count: 110))
+    #expect(unassessed.assessed == 0 && unassessed.total == 110)
+    #expect(unassessed.summary == .unassessed)
+    #expect(unassessed.summary.symbol != "checkmark")
+    #expect(coverage([]).summary == .unassessed)
+    #expect(coverage([.correct], supported: false).summary == .unassessed)
+    #expect(coverage([.correct, .unassessed]).summary == .partial)
+    #expect(coverage([.incorrect, .unassessed]).summary == .partial)
+    #expect(coverage([.correct, .nearCorrect]).summary == .focus)
+    #expect(coverage([.correct, .incorrect]).summary == .focus)
+    #expect(coverage([.correct, .correct]).summary == .matched)
+  }
+
   @Test func everyRPChartSoundAndDictionaryVariantHasTeachingContent() throws {
     let consonants = ["p", "b", "t", "d", "k", "ɡ", "f", "v", "θ", "ð", "s", "z", "ʃ", "ʒ", "h", "tʃ", "dʒ", "m", "n", "ŋ", "l", "ɹ", "j", "w"]
     #expect(UKSoundLibrary.all.count == 44)

@@ -109,6 +109,7 @@
 "progress.shown" = "%d shown";
 "progress.take_title" = "Take %d · %@";
 "progress.take_metadata" = "%@ · %@ · %@";
+"progress.loading" = "Loading your progress…";
 "sentence" = "sentence";
 "phrase" = "phrase";
 "review.recordings_sentence" = "Your recordings · Sentence %d";
@@ -1086,7 +1087,9 @@
 "review.drawer.priorities" = "Focus next";
 "review.drawer.open" = "Open";
 "review.drawer.more" = "More feedback";
-"review.drawer.clear" = "Clear and understandable";
+"review.drawer.unassessed" = "Not enough evidence to assess";
+"review.drawer.partial" = "Only partially assessed";
+"review.drawer.matched" = "Assessed sounds match";
 "review.drawer.focus" = "Focus on these sounds";
 "review.drawer.continue" = "Close and continue";
 "review.local" = "On device";
@@ -1292,8 +1295,8 @@
 
 // PhoneticXeus UK experimental
 "assessment.xeus.installed" = "Local · FP32 · Experimental";
-"assessment.xeus.size" = "2.30 GB model download · Local · UK experimental";
-"assessment.xeus.details" = "CTC evidence for UK vowels and consonants; no calibrated overall grade. Uncertain phones stay neutral. Uses the UK Reference delivery branch; no silent model fallback.";
+"assessment.xeus.size" = "~3.6 GB download · includes UK Reference · Local · UK experimental";
+"assessment.xeus.details" = "CTC evidence for UK vowels and consonants; no calibrated overall grade. Uncertain phones stay neutral. Installs UK Reference alongside (VAD, IPA, rhythm and pitch); no silent model fallback. Removing the package removes UK Reference too.";
 "assessment.xeus.uk_required" = "Install UK Reference for VAD, IPA and the existing delivery branch.";
 "assessment.xeus.runtime_missing" = "This build is missing the packaged PhoneticXeus runtime.";
 "assessment.xeus.invalid_evidence" = "PhoneticXeus returned invalid evidence or timed out.";
@@ -1507,10 +1510,11 @@
 "practice.error.capture_write" = "The recording could not be written: %@";
 "practice.error.persistence" = "The take could not be saved: %@";
 "practice.error.recovery" = "Take recovery is required: %@";
-"practice.trace.pitch" = "Pitch";
-"practice.trace.energy" = "Energy";
-"practice.trace.both" = "Both";
-"practice.trace.axis" = "Pitch and energy versus the original sentence";
+"practice.trace.axis" = "Original and recording waveforms on the same timeline";
+"practice.trace.recording" = "Recording";
+"practice.trace.awaiting" = "Awaiting voice";
+"practice.trace.finishing" = "Finishing";
+"practice.trace.waiting" = "No signal data yet";
 "The production Library could not be initialized." = "The production Library could not be initialized.";
 "Production Library unavailable" = "Production Library unavailable";
 "Prepare a sentence before practicing" = "Prepare a sentence before practicing";

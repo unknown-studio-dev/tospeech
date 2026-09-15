@@ -36,10 +36,10 @@ final class PracticeController {
 
   init(store: EchoStore) { self.store = store }
 
-  func playSentence(repeating: Bool = false) {
+  func playSentence(repeating: Bool? = nil) {
     guard interrupt(), prepareSelectedTarget() else { return }
-    if repeating { round = 1 }
-    repeatEnabled = repeating
+    round = 1
+    repeatEnabled = repeating ?? (roundPreferences.repeats > 1)
     sourcePosition = span.start
     remaining = span.duration / roundPreferences.speed
     elapsed = 0
@@ -157,7 +157,7 @@ final class PracticeController {
     } else {
       phase = .paused
       ticker?.cancel()
-      if roundPreferences.repeats == 1, scope == .sentence,
+      if (roundPreferences.repeats == 1 || repeatEnabled), scope == .sentence,
         let lesson = store.selectedLesson,
         let index = lesson.sentences.firstIndex(where: { $0.id == target?.id }),
         lesson.sentences.indices.contains(index + 1)

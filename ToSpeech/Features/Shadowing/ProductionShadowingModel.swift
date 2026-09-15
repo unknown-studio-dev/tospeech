@@ -89,8 +89,8 @@ final class ProductionShadowingModel {
         || controller.phase == .listening || controller.phase == .countdown
         || controller.phase.isCapture || controller.phase == .saving
     }
-    controller.onSingleListenCompleted = { [weak self] revisionID, repeating in
-      self?.advanceAfterSingleListen(revisionID: revisionID, repeating: repeating)
+    controller.onListenSequenceCompleted = { [weak self] revisionID, repeating in
+      self?.advanceAfterListenSequence(revisionID: revisionID, repeating: repeating)
     }
   }
 
@@ -117,6 +117,13 @@ final class ProductionShadowingModel {
     do {
       var loaded = try await service.preparedSentences(lessonID: lesson.id)
       guard !loaded.isEmpty else {
+        // The lesson was deleted (or has no usable sentences): drop any stale content so the
+        // view shows the empty state instead of the previous lesson's transcript and sentence.
+        preparedSentences = []
+        targets = []
+        takes = []
+        savedTakeSentences = [:]
+        selectedTarget = nil
         error = EchoCopy("production.practice.no_target")
         return
       }
@@ -229,12 +236,13 @@ final class ProductionShadowingModel {
     }
     if controller.phase == .listening { controller.pauseAndKeep() }
     do {
-      let maximumDuration = max(4, min(30, target.duration * 2.5))
+      // Recording window is fixed to the source sentence length so every take matches the
+      // original timing; the user speaks for exactly that long, no silence-based early stop.
       try controller.configure(
         target: target, sourceSpeed: practiceOptions.speed,
         policy: ProductionCapturePolicy(
           countdown: practiceOptions.countdown, trailingSilence: practiceOptions.silence,
-          maximumDuration: min(practiceOptions.maxDuration, maximumDuration)),
+          maximumDuration: max(0.5, target.duration), fixedWindow: true),
         repeatCount: practiceOptions.repeats, autoRecord: practiceOptions.autoRecord)
       selectedTarget = target
       error = nil
@@ -550,14 +558,17 @@ final class ProductionShadowingModel {
     guard let target = selectedTarget,
       let policy = try? ProductionCapturePolicy(
         countdown: preferences.countdown, trailingSilence: preferences.silence,
-        maximumDuration: min(preferences.maxDuration, max(4, min(30, target.duration * 2.5))))
+        maximumDuration: max(0.5, target.duration), fixedWindow: true)
     else { return }
     controller.updateOptions(
       sourceSpeed: preferences.speed, policy: policy,
       repeatCount: preferences.repeats, autoRecord: preferences.autoRecord)
   }
 
-  func listen() { controller.listen() }
+  func listen() {
+    if controller.canResumeSource { controller.resumeFromSource() }
+    else { controller.listen(repeating: practiceOptions.repeats > 1) }
+  }
   func listenLoop() { controller.listen(repeating: true) }
   func listenThenRecord() { controller.listen(thenCapture: true) }
   func resumeSource() { controller.resumeFromSource() }
@@ -594,8 +605,8 @@ final class ProductionShadowingModel {
     select(targets[index + delta])
   }
 
-  private func advanceAfterSingleListen(revisionID: UUID, repeating: Bool) {
-    guard practiceOptions.repeats == 1, selectedTarget?.segmentRevisionID == revisionID,
+  private func advanceAfterListenSequence(revisionID: UUID, repeating: Bool) {
+    guard selectedTarget?.segmentRevisionID == revisionID,
       let index = targets.firstIndex(where: { $0.segmentRevisionID == revisionID }),
       targets.indices.contains(index + 1)
     else { return }

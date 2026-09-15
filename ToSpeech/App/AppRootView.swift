@@ -4,6 +4,7 @@ struct AppRootView: View {
   var settingsStartOnRecording = false
   var productionLibrary: ProductionLibraryModel?
   var productionShadowing: ProductionShadowingModel?
+  var productionProgress: ProductionProgressModel?
   var usesPreviewLibrary = false
   var productionLibraryError: String?
   var retryProductionLibrary: () -> Void = {}
@@ -31,7 +32,19 @@ struct AppRootView: View {
             if usesPreviewLibrary { ShadowingView() }
             else if let productionShadowing { ProductionShadowingView(model: productionShadowing) }
             else { ProductionShadowingGate() }
-          case .progress: LearningProgressView()
+          case .progress:
+            if usesPreviewLibrary {
+              StoreProgressScreen()
+            } else if let productionProgress {
+              ProductionProgressScreen(model: productionProgress, shadowing: productionShadowing)
+            } else {
+              EchoPanel {
+                EchoEmptyState(
+                  title: "Progress starts with your first lesson",
+                  message: "Import a lesson and record a sentence to see honest history here.",
+                  symbol: "chart.bar.xaxis")
+              }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
           case .settings: SettingsView(recordingTab: settingsStartOnRecording)
           }
         }.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)

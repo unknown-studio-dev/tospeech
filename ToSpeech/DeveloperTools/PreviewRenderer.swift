@@ -18,6 +18,79 @@
       try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
       let store = EchoStore(snapshot: PreviewFixtures.snapshot(), repository: .memory)
       store.preferences.language = previewLanguage
+      if ProcessInfo.processInfo.arguments.contains("--practice-trace-previews") {
+        let duration = 4.8
+        func track(until end: Double, learner: Bool) -> DeliveryTrack {
+          let frames = stride(from: 0.0, through: end, by: 0.02).map { time in
+            let spokenTime = time - (learner ? 0.12 : 0)
+            let voice = sin(spokenTime * 5.4) > -0.65 && spokenTime > 0.2
+            return DeliveryFrame(time: time,
+              relativeDB: voice ? -14 + 8 * sin(spokenTime * 7) : -40,
+              pitchSemitones: voice ? 4 * sin(time * 2.6) + (learner ? 1.2 * cos(time * 7) : 0) : nil)
+          }
+          return DeliveryTrack(duration: end, frames: frames, pauses: [], activeSpan: nil)
+        }
+        let fixture = PracticeTracePreview(reference: track(until: duration, learner: false),
+          live: track(until: 2.6, learner: true), duration: duration)
+        store.route = .shadowing
+        store.practice.phase = .recording
+        store.practice.elapsed = 2.6
+        for size in [CGSize(width: 1000, height: 680), CGSize(width: 1280, height: 860), CGSize(width: 1800, height: 1120)] {
+          store.practice.phase = .recording
+          try await write(AppRootView(usesPreviewLibrary: true).environment(store)
+            .environment(\.practiceTracePreview, fixture), size: size,
+            name: "practice-trace-\(Int(size.width))-\(previewLanguage.rawValue)", directory: directory)
+          store.practice.phase = .idle
+          try await write(AppRootView(usesPreviewLibrary: true).environment(store)
+            .environment(\.practiceTracePreview, fixture), size: size,
+            name: "practice-source-\(Int(size.width))-\(previewLanguage.rawValue)", directory: directory)
+        }
+        for width in [752.0, 1032, 1552] {
+          let scale = ShadowingLayout(contentWidth: width, contentHeight: 1072).controlScale
+          var referenceFrame: CGRect?
+          for phase in [PracticePhase.idle, .listening, .paused, .countdown,
+            .awaitingSpeech, .recording, .trailingSilence, .saving, .saveFailed, .feedback] {
+            store.practice.phase = phase
+            var measuredHeight: CGFloat = 0
+            var waveformFrame = CGRect.zero
+            let trace = phase == .awaitingSpeech
+              ? PracticeTracePreview(reference: nil, live: nil, duration: duration) : fixture
+            try await write(PracticeTransportView(onOptions: {}, onReview: {},
+              compact: width < 950, contentScale: scale)
+              .onGeometryChange(for: CGFloat.self, of: { $0.size.height }) { measuredHeight = $0 }
+              .environment(store).environment(\.practiceTracePreview, trace)
+              .environment(\.practiceWaveformFrame, { waveformFrame = $0 }).padding(16),
+              size: .init(width: width + 32, height: 180),
+              name: "practice-bar-\(phase.rawValue)-\(Int(width))-\(previewLanguage.rawValue)", directory: directory)
+            let expectedHeight = ShadowingLayout.transportHeight * scale
+            guard abs(measuredHeight - expectedHeight) < 1 else {
+              throw NSError(domain: "PracticeTransportLayout", code: 1, userInfo: [
+                NSLocalizedDescriptionKey: "\(phase.rawValue) at \(width): height \(measuredHeight), expected \(expectedHeight)"])
+            }
+            print("TRANSPORT HEIGHT: \(phase.rawValue) · \(Int(width))pt wide · \(measuredHeight)pt (expected \(expectedHeight))")
+            if !phase.isCapture {
+              guard waveformFrame == .zero else {
+                throw NSError(domain: "PracticeWaveformVisibility", code: 1, userInfo: [
+                  NSLocalizedDescriptionKey: "Waveform must be absent during \(phase.rawValue)"])
+              }
+              print("WAVEFORM HIDDEN: \(phase.rawValue) · \(Int(width))pt wide")
+              continue
+            }
+            guard waveformFrame.height > 0 else {
+              throw NSError(domain: "PracticeWaveformVisibility", code: 2, userInfo: [
+                NSLocalizedDescriptionKey: "Waveform must be visible during \(phase.rawValue)"])
+            }
+            if let referenceFrame {
+              guard waveformFrame == referenceFrame else {
+                throw NSError(domain: "PracticeWaveformAlignment", code: 1, userInfo: [
+                  NSLocalizedDescriptionKey: "\(phase.rawValue): waveform moved from \(referenceFrame) to \(waveformFrame)"])
+              }
+            } else { referenceFrame = waveformFrame }
+            print("WAVEFORM FRAME: \(phase.rawValue) · \(Int(width))pt wide · \(waveformFrame)")
+          }
+        }
+        return
+      }
       if ProcessInfo.processInfo.arguments.contains("--dictation-native-probe") {
         try await DictationNativeProbe.run()
         return

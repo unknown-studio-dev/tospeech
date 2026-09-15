@@ -30,12 +30,19 @@ final class PronunciationModelManager {
     isInstalled = await package.installed()
     phoneInstalled = await phonePackage?.installed() ?? false
   }
+  /// PhoneticXeus reuses UK Reference for VAD, IPA, rhythm and pitch, so they ship as one
+  /// package: install UK Reference first when missing, then XEUS.
+  var xeusReady: Bool { xeusInstalled && ukInstalled }
   func installXeus() {
     guard let xeusPackage, !xeusInstalling else { return }
     xeusInstalling = true; xeusFailure = nil
     xeusInstallation = Task {
       defer { xeusInstalling = false; xeusInstallation = nil }
-      do { try await xeusPackage.install(); await refresh() }
+      do {
+        if let ukPackage, !(await ukPackage.installed()) { try await ukPackage.install() }
+        try await xeusPackage.install()
+        await refresh()
+      }
       catch is CancellationError { await refresh() }
       catch let error as URLError where error.code == .cancelled { await refresh() }
       catch { xeusFailure = error.localizedDescription; await refresh() }
@@ -44,8 +51,12 @@ final class PronunciationModelManager {
   func cancelXeus() { xeusInstallation?.cancel() }
   func removeXeus() async {
     guard !isBusy(), !xeusInstalling else { xeusFailure = "assessment.error.busy"; return }
-    do { try await xeusPackage?.remove(); await refresh() }
-    catch { xeusFailure = error.localizedDescription }
+    do {
+      try await xeusPackage?.remove()
+      try await ukPackage?.remove()
+      await refresh()
+    }
+    catch { xeusFailure = error.localizedDescription; await refresh() }
   }
   func installUK() {
     guard let ukPackage, !ukInstalling else { return }

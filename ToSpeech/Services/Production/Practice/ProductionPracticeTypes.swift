@@ -193,11 +193,15 @@ struct ProductionCapturePolicy: Equatable, Sendable {
   let speechThresholdDB: Float
   let quietThresholdDB: Float
   let minimumSpeechDuration: TimeInterval
+  /// Record the full `maximumDuration` (the source sentence length) without ending early on
+  /// silence, so every take matches the original timing. Trailing-silence detection is skipped.
+  let fixedWindow: Bool
 
   init(
     countdown: TimeInterval, trailingSilence: TimeInterval,
     maximumDuration: TimeInterval, speechThresholdDB: Float = -42,
-    quietThresholdDB: Float = -34, minimumSpeechDuration: TimeInterval = 0.15
+    quietThresholdDB: Float = -34, minimumSpeechDuration: TimeInterval = 0.15,
+    fixedWindow: Bool = false
   ) throws {
     guard countdown.isFinite, trailingSilence.isFinite, maximumDuration.isFinite,
       countdown >= 0, trailingSilence > 0, maximumDuration > 0,
@@ -210,6 +214,37 @@ struct ProductionCapturePolicy: Equatable, Sendable {
     self.speechThresholdDB = speechThresholdDB
     self.quietThresholdDB = quietThresholdDB
     self.minimumSpeechDuration = minimumSpeechDuration
+    self.fixedWindow = fixedWindow
+  }
+}
+
+/// Pure capture-loop decision: given the current phase and the latest level/elapsed reading,
+/// says whether to finish or how to advance. Extracted so both the normal (silence-driven) and
+/// fixed-window (full-duration) paths are unit-testable without the recorder or a live clock.
+enum CaptureTick {
+  enum Decision: Equatable {
+    case finish(reachedLimit: Bool)
+    case advance(phase: PracticePhase, remaining: TimeInterval)
+  }
+
+  static func decide(
+    phase: PracticePhase, elapsed: TimeInterval, remaining: TimeInterval,
+    delta: TimeInterval, levelDB: Float, policy: ProductionCapturePolicy
+  ) -> Decision {
+    if elapsed >= policy.maximumDuration { return .finish(reachedLimit: true) }
+    let speaking = levelDB >= policy.speechThresholdDB
+    if policy.fixedWindow {
+      // Never end early: keep recording until the source-sentence duration is reached.
+      let next: PracticePhase = speaking || phase != .awaitingSpeech ? .recording : .awaitingSpeech
+      return .advance(phase: next, remaining: max(0, policy.maximumDuration - elapsed))
+    }
+    if speaking { return .advance(phase: .recording, remaining: policy.trailingSilence) }
+    if phase == .recording { return .advance(phase: .trailingSilence, remaining: policy.trailingSilence) }
+    if phase == .trailingSilence {
+      let next = max(0, remaining - delta)
+      return next == 0 ? .finish(reachedLimit: false) : .advance(phase: .trailingSilence, remaining: next)
+    }
+    return .advance(phase: phase, remaining: remaining)
   }
 }
 

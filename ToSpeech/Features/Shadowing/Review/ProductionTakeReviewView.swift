@@ -528,7 +528,8 @@ struct ProductionTakeReviewView<Source: View>: View {
 
         drawerNavigationRow("review.drawer.sound_detail", value: copy("review.select_phone"),
           symbol: "waveform", color: counts[.incorrect, default: 0] > 0 ? EchoTheme.danger
-            : counts[.nearCorrect, default: 0] > 0 ? EchoTheme.caution : EchoTheme.success) {
+            : counts[.nearCorrect, default: 0] > 0 ? EchoTheme.caution
+            : coverage.summary == .matched ? EchoTheme.success : EchoTheme.secondaryText) {
           selection = preferredPhone
           page = selection == nil ? .details : .phone
         }
@@ -566,22 +567,25 @@ struct ProductionTakeReviewView<Source: View>: View {
   private func drawerScore(
     coverage: PronunciationCoverage, counts: [PronunciationQuality: Int]
   ) -> some View {
-    HStack(spacing: 14) {
+    let summary = coverage.summary
+    let color = summary == .unassessed || summary == .partial
+      ? EchoTheme.secondaryText : EchoTheme.accent
+    return HStack(spacing: 14) {
       ZStack {
-        Circle().fill(EchoTheme.selection)
-        Circle().stroke(EchoTheme.accent, lineWidth: 3)
-        if let score = take.latestAssessment?.score {
+        Circle().fill(summary == .unassessed || summary == .partial
+          ? EchoTheme.soft : EchoTheme.selection)
+        Circle().stroke(color, lineWidth: 3)
+        if coverage.assessed > 0, let job, job.status == .complete,
+          let score = take.assessments.first(where: { $0.id == job.id.uuidString })?.score {
           Text(verbatim: "\(Int(score.rounded()))")
             .font(EchoFont.heading(size: 25)).monospacedDigit()
         } else {
-          Image(systemName: counts[.incorrect, default: 0] == 0
-            ? "checkmark" : "waveform.badge.exclamationmark")
-            .font(.system(size: 22, weight: .semibold)).foregroundStyle(EchoTheme.accent)
+          Image(systemName: summary.symbol)
+            .font(.system(size: 22, weight: .semibold)).foregroundStyle(color)
         }
       }.frame(width: 66, height: 66)
       VStack(alignment: .leading, spacing: 5) {
-        EchoLocalizedText(counts[.incorrect, default: 0] == 0
-          ? "review.drawer.clear" : "review.drawer.focus")
+        EchoLocalizedText(summary.title)
           .font(EchoFont.body(size: 16, weight: .semibold))
         Text(verbatim: EchoLocalization.format("review.coverage_counts", locale: locale,
           arguments: [counts[.correct, default: 0], counts[.nearCorrect, default: 0],

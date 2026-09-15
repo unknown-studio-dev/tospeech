@@ -5,6 +5,9 @@ import SwiftUI
 struct PracticeTransportView: View {
   @Environment(EchoStore.self) private var store
   @Environment(\.locale) private var locale
+  #if DEBUG
+  @Environment(\.practiceTracePreview) private var tracePreview
+  #endif
   var onOptions: () -> Void
   var onReview: () -> Void
   var compact = false
@@ -17,17 +20,15 @@ struct PracticeTransportView: View {
   @State private var confirmDiscard = false
 
   var body: some View {
-    EchoTransportBar(minimumHeight: ShadowingLayout.transportHeight * contentScale) {
+    EchoTransportBar(minimumHeight: ShadowingLayout.transportHeight * contentScale,
+      verticalPadding: dictationModel == nil && phase.isCapture ? 12 * contentScale : 20) {
       if let dictationModel { dictationControls(dictationModel) }
-      else if phase.isCapture { capture }
-      else if phase == .saving || phase == .saveFailed { saving }
-      else if phase == .countdown { countdown }
-      else { normal }
+      else { shadowingControls }
     } timeline: {
       if let model = dictationModel {
         EchoSeekSlider(value: .constant(model.player.rangeProgress * (model.sentence?.target.duration ?? 1)),
           range: 0...max(0.001, model.sentence?.target.duration ?? 1)).disabled(true)
-      } else if let range = sourceSeekRange {
+      } else if !phase.isCapture, let range = sourceSeekRange {
         EchoSeekSlider(value: sourcePositionBinding, range: range).disabled(!canSeekSource)
       }
     }
@@ -41,6 +42,25 @@ struct PracticeTransportView: View {
           ? "Only the current unsaved preview take will be discarded. Earlier takes stay in history."
           : "Only the current unsaved take will be discarded. Earlier takes stay in history.")
     }
+  }
+
+  @ViewBuilder private var shadowingControls: some View {
+    if phase.isCapture {
+      VStack(spacing: 4 * contentScale) {
+        PracticeWaveformView(reference: referenceTrack, live: liveTrack,
+          elapsed: elapsed, sentenceDuration: traceDuration)
+          .frame(height: 24 * contentScale)
+        capture.frame(height: 56 * contentScale)
+      }
+    } else {
+      phaseControls
+    }
+  }
+
+  @ViewBuilder private var phaseControls: some View {
+    if phase == .saving || phase == .saveFailed { saving }
+    else if phase == .countdown { countdown }
+    else { normal }
   }
 
   private func dictationControls(_ model: DictationModel) -> some View {
@@ -186,44 +206,67 @@ struct PracticeTransportView: View {
   }
 
   private var capture: some View {
-    VStack(alignment: .leading, spacing: 16) {
-      HStack {
-        Circle().fill(EchoTheme.danger).frame(width: 8, height: 8)
-        EchoLocalizedText(phase.title).font(EchoFont.body(size: 17, weight: .medium))
-        Spacer()
-        Text(EchoFormat.decimal(elapsed) + "s")
-          .font(EchoFont.body(size: 18, design: .monospaced))
+    HStack(spacing: compact ? 12 : 20) {
+      VStack(alignment: .leading, spacing: 6) {
+        Label {
+          EchoLocalizedText(phase == .awaitingSpeech ? "practice.trace.awaiting"
+            : phase == .trailingSilence ? "practice.trace.finishing" : "practice.trace.recording")
+            .font(EchoFont.body(size: 14, weight: .semibold))
+        } icon: {
+          Circle().fill(EchoTheme.danger).frame(width: 7, height: 7)
+        }
+        Text(verbatim: captureTime)
+          .font(EchoFont.body(size: 12, design: .monospaced))
+          .foregroundStyle(EchoTheme.secondaryText)
+        inputMeter
       }
-      if let productionModel {
-        LivePitchEnergyTrace(
-          reference: productionModel.controller.referenceDeliveryTrack,
-          live: productionModel.controller.liveDeliveryTrack,
-          elapsed: elapsed,
-          sentenceDuration: productionModel.controller.currentTargetDuration)
-          .frame(height: 66 * contentScale)
-      } else {
-        inputMeter   // preview route keeps the simple capsule meter
-      }
-      HStack(alignment: .center, spacing: 24) {
-        Image(systemName: "mic").font(.system(size: 24)).foregroundStyle(EchoTheme.danger)
-          .frame(width: 40, height: 42).accessibilityHidden(true)
-        Text(verbatim: captureDetail)
-          .font(EchoFont.body(size: 11)).foregroundStyle(EchoTheme.secondaryText)
-        Spacer()
-        EchoButton("Pause & keep", symbol: "pause") { pause() }
+      .fixedSize(horizontal: true, vertical: false)
+      .help(captureDetail)
+      .echoAccessibilityLabel(phase.title)
+
+      Spacer(minLength: 0)
+
+      HStack(spacing: 8) {
+        EchoIconButton(symbol: "trash", label: "Discard take") {
+          confirmDiscard = true
+        }
+        if compact {
+          EchoIconButton(symbol: "pause", label: "Pause & keep") { pause() }
+        } else {
+          EchoButton("Pause & keep", symbol: "pause") { pause() }
+        }
         EchoButton("Done", symbol: "checkmark", kind: .primary) { finishRecording() }
           .accessibilityIdentifier("finish-take")
       }
-      HStack {
-        EchoButton("Discard take", kind: .danger) { confirmDiscard = true }
-        Spacer()
-        Text("Source audio is stopped · each round saves separately")
-          .font(EchoFont.body(size: 10)).foregroundStyle(EchoTheme.secondaryText)
-      }
+      .fixedSize(horizontal: true, vertical: false)
     }
   }
 
+  private var captureTime: String {
+    let current = EchoFormat.decimal(elapsed)
+    guard let traceDuration else { return current + " s" }
+    return current + " / " + EchoFormat.decimal(traceDuration) + " s"
+  }
+
   private var phase: PracticePhase { productionModel?.controller.phase ?? store.practice.phase }
+  private var referenceTrack: DeliveryTrack? {
+    #if DEBUG
+    if productionModel == nil { return tracePreview?.reference }
+    #endif
+    return productionModel?.controller.referenceDeliveryTrack
+  }
+  private var liveTrack: DeliveryTrack? {
+    #if DEBUG
+    if productionModel == nil { return tracePreview?.live }
+    #endif
+    return productionModel?.controller.liveDeliveryTrack
+  }
+  private var traceDuration: Double? {
+    #if DEBUG
+    if productionModel == nil { return tracePreview?.duration }
+    #endif
+    return productionModel?.controller.currentTargetDuration
+  }
   private var remaining: Double { productionModel?.controller.remaining ?? store.practice.remaining }
   private var elapsed: Double { productionModel?.controller.elapsed ?? store.practice.elapsed }
   private var hasListened: Bool { productionModel?.controller.hasListened ?? store.practice.hasListened }
@@ -306,8 +349,7 @@ struct PracticeTransportView: View {
   private func toggleListen() {
     if phase == .listening { pause() }
     else if let model = productionModel {
-      if model.controller.canResumeSource && !model.controller.isRepeating { model.resumeSource() }
-      else { model.listen() }
+      model.listen()
     } else { store.practice.playSentence() }
   }
 

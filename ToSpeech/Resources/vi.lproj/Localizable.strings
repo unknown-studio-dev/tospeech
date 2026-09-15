@@ -101,6 +101,7 @@
 "progress.shown" = "Đang hiện %d";
 "progress.take_title" = "Lượt %d · %@";
 "progress.take_metadata" = "%@ · %@ · %@";
+"progress.loading" = "Đang tải tiến bộ của bạn…";
 "sentence" = "câu";
 "phrase" = "cụm từ";
 "review.recordings_sentence" = "Bản thu của bạn · Câu %d";
@@ -1090,7 +1091,9 @@
 "review.drawer.priorities" = "Ưu tiên sửa";
 "review.drawer.open" = "Mở";
 "review.drawer.more" = "Xem thêm đánh giá";
-"review.drawer.clear" = "Rõ và dễ hiểu";
+"review.drawer.unassessed" = "Chưa đủ dữ liệu để đánh giá";
+"review.drawer.partial" = "Mới chấm được một phần";
+"review.drawer.matched" = "Các âm được chấm đều khớp";
 "review.drawer.focus" = "Tập trung vào các âm này";
 "review.drawer.continue" = "Đóng để luyện tiếp";
 "review.local" = "Trên máy";
@@ -1296,8 +1299,8 @@
 
 // PhoneticXeus UK experimental
 "assessment.xeus.installed" = "Local · FP32 · Thử nghiệm";
-"assessment.xeus.size" = "Tải model 2,30 GB · Local · UK thử nghiệm";
-"assessment.xeus.details" = "Bằng chứng CTC cho nguyên âm và phụ âm UK; chưa có điểm tổng được hiệu chuẩn. Âm chưa chắc giữ trung tính. Dùng nhánh UK Reference cho nhịp điệu và cao độ; không đổi model ngầm.";
+"assessment.xeus.size" = "Tải ~3,6 GB · kèm UK Reference · Local · UK thử nghiệm";
+"assessment.xeus.details" = "Bằng chứng CTC cho nguyên âm và phụ âm UK; chưa có điểm tổng được hiệu chuẩn. Âm chưa chắc giữ trung tính. Cài kèm UK Reference (VAD, IPA, nhịp điệu, cao độ); không đổi model ngầm. Xóa gói sẽ gỡ cả UK Reference.";
 "assessment.xeus.uk_required" = "Cài UK Reference để dùng VAD, IPA và nhánh nhịp điệu hiện có.";
 "assessment.xeus.runtime_missing" = "Bản build thiếu runtime PhoneticXeus đã đóng gói.";
 "assessment.xeus.invalid_evidence" = "PhoneticXeus trả bằng chứng không hợp lệ hoặc quá thời gian.";
@@ -1513,10 +1516,11 @@
 "practice.error.capture_write" = "Không ghi được bản thu: %@";
 "practice.error.persistence" = "Không lưu được bản thu: %@";
 "practice.error.recovery" = "Cần khôi phục bản thu: %@";
-"practice.trace.pitch" = "Cao độ";
-"practice.trace.energy" = "Nhịp";
-"practice.trace.both" = "Cả hai";
-"practice.trace.axis" = "Cao độ và nhịp so với câu gốc";
+"practice.trace.axis" = "Dạng sóng audio gốc và bản thu trên cùng thời gian";
+"practice.trace.recording" = "Đang thu";
+"practice.trace.awaiting" = "Chờ giọng nói";
+"practice.trace.finishing" = "Sắp kết thúc";
+"practice.trace.waiting" = "Chưa có dữ liệu sóng";
 "The production Library could not be initialized." = "Không khởi tạo được Thư viện.";
 "Production Library unavailable" = "Thư viện chưa sẵn sàng";
 "Prepare a sentence before practicing" = "Chuẩn bị câu trước khi luyện";

@@ -22,15 +22,12 @@ struct TimingWaveform: View {
       ZStack(alignment: .leading) {
         RoundedRectangle(cornerRadius: 12).fill(EchoTheme.canvas)
         if samples?.isEmpty == false || usesSimulatedSamples {
-          HStack(alignment: .center, spacing: 5) {
-            ForEach(0..<max(1, Int((width - 20) / 8)), id: \.self) { index in
-              let position = CGFloat(index * 8 + 10)
-              Capsule().fill(
-                position >= startX && position <= endX
-                  ? EchoTheme.accent : EchoTheme.text.opacity(0.28)
-              ).frame(width: 3, height: barHeight(index: index, width: width, height: proxy.size.height))
-            }
-          }.frame(maxWidth: .infinity).padding(.horizontal, 10).clipped()
+          TimingWaveformBars { index, _, size in
+            barHeight(index: index, width: size.width, height: size.height)
+          } color: { position in
+            position >= startX && position <= endX
+              ? EchoTheme.accent : EchoTheme.text.opacity(0.28)
+          }
         } else if let loadError {
           HStack(spacing: 8) {
             Image(systemName: "waveform.badge.exclamationmark")
@@ -130,5 +127,39 @@ struct TimingWaveform: View {
 
   private func isAllowed(_ span: AudioSpan) -> Bool {
     span.start >= limits.start && span.end <= limits.end && span.duration > TimingRules.minimumSpan
+  }
+}
+
+/// Shared centered capsule bars for timing and the practice overlay.
+/// Each layer uses the same columns; absent samples leave their column empty.
+struct TimingWaveformBars: View {
+  let height: (Int, Int, CGSize) -> CGFloat?
+  let color: (CGFloat) -> Color
+
+  var body: some View {
+    Canvas { context, size in
+      let columns = TimingWaveformBarLayout(width: size.width)
+      let count = columns.count
+      for index in 0..<count {
+        guard let value = height(index, count, size), value.isFinite else { continue }
+        let h = min(size.height, max(2, value))
+        let x = columns.start + CGFloat(index) * 8
+        let rect = CGRect(x: x - 1.5, y: (size.height - h) / 2, width: 3, height: h)
+        context.fill(Path(roundedRect: rect, cornerRadius: 1.5), with: .color(color(x)))
+      }
+    }
+    .clipped()
+    .accessibilityHidden(true)
+  }
+}
+
+struct TimingWaveformBarLayout {
+  let width: CGFloat
+  var count: Int { max(1, Int((width - 20) / 8)) }
+  var start: CGFloat { (width - CGFloat(count - 1) * 8) / 2 }
+  var span: CGFloat { CGFloat(count - 1) * 8 }
+  func x(at fraction: Double) -> CGFloat { start + CGFloat(fraction) * span }
+  func fraction(at x: CGFloat) -> Double {
+    min(1, max(0, Double((x - start) / max(1, span))))
   }
 }
