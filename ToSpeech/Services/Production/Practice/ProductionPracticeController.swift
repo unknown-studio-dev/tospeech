@@ -470,6 +470,7 @@ final class ProductionPracticeController {
         self.phase = .awaitingSpeech
         self.elapsed = 0
         self.remaining = policy.trailingSilence
+        self.liveDeliveryTrack = nil
         self.startTicker()
       } catch {
         self.fail(error)
