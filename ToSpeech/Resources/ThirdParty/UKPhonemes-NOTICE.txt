@@ -1,0 +1,23 @@
+ToSpeech UK phoneme reference audio — attribution and licence notice
+
+Newcastle University IPA Online
+Creators: Ghada Khattab and Gerry Docherty; the bundled derivatives use the
+female-speaker (GK) files. Recorded at Culture Lab, Newcastle University.
+Source: https://teaching.ncl.ac.uk/ipa/
+Licence: Creative Commons Attribution-NonCommercial 2.0 UK: England & Wales
+https://creativecommons.org/licenses/by-nc/2.0/uk/
+Changes: audio extracted from MP4, the surrounding VCV context removed for
+consonants, steady vowels shortened, level normalised, fades and silence padding
+added, and encoded as mono 44.1 kHz PCM WAV.
+
+University of Salford Harvard speech corpus — edited, end-pointed, zero-padded
+Dataset author: Philippa Demonte; recorded with a female native British English
+speaker.
+Source: https://salford.figshare.com/articles/dataset/Speech_corpus_-_Harvard_-_edited_end-pointed_zero-padded_audio/7862186
+Licence: Creative Commons Attribution-NonCommercial 4.0 International
+https://creativecommons.org/licenses/by-nc/4.0/
+Changes: contiguous sound excerpts selected from recorded words, resampled to
+mono 44.1 kHz PCM WAV, level normalised, and short fades/silence padding added.
+
+The resulting audio pack is restricted to noncommercial use under its source
+licences. This notice does not apply one licence to ToSpeech's own source code.

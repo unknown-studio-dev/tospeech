@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "tools": {
+    "yt-dlp": {
+      "version": "2026.08.19",
+      "binaryURL": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp_macos.zip",
+      "binarySHA256": "07e54b0865303c864006925913bce2604f8ee8cc6f18699bac9c309f9328a6d8",
+      "executableSHA256": "4f54eb67e4e96c7c3ffa49dd5deb81bc348bbb495080889b47d157d5c6d74443",
+      "sourceURL": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.08.19/yt-dlp.tar.gz",
+      "sourceSHA256": "072aad4f2a7604e92155f61a275a4752dc64046c8f6d90df3710525d94cd37c1",
+      "noticesURL": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.08.19/THIRD_PARTY_LICENSES.txt",
+      "noticesSHA256": "472aefe951c7db35e1657c1d13fd337140511ed6f2b329205105ad441c5a02b7",
+      "execution": "official macOS onedir archive; official onefile executable is incompatible with App Sandbox temporary extraction and IPC",
+      "signatureIdentity": "yt-dlp release SHA2-256SUMS.sig",
+      "license": "GPL-3.0-or-later for the PyInstaller-bundled macOS distribution; yt-dlp source is Unlicense; bundled third-party notices included"
+    },
+    "ffmpeg": {
+      "version": "9.0.1",
+      "sourceURL": "https://ffmpeg.org/releases/ffmpeg-9.0.1.tar.xz",
+      "sourceSHA256": "cf38e0e28c7e5605942c4a77755349b0145804a397af37eb1fb4c77cb237f635",
+      "signatureIdentity": "FFmpeg release signing key",
+      "configure": ["--arch=arm64", "--target-os=darwin", "--disable-shared", "--enable-static", "--disable-debug", "--disable-doc", "--disable-ffplay", "--enable-ffmpeg", "--enable-ffprobe"],
+      "executables": {
+        "ffmpeg": "8920fb6559fb2e0e137ee4d1c29bbbbedd283a39b65c6a883f655e07974d4057",
+        "ffprobe": "514e4244eed651fbdb31a242d75045f72c4e3e0d6ed8a9182c3d33139b880f56"
+      },
+      "license": "LGPL-2.1-or-later"
+    },
+    "quickjs": {
+      "version": "2026-06-04",
+      "sourceURL": "https://bellard.org/quickjs/quickjs-2026-06-04.tar.xz",
+      "sourceSHA256": "b376e839b322978313d929fd20663b11ba58b75df5a46c126dd19ea2fa70ad2a",
+      "signatureIdentity": null,
+      "buildNormalization": "debug disabled; qjs --version added; LC_UUID fixed to 4F3B9062-5B7B-4D9A-9499-BFD3EA1CA2B5",
+      "executableSHA256": "88b92796e3f471f613fdee4b5fefa87d2f86bf7d923179b857f3cff3965c9eb0",
+      "license": "MIT"
+    }
+  }
+}

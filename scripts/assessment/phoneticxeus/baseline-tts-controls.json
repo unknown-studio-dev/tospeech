@@ -1,0 +1,7 @@
+{
+ "_comment": "Gated (Daniel/Samantha) rates as measured on 2026-09-13 after the fix wave. --baseline fails only on a drop of more than 0.02 below one of these; it is a floor check, so the direction-correct upper bound on rightWordRed lives in expected-tts-controls.json (--expect).",
+ "ukGreen": 0.9107142857142857,
+ "usFlagged": 0.9333333333333333,
+ "wrongWordFlagged": 0.5,
+ "rightWordRed": 0.0
+}

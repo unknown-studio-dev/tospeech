@@ -1,0 +1,6 @@
+{"source": "fixtures/okay-source.f32", "take": "fixtures/okay-source.f32",
+ "words": [
+  {"id": "speech-4-word-0", "text": "Okay,", "variants": [["əʊ", "k", "eɪ"]]},
+  {"id": "speech-4-word-1", "text": "let's", "variants": [["l", "ɛ", "t", "s"]]},
+  {"id": "speech-4-word-2", "text": "get", "variants": [["g", "ɛ", "t"]]},
+  {"id": "speech-4-word-3", "text": "started.", "variants": [["s", "t", "ɑː", "t", "ɪ", "d"]]}]}

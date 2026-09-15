@@ -1,0 +1,8 @@
+Parakeet TDT 0.6B v3
+Original model by NVIDIA: https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3
+CoreML conversion by FluidInference: https://huggingface.co/FluidInference/parakeet-tdt-0.6b-v3-coreml
+Model license: Creative Commons Attribution 4.0 International (CC BY 4.0).
+https://creativecommons.org/licenses/by/4.0/
+ToSpeech uses the converted model with an INT8 encoder and does not modify the weights.
+FluidAudio Swift runtime: https://github.com/FluidInference/FluidAudio (Apache 2.0).
+The model is downloaded separately on request; recognition runs locally.

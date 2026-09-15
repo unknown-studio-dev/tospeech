@@ -14,6 +14,12 @@ DerivedData/
 # Swift Package Manager build output
 .build/
 
-# Locally generated previews and downloaded import toolchain
+# Locally generated previews and downloaded import toolchain / model packages
 screenshots/
 vendor/
+
+# Python caches from maintainer conversion/research scripts
+__pycache__/
+
+# Working notes, plans and session evidence stay local; they are never committed.
+docs/

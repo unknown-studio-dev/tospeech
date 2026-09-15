@@ -1,0 +1,10 @@
+Phone Scorer E16, private local evaluation package.
+Source: https://github.com/aviadarn/Accentedness-Scoring-Challenge
+Revision: 2211f19be4abc6cdfb7908eb9bbb34f9dcccb550
+Checkpoint: ead3144c82ab87ad9d6406511c6348a99c944a9f8ac1097756a6a61d78e80338
+Converted to ONNX by ToSpeech scripts/assessment/export_phone.py.
+Whisper encoder: OpenAI Whisper (MIT); ordinal scorer: Aviadara/Aviad Arn.
+No affirmative redistribution license for the full scorer was found in the
+upstream repository at this revision. This package is used for the user's
+requested private evaluation; this notice does not grant redistribution rights.
+Runtime: existing ONNX Runtime 1.24.2 (MIT), shipped notices in ToSpeech resources.

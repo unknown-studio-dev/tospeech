@@ -1,0 +1,222 @@
+{
+ "UKPhoneme_01.wav": {
+  "symbol": "iː",
+  "source": "audio_uk/iː.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.31
+ },
+ "UKPhoneme_02.wav": {
+  "symbol": "ɪ",
+  "source": "audio_uk/ɪ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.22
+ },
+ "UKPhoneme_03.wav": {
+  "symbol": "e",
+  "source": "audio_uk/e.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.23
+ },
+ "UKPhoneme_04.wav": {
+  "symbol": "æ",
+  "source": "audio_uk/æ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.26
+ },
+ "UKPhoneme_05.wav": {
+  "symbol": "ɑː",
+  "source": "audio_uk/ɑː.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.38
+ },
+ "UKPhoneme_06.wav": {
+  "symbol": "ɒ",
+  "source": "audio_uk/ɒ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.22
+ },
+ "UKPhoneme_07.wav": {
+  "symbol": "ɔː",
+  "source": "audio_uk/ɔː.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.31
+ },
+ "UKPhoneme_08.wav": {
+  "symbol": "ʊ",
+  "source": "audio_uk/ʊ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.19
+ },
+ "UKPhoneme_09.wav": {
+  "symbol": "uː",
+  "source": "audio_uk/uː.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.32
+ },
+ "UKPhoneme_10.wav": {
+  "symbol": "ʌ",
+  "source": "audio_uk/ʌ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.19
+ },
+ "UKPhoneme_11.wav": {
+  "symbol": "ɜː",
+  "source": "audio_uk/ɜː.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.34
+ },
+ "UKPhoneme_12.wav": {
+  "symbol": "ə",
+  "source": "audio_uk/ə.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.21
+ },
+ "UKPhoneme_13.wav": {
+  "symbol": "eɪ",
+  "source": "audio_uk/eɪ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.36
+ },
+ "UKPhoneme_14.wav": {
+  "symbol": "aɪ",
+  "source": "audio_uk/aɪ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.38
+ },
+ "UKPhoneme_15.wav": {
+  "symbol": "ɔɪ",
+  "source": "audio_uk/ɔɪ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.38
+ },
+ "UKPhoneme_16.wav": {
+  "symbol": "əʊ",
+  "source": "audio_uk/əʊ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.33
+ },
+ "UKPhoneme_17.wav": {
+  "symbol": "aʊ",
+  "source": "audio_uk/aʊ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.33
+ },
+ "UKPhoneme_18.wav": {
+  "symbol": "ɪə",
+  "source": "audio_uk/ɪə.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.35
+ },
+ "UKPhoneme_19.wav": {
+  "symbol": "eə",
+  "source": "audio_uk/eə.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.4
+ },
+ "UKPhoneme_20.wav": {
+  "symbol": "ʊə",
+  "source": "audio_uk/ʊə.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.43
+ },
+ "UKPhoneme_21.wav": {
+  "symbol": "p",
+  "source": "audio_uk/p.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.19
+ },
+ "UKPhoneme_22.wav": {
+  "symbol": "b",
+  "source": "audio_uk/b.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.17
+ },
+ "UKPhoneme_23.wav": {
+  "symbol": "t",
+  "source": "audio_uk/t.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.23
+ },
+ "UKPhoneme_24.wav": {
+  "symbol": "d",
+  "source": "audio_uk/d.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.2
+ },
+ "UKPhoneme_25.wav": {
+  "symbol": "k",
+  "source": "audio_uk/k.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.21
+ },
+ "UKPhoneme_26.wav": {
+  "symbol": "ɡ",
+  "source": "audio_uk/g.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.21
+ },
+ "UKPhoneme_27.wav": {
+  "symbol": "f",
+  "source": "audio_uk/f.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.31
+ },
+ "UKPhoneme_28.wav": {
+  "symbol": "v",
+  "source": "audio_uk/v.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.32
+ },
+ "UKPhoneme_29.wav": {
+  "symbol": "θ",
+  "source": "audio_uk/θ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.3
+ },
+ "UKPhoneme_30.wav": {
+  "symbol": "ð",
+  "source": "audio_uk/ð.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.29
+ },
+ "UKPhoneme_31.wav": {
+  "symbol": "s",
+  "source": "audio_uk/s.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.39
+ },
+ "UKPhoneme_32.wav": {
+  "symbol": "z",
+  "source": "audio_uk/z.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.32
+ },
+ "UKPhoneme_33.wav": {
+  "symbol": "ʃ",
+  "source": "audio_uk/ʃ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.28
+ },
+ "UKPhoneme_34.wav": {
+  "symbol": "ʒ",
+  "source": "audio_uk/ʒ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.34
+ },
+ "UKPhoneme_35.wav": {
+  "symbol": "h",
+  "source": "audio_uk/h.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.27
+ },
+ "UKPhoneme_36.wav": {
+  "symbol": "tʃ",
+  "source": "audio_uk/tʃ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.29
+ },
+ "UKPhoneme_37.wav": {
+  "symbol": "dʒ",
+  "source": "audio_uk/dʒ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.37
+ },
+ "UKPhoneme_38.wav": {
+  "symbol": "m",
+  "source": "audio_uk/m.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.35
+ },
+ "UKPhoneme_39.wav": {
+  "symbol": "n",
+  "source": "audio_uk/n.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.37
+ },
+ "UKPhoneme_40.wav": {
+  "symbol": "ŋ",
+  "source": "audio_uk/ŋ.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.43
+ },
+ "UKPhoneme_41.wav": {
+  "symbol": "l",
+  "source": "audio_uk/l.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.32
+ },
+ "UKPhoneme_42.wav": {
+  "symbol": "ɹ",
+  "source": "audio_uk/r.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.31
+ },
+ "UKPhoneme_43.wav": {
+  "symbol": "j",
+  "source": "audio_uk/j.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.29
+ },
+ "UKPhoneme_44.wav": {
+  "symbol": "w",
+  "source": "audio_uk/w.mp3 (Cambridge Dictionary UK phonetics sound file, unlicensed placeholder)",
+  "seconds": 0.28
+ }
+}

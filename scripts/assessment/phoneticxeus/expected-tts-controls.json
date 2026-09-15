@@ -1,0 +1,1 @@
+{"ukGreen": [">=", 0.95], "usFlagged": [">=", 0.90], "wrongWordFlagged": [">=", 0.90], "rightWordRed": ["<=", 0.05]}

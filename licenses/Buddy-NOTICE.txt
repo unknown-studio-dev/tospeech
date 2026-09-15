@@ -1,0 +1,55 @@
+buddy-pronunciation-onnx
+========================
+
+This repository redistributes MODIFIED copies of two third-party speech models.
+Both originals are licensed under the Apache License, Version 2.0; a copy is in
+LICENSE. This NOTICE records what was changed, as Apache-2.0 section 4 requires.
+
+No model weights were retrained, fine-tuned or otherwise altered in substance.
+The only changes are a format conversion and a numeric quantization, described
+below, so that the models can run through ONNX Runtime on a mobile device.
+
+
+en/v1/model.int8.onnx
+---------------------
+Derived from : nrshoudi/speech_ocean_wav2vec_mdd
+               https://huggingface.co/nrshoudi/speech_ocean_wav2vec_mdd
+Original     : wav2vec2 CTC, fine-tuned on speechocean762 (Apache-2.0)
+License      : Apache-2.0
+Vocabulary   : en/v1/vocab.json — copied verbatim from the original repository.
+
+Changes:
+  1. Exported from PyTorch to ONNX with torch.onnx.export (opset 17), with the
+     time axis marked dynamic so any clip length works at inference.
+  2. Dynamically quantized to int8, restricted to MatMul operators:
+     onnxruntime.quantization.quantize_dynamic(
+         weight_type=QuantType.QInt8, op_types_to_quantize=["MatMul"])
+     Conv operators are deliberately left in float: the feature extractor
+     resists dynamic quantization (its inputs are computed rather than
+     initializers), and the transformer encoder holds ~95% of the weights, so
+     excluding Conv keeps the full size reduction.
+
+Result: 1262 MB fp32 -> 357 MB int8.
+
+
+zh/v1/model.int8.onnx
+---------------------
+Derived from : facebook/wav2vec2-xlsr-53-espeak-cv-ft
+               https://huggingface.co/facebook/wav2vec2-xlsr-53-espeak-cv-ft
+Original     : wav2vec2 XLSR-53, fine-tuned for multilingual phoneme
+               recognition (Common Voice, CC0)
+License      : Apache-2.0
+Vocabulary   : zh/v1/vocab.json — copied verbatim from the original repository.
+
+Changes: identical to en/v1 above.
+
+Result: 1263 MB fp32 -> 358 MB int8.
+
+
+Attribution
+-----------
+Please cite the original authors, not this repository, when referring to the
+models themselves. This repository exists only to host a runnable format.
+
+  Zero-shot cross-lingual phoneme recognition (the XLSR-53 espeak model):
+  https://arxiv.org/abs/2109.11680

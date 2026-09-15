@@ -1,0 +1,8 @@
+torch==2.10.0
+torchaudio==2.10.0
+typeguard==2.13.3
+pyinstaller==6.19.0
+safetensors==0.7.0
+PyYAML==6.0.3
+huggingface-hub==0.36.2
+numpy==2.4.2

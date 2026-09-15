@@ -1,6 +1,6 @@
-name: EchoLab
+name: ToSpeech
 options:
-  bundleIdPrefix: studio.unknown
+  bundleIdPrefix: com.unknownstudio
   deploymentTarget:
     macOS: "26.0"
   createIntermediateGroups: true
@@ -12,14 +12,14 @@ settings:
     CODE_SIGN_IDENTITY: "-"
     CODE_SIGN_STYLE: Manual
 packages:
+  ONNXRuntime:
+    url: https://github.com/microsoft/onnxruntime-swift-package-manager
+    exactVersion: 1.24.2
   FluidAudio:
     url: https://github.com/FluidInference/FluidAudio
     exactVersion: 0.15.7
-  WhisperKit:
-    url: https://github.com/argmaxinc/WhisperKit
-    exactVersion: 1.1.0
 targets:
-  EchoLab:
+  ToSpeech:
     type: application
     platform: macOS
     dependencies:
@@ -27,55 +27,122 @@ targets:
       - sdk: Speech.framework
       - sdk: Translation.framework
       - sdk: WebKit.framework
+      - sdk: Accelerate.framework
+      - package: ONNXRuntime
+        product: onnxruntime
       - package: FluidAudio
         product: FluidAudio
-      - package: WhisperKit
-        product: WhisperKit
+      - target: RubberBandRender
+        embed: false
+    # These guards and staging steps must run on every build: they re-verify
+    # pinned checksums and re-codesign helpers, so making them incremental would
+    # change that posture. Each declares a stamp under DERIVED_FILE_DIR that the
+    # script never writes — Xcode therefore treats the phase as always
+    # out-of-date (so it always runs) while staying quiet, instead of emitting
+    # the "runs every build because dependency analysis is off" note. The stamp
+    # paths are unique per phase to avoid "multiple commands produce" errors.
     preBuildScripts:
       - name: Check shared UI component usage
-        script: bash "${SRCROOT}/scripts/check-ui-components.sh"
-        basedOnDependencyAnalysis: false
+        script: bash "${SRCROOT}/scripts/xcode/check-ui-components.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/check-ui-components.stamp"
     postBuildScripts:
+      - name: Stage DeepFilterNet3 audio enhancement
+        script: bash "${SRCROOT}/scripts/xcode/stage-deepfilternet.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-deepfilternet.stamp"
+      - name: Stage Rubber Band helper
+        script: bash "${SRCROOT}/scripts/xcode/stage-rubberband.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-rubberband.stamp"
       - name: Stage verified import toolchain
-        script: bash "${SRCROOT}/scripts/stage-toolchain.sh"
-        basedOnDependencyAnalysis: false
+        script: bash "${SRCROOT}/scripts/xcode/stage-toolchain.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-toolchain.stamp"
+      - name: Stage local word alignment package
+        script: bash "${SRCROOT}/scripts/xcode/stage-alignment.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-alignment.stamp"
+      - name: Stage Phone Scorer package
+        script: bash "${SRCROOT}/scripts/xcode/stage-phone-scorer.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-phone-scorer.stamp"
+      - name: Stage verified UK Reference package
+        script: bash "${SRCROOT}/scripts/xcode/stage-uk-reference.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-uk-reference.stamp"
+      - name: Stage PhoneticXeus local runtime
+        script: bash "${SRCROOT}/scripts/xcode/stage-phoneticxeus.sh"
+        outputFiles:
+          - "$(DERIVED_FILE_DIR)/stage-phoneticxeus.stamp"
     sources:
-      - path: EchoLab
+      - path: ToSpeech
         excludes: [Resources]
-      - path: EchoLab/Resources
+      - path: ToSpeech/Resources
+        excludes: [PhonemeAudio]
         buildPhase: resources
+      # Raw phoneme clips keep their uk/us folders (same file names in both), so
+      # they ship as a folder reference instead of being flattened.
+      - path: ToSpeech/Resources/PhonemeAudio
+        type: folder
+        buildPhase: resources
+        optional: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: studio.unknown.EchoLab
+        PRODUCT_BUNDLE_IDENTIFIER: com.unknownstudio.tospeech
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: EchoLab
+        INFOPLIST_KEY_CFBundleDisplayName: ToSpeech
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.education
-        INFOPLIST_KEY_NSMicrophoneUsageDescription: EchoLab records your shadowing takes when you explicitly start recording.
-        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: EchoLab uses on-device speech recognition to prepare transcript and word timing for imported lessons.
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: ToSpeech records your shadowing takes when you explicitly start recording.
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: ToSpeech uses on-device speech recognition to prepare transcript and word timing for imported lessons.
         ENABLE_APP_SANDBOX: YES
-        ENABLE_HARDENED_RUNTIME: YES
         SWIFT_STRICT_CONCURRENCY: complete
+      configs:
+        # Ad-hoc ("-") signing can't carry a hardened runtime, so Xcode disables
+        # it and logs a note on every Debug build. Release keeps it on for
+        # notarization once a real signing identity is available.
+        Debug:
+          ENABLE_HARDENED_RUNTIME: NO
+        Release:
+          ENABLE_HARDENED_RUNTIME: YES
     entitlements:
-      path: EchoLab/App/EchoLab.entitlements
+      path: ToSpeech/App/ToSpeech.entitlements
       properties:
         com.apple.security.app-sandbox: true
         com.apple.security.files.user-selected.read-only: true
         com.apple.security.network.client: true
         com.apple.security.device.audio-input: true
-  EchoLabTests:
+  ToSpeechTests:
     type: bundle.unit-test
     platform: macOS
-    sources: [EchoLabTests]
+    sources: [ToSpeechTests]
     dependencies:
-      - target: EchoLab
+      - target: ToSpeech
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES
+  RubberBandRender:
+    type: tool
+    platform: macOS
+    sources:
+      - path: ThirdParty/RubberBand/single/RubberBandSingle.cpp
+        compilerFlags: "-O3"
+      - path: ThirdParty/RubberBand/helper/rubberband-render.cpp
+        compilerFlags: "-O3"
+    dependencies:
+      - sdk: Accelerate.framework
+    settings:
+      base:
+        PRODUCT_NAME: rubberband-render
+        HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/ThirdParty/RubberBand"
+        CLANG_CXX_LANGUAGE_STANDARD: c++17
+        GCC_OPTIMIZATION_LEVEL: 3
+
 schemes:
-  EchoLab:
+  ToSpeech:
     build:
       targets:
-        EchoLab: all
+        ToSpeech: all
     test:
-      targets: [EchoLabTests]
+      targets: [ToSpeechTests]
