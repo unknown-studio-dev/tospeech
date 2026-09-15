@@ -1,7 +1,7 @@
 import Foundation
 
 enum PhoneAssessmentAvailability: String, Codable, Sendable {
-  case outsideModel, referenceUncertain, takeUncertain, unavailable, referenceUnmapped, referenceWeak, modelCannotDistinguish
+  case outsideModel, referenceUncertain, takeUncertain, unavailable, referenceUnmapped, referenceWeak, modelCannotDistinguish, referenceNotConfident, ambiguousSubstitution
   var title: String { "review.availability.\(rawValue)" }
 }
 

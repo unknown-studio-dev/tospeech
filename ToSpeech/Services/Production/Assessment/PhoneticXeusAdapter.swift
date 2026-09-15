@@ -187,7 +187,9 @@ actor PhoneticXeusAdapter: PhoneScoring {
     switch phone.reason {
     case "referenceUnmapped": .referenceUnmapped
     case "referenceWeak": .referenceWeak
+    case "referenceNotConfident": .referenceNotConfident
     case "modelCannotDistinguish": .modelCannotDistinguish
+    case "ambiguousSubstitution": .ambiguousSubstitution
     case "referenceUncertain": .referenceUncertain
     default: .takeUncertain
     }

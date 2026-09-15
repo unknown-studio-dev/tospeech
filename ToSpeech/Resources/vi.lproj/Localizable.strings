@@ -1229,6 +1229,8 @@
 "review.availability.referenceUnmapped" = "Cách giáo viên phát âm âm này nằm ngoài các biến thể Anh-Anh đã biết, nên bản thu chưa được chấm ở âm này. Đã đưa vào hàng đợi xem lại.";
 "review.availability.referenceWeak" = "Model chưa xác nhận đủ chắc âm này trong câu mẫu; bản thu chưa được chấm ở âm này.";
 "review.availability.modelCannotDistinguish" = "Model chưa phân biệt được nguyên âm Anh-Anh này với nguyên âm kiểu Mỹ gần nhất ở đây; giữ trung tính thay vì đoán.";
+"review.availability.referenceNotConfident" = "Bản mẫu chưa đủ rõ để chấm";
+"review.availability.ambiguousSubstitution" = "Chưa rõ — không chấm";
 "review.observed_unknown" = "Chưa xác định";
 "coach.library" = "Bảng 44 âm UK";
 "coach.title" = "Cách phát âm";

@@ -233,6 +233,39 @@ private final class PhoneticXeusFixtureLocator: NSObject { }
     let mismatched = try JSONDecoder().decode(PhoneticXeusEvidence.self, from: JSONSerialization.data(withJSONObject: object))
     #expect(throws: (any Error).self) { try PhoneticXeusAdapter.convert(mismatched, targets: [target]) }
   }
+  @Test func referenceNotConfidentAndAmbiguousSubstitutionMapToDistinctAvailability() throws {
+    let notConfident = try PhoneticXeusAdapter.convert(fixture(status: "uncertain", reason: "referenceNotConfident"), targets: [target])[0]
+    #expect(notConfident.phones[0].quality == .unassessed)
+    #expect(notConfident.phones[0].unassessedReason == .referenceNotConfident)
+    let ambiguousSubstitution = try PhoneticXeusAdapter.convert(fixture(status: "uncertain", reason: "ambiguousSubstitution"), targets: [target])[0]
+    #expect(ambiguousSubstitution.phones[0].quality == .unassessed)
+    #expect(ambiguousSubstitution.phones[0].unassessedReason == .ambiguousSubstitution)
+    #expect(PhoneAssessmentAvailability.referenceNotConfident.title == "review.availability.referenceNotConfident")
+    #expect(PhoneAssessmentAvailability.ambiguousSubstitution.title == "review.availability.ambiguousSubstitution")
+  }
+  @Test func evidencePolicyAndMappingMatchTheWordGatedHelperAndOldStoredResultsStillDecode() throws {
+    let raw = try fixture()
+    #expect(raw.policy == "xeus-uk-decision-v6-word-gated")
+    #expect(raw.policy == PhoneticXeusPackage.evidencePolicy)
+    #expect(raw.mapping == "xeus-uk-inventory-v4")
+    #expect(raw.mapping == PhoneticXeusPackage.mappingPolicy)
+    #expect(try PhoneticXeusAdapter.convert(raw, targets: [target]).count == 1)
+    // A result persisted under the previous policy/mapping ids must still decode through its
+    // stored path (it is only ever displayed, never re-converted) even though `convert` would
+    // now reject it as fresh evidence.
+    let v5 = try fixture()
+    var object = try #require(JSONSerialization.jsonObject(with: JSONEncoder().encode(v5)) as? [String: Any])
+    object["policy"] = "xeus-uk-ctc-evidence-v5-units"
+    object["mapping"] = "xeus-uk-inventory-v3"
+    let oldRaw = try JSONDecoder().decode(PhoneticXeusEvidence.self, from: JSONSerialization.data(withJSONObject: object))
+    #expect(oldRaw.policy == "xeus-uk-ctc-evidence-v5-units")
+    #expect(oldRaw.mapping == "xeus-uk-inventory-v3")
+    #expect(throws: (any Error).self) { try PhoneticXeusAdapter.convert(oldRaw, targets: [target]) }
+    let stored = PronunciationEvidence(words: [], duration: 1, recognizedPhones: [], phoneticXeus: oldRaw)
+    let decodedStored = try JSONDecoder().decode(PronunciationEvidence.self, from: JSONEncoder().encode(stored))
+    #expect(decodedStored.phoneticXeus?.policy == "xeus-uk-ctc-evidence-v5-units")
+    #expect(decodedStored.phoneticXeus?.mapping == "xeus-uk-inventory-v3")
+  }
   @Test func coverageKeepsYellowAssessedAndNamesModelLimits() throws {
     let yellow = try PhoneticXeusAdapter.convert(fixture(status: "uncertain", reason: "ambiguous", referenceMatch: true,
       logMargin: 1.0, takeStatus: "uncertain", state: "INSUFFICIENT_EVIDENCE"), targets: [target])

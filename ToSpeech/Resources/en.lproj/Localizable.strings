@@ -1225,6 +1225,8 @@
 "review.availability.referenceUnmapped" = "The reference speaker's realization of this sound is outside the known British variants, so your take is not graded for it. It is queued for review.";
 "review.availability.referenceWeak" = "The model could not confirm this sound in the reference strongly enough; your take is not graded for it.";
 "review.availability.modelCannotDistinguish" = "This model cannot tell this British vowel from its nearest American-style vowel here; the sound stays ungraded rather than guessed.";
+"review.availability.referenceNotConfident" = "Reference not clear enough to grade";
+"review.availability.ambiguousSubstitution" = "Unclear — not scored";
 "review.observed_unknown" = "Not identified";
 "coach.library" = "44 UK sounds";
 "coach.title" = "How to pronounce it";
