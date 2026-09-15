@@ -1,0 +1,8 @@
+{
+  "support": 0.3,
+  "margin": 1.3862943611198906,
+  "entropy": 0.55,
+  "competitor": 1.8,
+  "strength": 0.65,
+  "calibration": "native-zero-false-sai-v1"
+}

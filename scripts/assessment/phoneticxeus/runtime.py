@@ -19,6 +19,16 @@ def head_path():
         if base and (base/HEAD_FILE).exists(): return base/HEAD_FILE
     return None
 
+def load_thresholds():
+    """Loads the pinned calibration artifact (thresholds.json) if present, else the code defaults.
+
+    Returns (thresholds_dict, calibration_id_or_None). See calibrate.py for how the artifact is
+    produced (native-corpus grid search, offline, on saved fixtures)."""
+    p=Path(__file__).with_name('thresholds.json')
+    if not p.exists(): return dict(THRESHOLDS), None
+    data=json.loads(p.read_text()); cal=data.pop('calibration',None)
+    return {k:float(data[k]) for k in THRESHOLDS}, cal
+
 def load(root, device='cpu'):
     global HEAD
     import torch
@@ -92,7 +102,7 @@ def _span(row, step=.02):
     if row.get('emissionStart') is None or row.get('emissionEnd') is None: return None
     a=int(round(row['emissionStart']/step)); b=int(round(row['emissionEnd']/step)); return (a,b) if b>a else None
 
-def stage_a(source, units, vocab, duration, head=None, hidden=None):
+def stage_a(source, units, vocab, duration, head=None, hidden=None, thresholds=THRESHOLDS):
     """Reference licensing. Returns anchors, licensed allowed sets, licences, realizations and source rows."""
     discovery=align_units(source,units,[u.cond for u in units])
     if discovery is None: raise ValueError('source target lattice could not align')
@@ -103,7 +113,7 @@ def stage_a(source, units, vocab, duration, head=None, hidden=None):
         elif R in u.cond: lic,al='classD',u.allowed+[R]
         else: lic,al='unmapped',u.allowed
         allowed.append(al); licences.append(lic); realizations.append(R)
-    rows=assess_units(source,units,allowed,vocab,duration)
+    rows=assess_units(source,units,allowed,vocab,duration,thresholds=thresholds)
     for i,(u,row) in enumerate(zip(units,rows)):
         if len(u.display)!=1 or u.display[0] not in CONTRASTS_FOR or row['status']=='correct' or licences[i]=='classD': continue
         if row.get('closestPhone') not in COMPETITORS[u.display[0]]: continue
@@ -152,8 +162,9 @@ def assemble_from_logits(source,take,vocab,request,source_duration,take_duration
     selected=[v[i] for v,i in zip(variants,alignment[0])]
     units=build_units([(w['id'],v) for w,v in zip(words,selected)],vocab)
     inverse={i:s for s,i in vocab.items()}
-    a=stage_a(source,units,vocab,source_duration,head,hidden_source)
-    take_rows=assess_units(take,units,a['allowed'],vocab,take_duration)
+    thresholds,calibration=load_thresholds()
+    a=stage_a(source,units,vocab,source_duration,head,hidden_source,thresholds=thresholds)
+    take_rows=assess_units(take,units,a['allowed'],vocab,take_duration,thresholds=thresholds)
     take_rows=apply_head_take(units,take_rows,a['licences'],head,hidden_take)
     tr=runs(take)
     for i,(u,row,src) in enumerate(zip(units,take_rows,a['rows'])):
@@ -203,7 +214,7 @@ def assemble_from_logits(source,take,vocab,request,source_duration,take_duration
     return dict(revision=REVISION,policy=POLICY,mapping=MAPPING,referencePolicy=REFERENCE_POLICY,device=device,dtype='float32',
         duration=take_duration,sourceDuration=source_duration,sourceShape=list(source.shape),takeShape=list(take.shape),
         inferenceSeconds=inferred,words=results,coverage=coverage_fn([r for w in results for r in w['phones']]),reference=reference,contrastHead=head.summary() if head else None,
-        thresholds={k:round(v,6) for k,v in THRESHOLDS.items()},
+        thresholds={k:round(v,6) for k,v in thresholds.items()},calibration=calibration,
         sourceRecognizedPhones=greedy(source,inverse,.02,source_duration),recognizedPhones=greedy(take,inverse,.02,take_duration),
         peakRSS=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
 

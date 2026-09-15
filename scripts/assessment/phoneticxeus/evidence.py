@@ -309,12 +309,12 @@ def expand_rows(units, rows):
             r=dict(row); r.update(expected=phone,unitID=unit.id,shared=len(unit.display)>1); out.append(r)
     return out
 
-def assess_phones(lp, phones, vocab, duration, step=.02):
+def assess_phones(lp, phones, vocab, duration, step=.02, thresholds=THRESHOLDS):
     """Compatibility wrapper: one unit per phone, no class D, no position rule."""
     units=[Unit('w',[i],[p],accepted(p,vocab),[],False) for i,p in enumerate(phones)]
     if any(not u.allowed for u in units):
         raise ValueError('unsupported target phone(s): '+repr([p for p in phones if not accepted(p,vocab)]))
-    rows=assess_units(lp,units,[u.allowed for u in units],vocab,duration,step=step)
+    rows=assess_units(lp,units,[u.allowed for u in units],vocab,duration,thresholds=thresholds,step=step)
     return [{k:v for k,v in r.items() if k not in ('unitID','shared')} for r in expand_rows(units,rows)]
 
 def coverage(rows):
