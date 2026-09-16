@@ -140,6 +140,7 @@
 		51FD3B3B6BB85E40FFDE3A31 /* EchoPhoneticText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47006516AEE3323C09E607EB /* EchoPhoneticText.swift */; };
 		528DADAB1EA81AD1B5D21AD4 /* UKPhoneme_16.wav in Resources */ = {isa = PBXBuildFile; fileRef = FBFDACE07458BC5172DB2DD3 /* UKPhoneme_16.wav */; };
 		545D4D296AEC33B917FA9E40 /* pair-unit-result.json in Resources */ = {isa = PBXBuildFile; fileRef = AE0F3B80A912592615CC8D1D /* pair-unit-result.json */; };
+		55D62C77DB3DECA3A5AA3716 /* XeusOnnxPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE14980A3A454C64EDD55656 /* XeusOnnxPackageTests.swift */; };
 		57A9CD44A0AB3721F702A4EB /* rhythm.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 368224030999060E236B3CDB /* rhythm.jpg */; };
 		57C697C2460B325CC2EF3424 /* UKPhoneme_35.wav in Resources */ = {isa = PBXBuildFile; fileRef = 661F1F9E8074BEC3BCD47F80 /* UKPhoneme_35.wav */; };
 		58CF1EAA5DCA3C5B9B697B82 /* UKPhoneInventory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25AEE3A351177137BD691951 /* UKPhoneInventory.swift */; };
@@ -147,6 +148,7 @@
 		5A1546A4BE1F477C53043A53 /* XeusContrastHeadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76BA896C197B4655F7C36DF /* XeusContrastHeadTests.swift */; };
 		5A1CDDBA7234A40268C246C2 /* RubberBandRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1BB415E8CD3D7C014EEE00 /* RubberBandRenderer.swift */; };
 		5AC4998D96B8BAF29FED754D /* EchoLinkMarker.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB4962A0A40B09058B053F1B /* EchoLinkMarker.swift */; };
+		5B1402D9FDFD6984F6CC63D8 /* XeusOnnxScorer.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE7C9BEE4DCF188FDDB69DF1 /* XeusOnnxScorer.swift */; };
 		5BBA9D692F100E0E22E736B4 /* LessonFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6184DA004A3F784B580A081 /* LessonFixtures.swift */; };
 		5D8DD3C6230F1A71A3879F1A /* UKPhonemes-README.md in Resources */ = {isa = PBXBuildFile; fileRef = 3C71F55E25D971296BF71E3B /* UKPhonemes-README.md */; };
 		5D9B1744A87935D591C04810 /* UKPhoneme_21.wav in Resources */ = {isa = PBXBuildFile; fileRef = D09EA901D71FB5C674F8A6B2 /* UKPhoneme_21.wav */; };
@@ -167,6 +169,7 @@
 		689BF9E05520339C86077C9A /* EchoButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AD7A5B7A9D76D603A899C26 /* EchoButton.swift */; };
 		6915AD2A87D833B9F3E770F4 /* PreviewFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44FFFBBD6C1029004F7462F /* PreviewFixtures.swift */; };
 		694E12DDB5C41753EB837959 /* EchoFieldBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4B1C505E3CCA348F27B54A3 /* EchoFieldBorder.swift */; };
+		69796804B5EB7CB8300BB6BC /* XeusOnnxSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 016C778BAB94A9BC522F5DF3 /* XeusOnnxSession.swift */; };
 		6A17AB7FA16CC8DD1D732F49 /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1752ADE1B4A92D214EF10A68 /* Preferences.swift */; };
 		6A272918F3F5C357E621D52D /* PronunciationJob.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FDE60FB48E61AAFC6BCDF8 /* PronunciationJob.swift */; };
 		6A4F199D5E6951F6C0F8A3CF /* TranscriptNavigatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 802EF454506A32122B2108AE /* TranscriptNavigatorView.swift */; };
@@ -189,6 +192,7 @@
 		75AB130A4600FBA6894E8ED9 /* BuddyModelPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90E6BCA363DC3DD33CF178C6 /* BuddyModelPackage.swift */; };
 		765126A2DA7163E7F74C00AA /* PhoneticXeusPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708899352ED7B823B0C28092 /* PhoneticXeusPackage.swift */; };
 		768515C7F8DA997A6FBB45A7 /* Inter-OFL.txt in Resources */ = {isa = PBXBuildFile; fileRef = 9836DBD29C164B27C673F290 /* Inter-OFL.txt */; };
+		76A28CBFD999809E40DE0095 /* XeusDecisionParityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04683491AE292195027340DD /* XeusDecisionParityTests.swift */; };
 		7B0C8B01A4A90F7B45D6A65C /* LearnerLevelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24E4EC270301C993B8AC4EE8 /* LearnerLevelTests.swift */; };
 		7B25FBCF6593861199EFB3AA /* TranscriptionAdapterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D17B5C5A6C9427D277E13E79 /* TranscriptionAdapterTests.swift */; };
 		7BAA7BA3688EC9EAFF529E0E /* LinkingSuggestionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF770DA5C0E5A9799540C6E1 /* LinkingSuggestionTests.swift */; };
@@ -413,9 +417,11 @@
 
 /* Begin PBXFileReference section */
 		00A1F1430E0BE7BC7B36BCA4 /* SettingsLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsLayout.swift; sourceTree = "<group>"; };
+		016C778BAB94A9BC522F5DF3 /* XeusOnnxSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusOnnxSession.swift; sourceTree = "<group>"; };
 		0372A87D79FF22AF350EF6C0 /* harmonic-120.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "harmonic-120.wav"; sourceTree = "<group>"; };
 		0445A0CF8E0BEFF673A90C06 /* EchoBrand.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoBrand.swift; sourceTree = "<group>"; };
 		045CAAF48C0701C25CEDCE79 /* ProductionPracticeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionPracticeService.swift; sourceTree = "<group>"; };
+		04683491AE292195027340DD /* XeusDecisionParityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusDecisionParityTests.swift; sourceTree = "<group>"; };
 		0473B59D9A050FD2CD06D8AE /* ModelChecksumCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelChecksumCache.swift; sourceTree = "<group>"; };
 		04B7D474C844B750168D753F /* TranscriptAlignerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptAlignerTests.swift; sourceTree = "<group>"; };
 		04EB61FC1BED4EFE1DBAFCB7 /* ReviewPanelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewPanelView.swift; sourceTree = "<group>"; };
@@ -716,6 +722,7 @@
 		BA9BB7E82D0BFF5F9046CF26 /* UKPhoneme_44.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_44.wav; sourceTree = "<group>"; };
 		BAE5CAB4A3026531ED6B9283 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		BB4483ECAFEA15751ED8A71D /* TranslationLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationLanguage.swift; sourceTree = "<group>"; };
+		BE14980A3A454C64EDD55656 /* XeusOnnxPackageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusOnnxPackageTests.swift; sourceTree = "<group>"; };
 		BE52AD8036B3A6C132B0DB8B /* ResumeCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResumeCard.swift; sourceTree = "<group>"; };
 		BF712113AD6F1B86DCC6C02E /* PronunciationComparison.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationComparison.swift; sourceTree = "<group>"; };
 		BFC157EAC90EB80C7780C654 /* TranslationLanguageCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationLanguageCatalog.swift; sourceTree = "<group>"; };
@@ -770,6 +777,7 @@
 		EBDCFFC351FF355FFB478BC3 /* UKPhonemeAudioPlayerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UKPhonemeAudioPlayerTests.swift; sourceTree = "<group>"; };
 		EC7AE956B0D8CE773FFED7F1 /* UKPhoneme_03.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_03.wav; sourceTree = "<group>"; };
 		ED7BF3633B156BA3AD14E6D1 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		EE7C9BEE4DCF188FDDB69DF1 /* XeusOnnxScorer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusOnnxScorer.swift; sourceTree = "<group>"; };
 		EEA04310008B957B5567E27B /* ReviewSummaryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSummaryView.swift; sourceTree = "<group>"; };
 		EEA1B34C781AEB593DB76EF0 /* PronunciationAssessmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationAssessmentService.swift; sourceTree = "<group>"; };
 		EEBED9CFAE8B3112E36B8D23 /* PracticeTake.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PracticeTake.swift; sourceTree = "<group>"; };
@@ -1031,6 +1039,8 @@
 				F737E3E86B49597904013A73 /* XeusCTC.swift */,
 				99D6127E8F2553039F6E5E49 /* XeusInventory.swift */,
 				9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */,
+				EE7C9BEE4DCF188FDDB69DF1 /* XeusOnnxScorer.swift */,
+				016C778BAB94A9BC522F5DF3 /* XeusOnnxSession.swift */,
 				56C031A48ABE6A2BB7AAD127 /* XeusRuntime.swift */,
 			);
 			path = XeusNative;
@@ -1512,8 +1522,10 @@
 				4DF1CA6CA9F3BC681115D39C /* XeusAssessTests.swift */,
 				F76BA896C197B4655F7C36DF /* XeusContrastHeadTests.swift */,
 				B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */,
+				04683491AE292195027340DD /* XeusDecisionParityTests.swift */,
 				65BDAE587D204A412BE1E718 /* XeusInventoryTests.swift */,
 				27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */,
+				BE14980A3A454C64EDD55656 /* XeusOnnxPackageTests.swift */,
 				2E64C8D8C9B36B7301BCA8EA /* XeusRuntimeTests.swift */,
 				F3CE216DC899527ECF9FFF8E /* Fixtures */,
 			);
@@ -1657,7 +1669,7 @@
 				44D593EE53DC65210FD458F0 /* Stage local word alignment package */,
 				79E044FB2C2EF67E1CF98636 /* Stage Phone Scorer package */,
 				F22ADCB864EBDDD3E594D26F /* Stage verified UK Reference package */,
-				6A3E9DFE1E3742EC685BC289 /* Stage PhoneticXeus local runtime */,
+				A208AEED68D7148D3894A5C2 /* Stage PhoneticXeus ONNX graph */,
 			);
 			buildRules = (
 			);
@@ -1890,25 +1902,6 @@
 			shellPath = /bin/sh;
 			shellScript = "bash \"${SRCROOT}/scripts/xcode/stage-rubberband.sh\"";
 		};
-		6A3E9DFE1E3742EC685BC289 /* Stage PhoneticXeus local runtime */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Stage PhoneticXeus local runtime";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/stage-phoneticxeus.stamp",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "bash \"${SRCROOT}/scripts/xcode/stage-phoneticxeus.sh\"";
-		};
 		79E044FB2C2EF67E1CF98636 /* Stage Phone Scorer package */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1946,6 +1939,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "bash \"${SRCROOT}/scripts/xcode/stage-toolchain.sh\"";
+		};
+		A208AEED68D7148D3894A5C2 /* Stage PhoneticXeus ONNX graph */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Stage PhoneticXeus ONNX graph";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/stage-xeus-onnx.stamp",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "bash \"${SRCROOT}/scripts/xcode/stage-xeus-onnx.sh\"";
 		};
 		A83A4B1377189A7F1C582E7C /* Stage DeepFilterNet3 audio enhancement */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2045,8 +2057,10 @@
 				F5B61DBA8761AF2FABAE567A /* XeusAssessTests.swift in Sources */,
 				AB562FFE33D5577656F2F48F /* XeusCTCTests.swift in Sources */,
 				5A1546A4BE1F477C53043A53 /* XeusContrastHeadTests.swift in Sources */,
+				76A28CBFD999809E40DE0095 /* XeusDecisionParityTests.swift in Sources */,
 				E3C6C8F85B24124281499346 /* XeusInventoryTests.swift in Sources */,
 				061C38AA9A75A66B3FEE8A8B /* XeusLatticeTests.swift in Sources */,
+				55D62C77DB3DECA3A5AA3716 /* XeusOnnxPackageTests.swift in Sources */,
 				CE018C357690D9226A5A8A80 /* XeusRuntimeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2287,6 +2301,8 @@
 				DF17325870DA12789F4A0276 /* XeusDiagnosticValidation.swift in Sources */,
 				982B6CF6740A7736A5775D7C /* XeusInventory.swift in Sources */,
 				25B1CAD020DFBBF0DC11397F /* XeusLattice.swift in Sources */,
+				5B1402D9FDFD6984F6CC63D8 /* XeusOnnxScorer.swift in Sources */,
+				69796804B5EB7CB8300BB6BC /* XeusOnnxSession.swift in Sources */,
 				F27594D9D448BD3518DAA897 /* XeusReferenceDetailView.swift in Sources */,
 				91B0FD81038312FC9C1F1B16 /* XeusRuntime.swift in Sources */,
 				CF8A84328DC1F7D46EFBE866 /* YouTubeVideoFollowerView.swift in Sources */,

@@ -113,11 +113,15 @@ private final class PhoneticXeusFixtureLocator: NSObject { }
     #expect(try PhoneticXeusAdapter.convert(independent, targets: [target]).count == 1)
   }
   @Test func runtimeUpgradeRetainsVerifiedWeightsAndCreatesNewProvenance() {
-    let old = "PhoneticXeus · UK Experimental · \(PhoneticXeusPackage.revision) · \(PhoneticXeusPackage.weightHash) · old runtime"
-    #expect(PhoneticXeusPackage.acceptsInstallationMarker(old))
+    // The old Python-runtime + safetensors marker layout is a different install and must NOT read as
+    // installed now that the engine is native ONNX; only the exact ONNX identity is accepted.
+    let old = "PhoneticXeus weights · \(PhoneticXeusPackage.revision) · legacy-safetensors-hash"
+    #expect(!PhoneticXeusPackage.acceptsInstallationMarker(old))
     #expect(PhoneticXeusPackage.acceptsInstallationMarker(PhoneticXeusPackage.installationIdentity))
-    #expect(!PhoneticXeusPackage.acceptsInstallationMarker(old.replacingOccurrences(of: PhoneticXeusPackage.weightHash, with: "wrong")))
-    #expect(PronunciationAssessmentService.retryProvenance(old) == PhoneticXeusPackage.provenance)
+    // A retry of a job left by the old Python runtime still maps to the current ONNX provenance
+    // (the "PhoneticXeus · " prefix is preserved).
+    let oldProvenance = "PhoneticXeus · UK Experimental · \(PhoneticXeusPackage.revision) · old runtime"
+    #expect(PronunciationAssessmentService.retryProvenance(oldProvenance) == PhoneticXeusPackage.provenance)
     #expect(PronunciationAssessmentService.retryProvenance("UK Reference · old") == UKReferencePackage.provenance)
     #expect(PronunciationAssessmentService.retryProvenance("unknown") == "unknown")
   }

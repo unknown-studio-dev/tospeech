@@ -38,14 +38,15 @@ enum AssessmentStage {
 actor PhoneticXeusAdapter: PhoneScoring {
   let package: PhoneticXeusPackage
   let ukPackage: UKReferencePackage
-  private let runner = SubprocessRunner()
   private let policy: AssessmentResourcePolicy
   /// One UK adapter for the life of the app: it owns the cached source acoustics and encoder, and
   /// the app shares the very same instance with the UK Reference engine — two warm encoder sessions
   /// are ~1.5 GB each and nothing here needs a second one.
   let ukAdapter: UKReferenceAdapter
   private let logger = Logger(subsystem: "com.unknownstudio.tospeech", category: "PhoneticXeus")
-  private var session: HelperDaemonSession?
+  /// The native scorer memory-maps `xeus.onnx.data` (2.3 GB), so it is built once per install
+  /// directory and kept warm between jobs; `release()` drops it.
+  private var scorer: XeusOnnxScorer?
   /// An injected adapter belongs to the service, which releases it when neither engine needs it; one
   /// built here has no other owner, so `release()` has to drop it too.
   private let ownsUKAdapter: Bool
@@ -66,54 +67,51 @@ actor PhoneticXeusAdapter: PhoneScoring {
       ukAdapter: UKReferenceAdapter(package: ukPackage, idleTimeout: policy.idleTimeout), policy: policy,
       ownsUKAdapter: true)
   }
-  private struct Request: Encodable {
-    struct Word: Encodable { let id: String; let text: String; let variants: [[String]] }
-    let source: String; let take: String; let words: [Word]
-  }
   func assess(sourceURL: URL, sourceSpan: AudioSpan, takeURL: URL,
     words: [PronunciationWordTarget], accent: ReferenceAccent) async throws -> PronunciationEvidence {
     guard accent == .uk else { throw UKReferenceError.accent }
     guard !words.isEmpty, words.count <= 128 else { throw BuddyError.tooLong }
-    let directory = try await package.validate(), helper = try await package.helper()
+    let directory = try await package.validate()
     let ukDirectory = try await ukPackage.validate()
     var mark = ContinuousClock.now
     let vad = try UKVoiceActivity.analyze(sourceURL: sourceURL, span: sourceSpan, takeURL: takeURL, directory: ukDirectory)
     AssessmentStage.log("xeus.vad", since: mark)
     guard !vad.take.isEmpty, !vad.source.isEmpty else { throw BuddyError.noSpeech }
-    let work = FileManager.default.temporaryDirectory.appendingPathComponent("PhoneticXeus-\(UUID().uuidString)")
-    try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
-    defer { try? FileManager.default.removeItem(at: work) }
-    let source = work.appendingPathComponent("source.f32"), take = work.appendingPathComponent("take.f32")
     mark = .now
-    try writePCM(UKAudioInput.samples(sourceURL, span: sourceSpan), to: source)
-    try writePCM(UKAudioInput.samples(takeURL, span: nil), to: take)
+    let sourceSamples = try UKAudioInput.samples(sourceURL, span: sourceSpan)
+    let takeSamples = try UKAudioInput.samples(takeURL, span: nil)
     AssessmentStage.log("xeus.pcm", since: mark)
     // Everything that can reject this job is decided before the UK branch starts: an unsupported
     // target used to throw with the warm Task already running, which cancelled it mid-encoder.
-    let request = Request(source: source.path, take: take.path, words: try words.map { word in
+    let request = XeusRequest(words: try words.map { word in
       let variants = word.variants.compactMap { UKPhoneInventory.parse($0)?.map(\.symbol) }
       guard !variants.isEmpty else { throw PhoneticXeusError.target(word.text) }
       return .init(id: word.id, text: word.text, variants: variants)
     })
     // The delivery branch reads the same audio with its own encoder. Nothing it computes depends
-    // on the helper, so it runs alongside it and only the variant choice waits for XEUS.
+    // on the scorer, so it runs alongside it and only the variant choice waits for XEUS.
     let warm = policy.overlapsBranches ? Task { [ukAdapter] in
       try await ukAdapter.acoustics(sourceURL: sourceURL, sourceSpan: sourceSpan, takeURL: takeURL)
     } : nil
     defer { warm?.cancel() }
-    let requestURL = work.appendingPathComponent("request.json"), output = work.appendingPathComponent("result.json")
-    try JSONEncoder().encode(request).write(to: requestURL, options: .atomic)
     mark = .now
-    do { try await daemon(helper: helper, model: directory).run(request: requestURL, output: output) }
-    catch let failure as HelperDaemonSession.Failure {
-      guard failure == .degraded else { throw PhoneticXeusError.invalidEvidence }
-      logger.error("PhoneticXeus daemon unavailable; running the one-shot helper for this job")
-      try await oneShot(helper: helper, model: directory, request: requestURL, output: output, work: work)
+    // The native scorer throws (never traps) on a malformed assessment; an unsupported target that
+    // slips past the parse check above surfaces as PhoneticXeusError.target, mirroring the old path.
+    var raw: PhoneticXeusEvidence
+    do {
+      raw = try await scorer(directory: directory).evidence(
+        source: sourceSamples, take: takeSamples, request: request,
+        sourceDuration: Double(sourceSamples.count) / 16000, takeDuration: Double(takeSamples.count) / 16000)
+    } catch let error as XeusRuntimeError {
+      if case .unsupportedUKTarget(let word) = error { throw PhoneticXeusError.target(word) }
+      throw PhoneticXeusError.invalidEvidence
     }
-    AssessmentStage.log("xeus.daemon.run", since: mark)
-    var raw = try JSONDecoder().decode(PhoneticXeusEvidence.self, from: Data(contentsOf: output))
+    AssessmentStage.log("xeus.scorer.run", since: mark)
     mark = .now
-    let assessed = try Self.convert(raw, targets: words)
+    // The native port does not emit the reference-diagnostics block (reference.py's DTW/JSD layer is
+    // out of scope), so its validation is skipped here — no per-phone status/reason/coverage depends
+    // on it.
+    let assessed = try Self.convert(raw, targets: words, requireDiagnostics: false)
     AssessmentStage.log("xeus.convert", since: mark)
     var evidence = PronunciationEvidence(words: assessed, duration: raw.duration, recognizedPhones: raw.recognizedPhones,
       qualityPolicy: raw.policy)
@@ -143,28 +141,16 @@ actor PhoneticXeusAdapter: PhoneScoring {
   /// which may be the very engine being switched to, so its encoder is released by the service
   /// instead; one this adapter built for itself is released here.
   func release() async {
-    await session?.shutdown()
+    scorer = nil
     if ownsUKAdapter { await ukAdapter.release() }
   }
-  /// The daemon keeps the model loaded between jobs; it is started on the first assessment.
-  private func daemon(helper: URL, model: URL) -> HelperDaemonSession {
-    if let session { return session }
-    let session = HelperDaemonSession(executable: helper, arguments: ["--serve", "--model", model.path],
-      idleTimeout: policy.idleTimeout)
-    self.session = session
-    return session
-  }
-  private func oneShot(helper: URL, model: URL, request: URL, output: URL, work: URL) async throws {
-    _ = try await withThrowingTaskGroup(of: SubprocessOutput.self) { group in
-      group.addTask { try await self.runner.run(executable: helper,
-        arguments: ["--model", model.path, "--request", request.path, "--output", output.path], currentDirectory: work) }
-      group.addTask { try await Task.sleep(for: .seconds(240)); throw PhoneticXeusError.invalidEvidence }
-      defer { group.cancelAll() }
-      return try await group.next()!
-    }
-  }
-  private func writePCM(_ values: [Float], to url: URL) throws {
-    try values.withUnsafeBytes { try Data($0).write(to: url, options: .atomic) }
+  /// The scorer memory-maps the ONNX external data and keeps it warm between jobs; it is built on the
+  /// first assessment for the validated install directory.
+  private func scorer(directory: URL) throws -> XeusOnnxScorer {
+    if let scorer { return scorer }
+    let scorer = try XeusOnnxScorer(directory: directory)
+    self.scorer = scorer
+    return scorer
   }
   static let licences: Set<String> = ["accepted", "classD", "head", "weak", "unmapped", "cannotDistinguish"]
   /// Display policy over the helper's verdicts. Yellow only for a take that matches the reference realization
@@ -194,7 +180,8 @@ actor PhoneticXeusAdapter: PhoneScoring {
     default: .takeUncertain
     }
   }
-  static func convert(_ raw: PhoneticXeusEvidence, targets: [PronunciationWordTarget]) throws -> [WordPronunciationEvidence] {
+  static func convert(_ raw: PhoneticXeusEvidence, targets: [PronunciationWordTarget],
+    requireDiagnostics: Bool = true) throws -> [WordPronunciationEvidence] {
     guard raw.revision == PhoneticXeusPackage.revision, raw.policy == PhoneticXeusPackage.evidencePolicy,
       raw.mapping == PhoneticXeusPackage.mappingPolicy, raw.dtype == "float32", raw.device == "cpu",
       raw.duration.isFinite, raw.duration > 0, raw.duration <= 30,
@@ -202,7 +189,7 @@ actor PhoneticXeusAdapter: PhoneScoring {
       raw.words.map(\.id) == targets.map(\.id), raw.sourceShape.count == 2, raw.takeShape.count == 2,
       (1...1600).contains(raw.sourceShape[0]), (1...1600).contains(raw.takeShape[0]),
       raw.sourceShape[1] == 428, raw.takeShape[1] == 428 else { throw PhoneticXeusError.invalidEvidence }
-    try raw.validateReferenceDiagnostics()
+    if requireDiagnostics { try raw.validateReferenceDiagnostics() }
     var previousTakeEnd = 0.0, previousSourceEnd = 0.0
     var previousUnitID: String?
     var previousTake: (start: Double?, end: Double?) = (nil, nil)

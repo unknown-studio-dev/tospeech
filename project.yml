@@ -47,9 +47,6 @@ targets:
         script: bash "${SRCROOT}/scripts/xcode/check-ui-components.sh"
         outputFiles:
           - "$(DERIVED_FILE_DIR)/check-ui-components.stamp"
-    # Release leaves the 1,26 GB XLSR checkpoint out of the UK Reference package (the
-    # app downloads it from Hugging Face at onboarding) and skips PhoneticXeus, a 355 MB
-    # Python runtime that must run from the signed bundle; it stays Debug-only for now.
     postBuildScripts:
       - name: Stage DeepFilterNet3 audio enhancement
         script: bash "${SRCROOT}/scripts/xcode/stage-deepfilternet.sh"
@@ -75,10 +72,12 @@ targets:
         script: bash "${SRCROOT}/scripts/xcode/stage-uk-reference.sh"
         outputFiles:
           - "$(DERIVED_FILE_DIR)/stage-uk-reference.stamp"
-      - name: Stage PhoneticXeus local runtime
-        script: '[ "$CONFIGURATION" = Release ] || bash "${SRCROOT}/scripts/xcode/stage-phoneticxeus.sh"'
+      # PhoneticXeus native ONNX: the small xeus.onnx graph + vocab/head/thresholds ship in every
+      # configuration; the 2,3 GB xeus.onnx.data downloads at onboarding / first run, never bundled.
+      - name: Stage PhoneticXeus ONNX graph
+        script: bash "${SRCROOT}/scripts/xcode/stage-xeus-onnx.sh"
         outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-phoneticxeus.stamp"
+          - "$(DERIVED_FILE_DIR)/stage-xeus-onnx.stamp"
     sources:
       - path: ToSpeech
         excludes: [Resources]
