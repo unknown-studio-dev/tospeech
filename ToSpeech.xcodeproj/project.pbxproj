@@ -227,6 +227,7 @@
 		8E501EF7AD116FC0E8913EFF /* PracticeSpecimens.swift in Sources */ = {isa = PBXBuildFile; fileRef = 510C544A9C1176CF05DEA7E1 /* PracticeSpecimens.swift */; };
 		8EC7922CEDD3DA6C5182B8E5 /* PronunciationModelManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C8DBC5502B564E97D79B6E4 /* PronunciationModelManager.swift */; };
 		8FFCB3764694F2CE3A8C96F3 /* UKSoundLibrary.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7D582469B7F65DE2858C98 /* UKSoundLibrary.swift */; };
+		91B0FD81038312FC9C1F1B16 /* XeusRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56C031A48ABE6A2BB7AAD127 /* XeusRuntime.swift */; };
 		92151949717CA40E712CFE22 /* PronunciationAssessmentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA1B34C781AEB593DB76EF0 /* PronunciationAssessmentService.swift */; };
 		9349549E06CB5B263F3E04D6 /* UKPhoneme_05.wav in Resources */ = {isa = PBXBuildFile; fileRef = 839855B7CFBBD44029DF05F9 /* UKPhoneme_05.wav */; };
 		94972AE7F6E41B4017EC7077 /* UKPhoneme_02.wav in Resources */ = {isa = PBXBuildFile; fileRef = D31091BCCAC08CAC9E3B201F /* UKPhoneme_02.wav */; };
@@ -311,6 +312,7 @@
 		CD5A0F22F16007DCA19430C0 /* UKPhoneme_36.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9ADFDF94581C5E6BACDDF8D9 /* UKPhoneme_36.wav */; };
 		CD6B02530F10EAD6C8B345D7 /* UKReferenceQuality.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43FE9FB88790EA63DF440420 /* UKReferenceQuality.swift */; };
 		CD97FF47B5ABE022537AECEA /* PhonemeAudio in Resources */ = {isa = PBXBuildFile; fileRef = 20763B45D84F1C6242E4AB1C /* PhonemeAudio */; };
+		CE018C357690D9226A5A8A80 /* XeusRuntimeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E64C8D8C9B36B7301BCA8EA /* XeusRuntimeTests.swift */; };
 		CE557B749144C278AEB1682F /* ModelCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FDE0FD95303C5D8F2F385D1 /* ModelCardView.swift */; };
 		CF56949E611F640B9C073B60 /* SentenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A57054106740DF8E1BB68CA /* SentenceView.swift */; };
 		CF8A84328DC1F7D46EFBE866 /* YouTubeVideoFollowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53228645FEB597F27FA3A5C4 /* YouTubeVideoFollowerView.swift */; };
@@ -491,6 +493,7 @@
 		2CBD059C297C0B4E87968C08 /* ControlSpecimens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlSpecimens.swift; sourceTree = "<group>"; };
 		2CE3A312B04F348F0A4C6750 /* ProductionWordTiming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionWordTiming.swift; sourceTree = "<group>"; };
 		2DECF363AFD5CAD9350F9BF8 /* EchoTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoTextEditor.swift; sourceTree = "<group>"; };
+		2E64C8D8C9B36B7301BCA8EA /* XeusRuntimeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusRuntimeTests.swift; sourceTree = "<group>"; };
 		2E74C5AEAC039136A3970CBD /* ContentMatchingJob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMatchingJob.swift; sourceTree = "<group>"; };
 		30BF515F0EDD732A5643E461 /* ToSpeechTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ToSpeechTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		30EC986F67E491F5958256DB /* TranscriptionModelsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionModelsSection.swift; sourceTree = "<group>"; };
@@ -554,6 +557,7 @@
 		54330B837799E10FB722EDE4 /* ProductionLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionLibraryView.swift; sourceTree = "<group>"; };
 		55690FFD8EEB82AF1C19D3EC /* ImportSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportSheet.swift; sourceTree = "<group>"; };
 		55C2A66DD1F46958BF0AB0CE /* ReadingSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadingSize.swift; sourceTree = "<group>"; };
+		56C031A48ABE6A2BB7AAD127 /* XeusRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusRuntime.swift; sourceTree = "<group>"; };
 		57F29A776C291AE3ADCC7A00 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
 		5835B867BED2EBE16BE93448 /* AssessedSentenceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssessedSentenceView.swift; sourceTree = "<group>"; };
 		587ABC58E3A3438A5647FAA1 /* XeusDiagnosticValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusDiagnosticValidation.swift; sourceTree = "<group>"; };
@@ -1027,6 +1031,7 @@
 				F737E3E86B49597904013A73 /* XeusCTC.swift */,
 				99D6127E8F2553039F6E5E49 /* XeusInventory.swift */,
 				9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */,
+				56C031A48ABE6A2BB7AAD127 /* XeusRuntime.swift */,
 			);
 			path = XeusNative;
 			sourceTree = "<group>";
@@ -1509,6 +1514,7 @@
 				B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */,
 				65BDAE587D204A412BE1E718 /* XeusInventoryTests.swift */,
 				27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */,
+				2E64C8D8C9B36B7301BCA8EA /* XeusRuntimeTests.swift */,
 				F3CE216DC899527ECF9FFF8E /* Fixtures */,
 			);
 			path = ToSpeechTests;
@@ -2041,6 +2047,7 @@
 				5A1546A4BE1F477C53043A53 /* XeusContrastHeadTests.swift in Sources */,
 				E3C6C8F85B24124281499346 /* XeusInventoryTests.swift in Sources */,
 				061C38AA9A75A66B3FEE8A8B /* XeusLatticeTests.swift in Sources */,
+				CE018C357690D9226A5A8A80 /* XeusRuntimeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2281,6 +2288,7 @@
 				982B6CF6740A7736A5775D7C /* XeusInventory.swift in Sources */,
 				25B1CAD020DFBBF0DC11397F /* XeusLattice.swift in Sources */,
 				F27594D9D448BD3518DAA897 /* XeusReferenceDetailView.swift in Sources */,
+				91B0FD81038312FC9C1F1B16 /* XeusRuntime.swift in Sources */,
 				CF8A84328DC1F7D46EFBE866 /* YouTubeVideoFollowerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
