@@ -319,6 +319,7 @@
 		D30076366B74DA2A4BDC8261 /* HelperDaemonSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81EC88E9D0312287DC251654 /* HelperDaemonSession.swift */; };
 		D36BEFB213EA133F3BD51592 /* DictationStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71B7E5414B694B1E2F4EB768 /* DictationStorage.swift */; };
 		D3B52210E14368D57C0EFB62 /* UKPhoneme_06.wav in Resources */ = {isa = PBXBuildFile; fileRef = 450C19D768304799D00D2652 /* UKPhoneme_06.wav */; };
+		D464B9836869E809A9E41BD2 /* XeusAssess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FE3E7542FE1F0C74E3F57C0 /* XeusAssess.swift */; };
 		D4FA7A13425FEF83038263F2 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6D810AE89406315443041A60 /* Accelerate.framework */; };
 		D57E44AAA189D20DA6851D80 /* CaptionTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9061541BC4F865ACA2976B9 /* CaptionTranscript.swift */; };
 		D5F44F17057D7EF9ECB68D60 /* RecordingModelsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD031BA8DC9E629ADA04E775 /* RecordingModelsSettingsView.swift */; };
@@ -374,6 +375,7 @@
 		F3405FB19338713D1012BAAB /* CTCAlignment.swift in Sources */ = {isa = PBXBuildFile; fileRef = A529E625417B53602AB5DA61 /* CTCAlignment.swift */; };
 		F385C912B20772F827F5BAFB /* AlignmentPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED5CA5D3440FB16094A7BF5 /* AlignmentPackage.swift */; };
 		F4A2B9E04AB09D2C0663E54E /* AudioFirstPreparation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24585469C22A6B513423E959 /* AudioFirstPreparation.swift */; };
+		F5B61DBA8761AF2FABAE567A /* XeusAssessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF1CA6CA9F3BC681115D39C /* XeusAssessTests.swift */; };
 		F64768EF6B0EB76F23165E5A /* DictationFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C2D758A904210C35733432 /* DictationFixtures.swift */; };
 		F668507A1A61360FA24032B3 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 57F29A776C291AE3ADCC7A00 /* manifest.json */; };
 		F6B5DA3C4DF6BA3CAE9BC516 /* EchoUnsavedSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B5FB2DEB95733C4AE51173E /* EchoUnsavedSheet.swift */; };
@@ -512,6 +514,7 @@
 		3C71F55E25D971296BF71E3B /* UKPhonemes-README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = "UKPhonemes-README.md"; sourceTree = "<group>"; };
 		3D1413607A19D2DF2B3195E2 /* XeusReferenceDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusReferenceDetailView.swift; sourceTree = "<group>"; };
 		3F21330FC7C7DEC13503D54C /* PronunciationReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PronunciationReviewView.swift; sourceTree = "<group>"; };
+		3FE3E7542FE1F0C74E3F57C0 /* XeusAssess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusAssess.swift; sourceTree = "<group>"; };
 		4011B00ADF7A712844C1786B /* EchoSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoSlider.swift; sourceTree = "<group>"; };
 		40A7CD6EBF665F1CAD7BD8CC /* ProductionImportPresentationMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionImportPresentationMapper.swift; sourceTree = "<group>"; };
 		40B953E9A8DBF316A5451E15 /* EchoModalLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoModalLayout.swift; sourceTree = "<group>"; };
@@ -534,6 +537,7 @@
 		4BBD11DC2FC919738040BCFB /* ModelPackageCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelPackageCard.swift; sourceTree = "<group>"; };
 		4CCFB5C5B0F4AD7DA7DE7DB8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		4D5F9FCADC462A045F3A97AB /* DesignSystemFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystemFixtures.swift; sourceTree = "<group>"; };
+		4DF1CA6CA9F3BC681115D39C /* XeusAssessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusAssessTests.swift; sourceTree = "<group>"; };
 		4ED5CA5D3440FB16094A7BF5 /* AlignmentPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlignmentPackage.swift; sourceTree = "<group>"; };
 		4EFBEF0324517A383C8242CE /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
 		4F237DCE469296605C212857 /* UKSoundCoachView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UKSoundCoachView.swift; sourceTree = "<group>"; };
@@ -1012,6 +1016,7 @@
 		4BB268ABAD47C5A40AB5FE39 /* XeusNative */ = {
 			isa = PBXGroup;
 			children = (
+				3FE3E7542FE1F0C74E3F57C0 /* XeusAssess.swift */,
 				F737E3E86B49597904013A73 /* XeusCTC.swift */,
 				99D6127E8F2553039F6E5E49 /* XeusInventory.swift */,
 				9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */,
@@ -1491,6 +1496,7 @@
 				945A9EDCF2B47BFDD08D988B /* UKReferenceTests.swift */,
 				A893883D7830C4AAC601D86D /* UKSoundCoachingTests.swift */,
 				515A8A0998608C87EC5FD5A8 /* WordAlignmentPreparationTests.swift */,
+				4DF1CA6CA9F3BC681115D39C /* XeusAssessTests.swift */,
 				B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */,
 				65BDAE587D204A412BE1E718 /* XeusInventoryTests.swift */,
 				27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */,
@@ -2020,6 +2026,7 @@
 				A484292EB08BF03759AD7FFF /* UKReferenceTests.swift in Sources */,
 				35FC34017ABE5E8BCD0C7412 /* UKSoundCoachingTests.swift in Sources */,
 				07DDD1999DDB1602BB19F4A2 /* WordAlignmentPreparationTests.swift in Sources */,
+				F5B61DBA8761AF2FABAE567A /* XeusAssessTests.swift in Sources */,
 				AB562FFE33D5577656F2F48F /* XeusCTCTests.swift in Sources */,
 				E3C6C8F85B24124281499346 /* XeusInventoryTests.swift in Sources */,
 				061C38AA9A75A66B3FEE8A8B /* XeusLatticeTests.swift in Sources */,
@@ -2256,6 +2263,7 @@
 				CCF45277EB9608B1E76ABF4B /* WordAlignmentAdapter.swift in Sources */,
 				86A0EFF824DED25B6EA6CBA8 /* WordFlowLayout.swift in Sources */,
 				A07D5F2ED22F048B230F573E /* WordPronunciationView.swift in Sources */,
+				D464B9836869E809A9E41BD2 /* XeusAssess.swift in Sources */,
 				213BE78F86CE0761B02250FC /* XeusCTC.swift in Sources */,
 				DF17325870DA12789F4A0276 /* XeusDiagnosticValidation.swift in Sources */,
 				982B6CF6740A7736A5775D7C /* XeusInventory.swift in Sources */,
