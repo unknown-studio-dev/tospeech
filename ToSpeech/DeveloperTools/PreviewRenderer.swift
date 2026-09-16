@@ -583,7 +583,8 @@
           return
         }
         let takesBefore = try await service.takes(lessonID: lessonID)
-        let repair = AlignedWordTimingPreparer(service: service, aligner: CoreMLWordAligner())
+        let repair = AlignedWordTimingPreparer(service: service,
+          aligner: CoreMLWordAligner(directory: AlignmentPackage.directory(paths: paths)))
         let changed = try await repair.prepare(sentences: before, localeIdentifier: "en-GB")
         let after = try await service.preparedSentences(lessonID: lessonID)
         let takesAfter = try await service.takes(lessonID: lessonID)
@@ -628,7 +629,8 @@
         let liveDB = try ProductionDatabase(url: BackendPaths.live.database)
         let adapter = ParakeetTranscriptionAdapter(database: liveDB, paths: .live)
         let importer = ProductionImportService(database: db, paths: paths, usesSpeechFallback: false,
-          transcriptionAdapters: TranscriptionAdapterRegistry([adapter]), wordAligner: CoreMLWordAligner())
+          transcriptionAdapters: TranscriptionAdapterRegistry([adapter]),
+          wordAligner: CoreMLWordAligner(directory: AlignmentPackage.directory(paths: .live)))
         let started = Date()
         let job = try await importer.submit(.localAudio(url: url, securityScoped: false, titleOverride: "Parakeet integration probe"),
           transcriptionEngine: "parakeet", transcriptionModelID: TranscriptionSelection.parakeet.modelID, compareWithApple: false)

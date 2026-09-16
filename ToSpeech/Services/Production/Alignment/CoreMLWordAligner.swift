@@ -2,12 +2,14 @@ import AVFoundation
 import CoreML
 import Foundation
 
-/// Bounded, sequential English CTC alignment. The model is bundled and never
-/// fetched on a word click. ASR text, selection and raw timestamps stay intact.
+/// Bounded, sequential English CTC alignment. The model is downloaded once at onboarding
+/// (`AlignmentPackage`) and never fetched on a word click; `directory` is the installed
+/// container, not the app bundle, so a Release build without the download offered yet throws
+/// `.modelUnavailable` instead of loading a bundle copy that is missing its weights.
 actor CoreMLWordAligner: WordAlignmentAdapter {
   private let directory: URL
   private var busy = false
-  init(directory: URL = Bundle.main.resourceURL!.appendingPathComponent("Alignment")) {
+  init(directory: URL) {
     self.directory = directory
   }
 

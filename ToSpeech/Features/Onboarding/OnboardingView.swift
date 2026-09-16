@@ -14,6 +14,7 @@ struct OnboardingView: View {
   init(
     parakeetModels: ParakeetModelManager?,
     pronunciationModels: PronunciationModelManager?,
+    alignmentModels: AlignmentModelManager? = nil,
     storageReady: Bool,
     retryBootstrap: @escaping () -> Void = {},
     initialStep: Int = 0
@@ -23,6 +24,7 @@ struct OnboardingView: View {
     _setup = State(initialValue: OnboardingSetupModel(
       parakeetModels: parakeetModels,
       pronunciationModels: pronunciationModels,
+      alignmentModels: alignmentModels,
       storageReady: storageReady))
   }
 

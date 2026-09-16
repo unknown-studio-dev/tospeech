@@ -931,6 +931,10 @@
 
 "transcription.package.install_failed" = "Parakeet download or verification failed. Check your connection and free disk space, then retry.";
 
+"transcription.alignment.install_failed" = "Word-alignment download or verification failed. Check your connection and free disk space, then retry.";
+"transcription.alignment.installing" = "Downloading and verifying word alignment…";
+"transcription.alignment.details" = "Aligns each imported sentence's words to the audio so playback can highlight them; used for every practice session.";
+
 "transcription.retry.selected" = "Retry with model from Settings";
 "transcription.model.preparing" = "Preparing transcription model";
 

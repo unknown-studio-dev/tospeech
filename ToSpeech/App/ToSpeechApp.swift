@@ -11,6 +11,7 @@ final class ProductionLibraryBootstrap {
   var progress: ProductionProgressModel?
   var parakeetModels: ParakeetModelManager?
   var pronunciationModels: PronunciationModelManager?
+  var alignmentModels: AlignmentModelManager?
   var error: String?
 
   init(previewFixtures: Bool) {
@@ -27,6 +28,7 @@ final class ProductionLibraryBootstrap {
       progress = nil
       parakeetModels = nil
       pronunciationModels = nil
+      alignmentModels = nil
       error = nil
       return
     }
@@ -36,7 +38,11 @@ final class ProductionLibraryBootstrap {
       let database = try ProductionDatabase(url: paths.database)
       let ipaDictionary = try? OfflineIPADictionary.bundled()
       let transcriber = AppleSpeechAnalyzerTranscriber()
-      let aligner = CoreMLWordAligner()
+      // Word alignment is downloaded to the container (never Bundle.main directly in
+      // Release, which excludes its 188 MB weights) — see AlignmentPackage.
+      let alignPackage = AlignmentPackage(paths: paths)
+      alignmentModels = AlignmentModelManager(package: alignPackage)
+      let aligner = CoreMLWordAligner(directory: AlignmentPackage.directory(paths: paths))
       let parakeet = ParakeetTranscriptionAdapter(database: database, paths: paths)
       parakeetModels = ParakeetModelManager(adapter: parakeet)
       let adapters = TranscriptionAdapterRegistry([parakeet])
@@ -84,6 +90,7 @@ final class ProductionLibraryBootstrap {
       progress = nil
       parakeetModels = nil
       pronunciationModels = nil
+      alignmentModels = nil
       self.error = error.localizedDescription
     }
   }
@@ -135,6 +142,7 @@ struct ToSpeechApp: App {
           OnboardingView(
             parakeetModels: productionLibrary.parakeetModels,
             pronunciationModels: productionLibrary.pronunciationModels,
+            alignmentModels: productionLibrary.alignmentModels,
             storageReady: productionLibrary.model != nil,
             retryBootstrap: productionLibrary.reload
           )
@@ -155,6 +163,7 @@ struct ToSpeechApp: App {
             .environment(\.locale, store.preferences.language.locale)
             .environment(\.parakeetModelManager, productionLibrary.parakeetModels)
             .environment(\.pronunciationModelManager, productionLibrary.pronunciationModels)
+            .environment(\.alignmentModelManager, productionLibrary.alignmentModels)
             .environment(\.appUpdateChecker, productionLibrary.usesPreviewFixtures ? nil : updateChecker)
             .toolbar(removing: .title)
             .preferredColorScheme(.dark).tint(EchoTheme.accent)
@@ -169,6 +178,11 @@ struct ToSpeechApp: App {
                 await model.resumePendingJobs()
               }
               await productionLibrary.recoverPracticeTakes()
+              if !productionLibrary.usesPreviewFixtures, store.preferences.hasCompletedOnboarding,
+                let models = productionLibrary.pronunciationModels,
+                let engine = await models.adoptXeusIfNeeded(preferences: store.preferences) {
+                store.preferences.productionAssessmentEngine = engine
+              }
               if ProcessInfo.processInfo.arguments.contains("--components") {
                 openWindow(id: "ui-components")
               }

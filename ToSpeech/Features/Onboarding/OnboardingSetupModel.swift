@@ -36,6 +36,7 @@ struct OnboardingSetupItem: Identifiable, Equatable, Sendable {
 final class OnboardingSetupModel {
   private let parakeetModels: ParakeetModelManager?
   private let pronunciationModels: PronunciationModelManager?
+  private let alignmentModels: AlignmentModelManager?
   private let storageReady: Bool
   /// False when the learner reads no translation: the package step disappears.
   var includesTranslation = true
@@ -54,10 +55,12 @@ final class OnboardingSetupModel {
   init(
     parakeetModels: ParakeetModelManager?,
     pronunciationModels: PronunciationModelManager?,
+    alignmentModels: AlignmentModelManager? = nil,
     storageReady: Bool
   ) {
     self.parakeetModels = parakeetModels
     self.pronunciationModels = pronunciationModels
+    self.alignmentModels = alignmentModels
     self.storageReady = storageReady
   }
 
@@ -80,6 +83,12 @@ final class OnboardingSetupModel {
         }
         try await parakeetModels.installRequired()
         store.preferences.transcriptionEngine = "parakeet"
+        // Word alignment backs word-level timing for every practice session, regardless of
+        // reference accent, so it downloads unconditionally alongside Parakeet.
+        guard let alignmentModels else {
+          throw OnboardingSetupError.missingDependency("Word Alignment")
+        }
+        try await alignmentModels.installRequired()
       }
 
       try await perform("apple-speech", runningDetail: "Đang chuẩn bị gói ngôn ngữ…") {

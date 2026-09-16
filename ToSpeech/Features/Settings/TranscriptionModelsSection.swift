@@ -1,10 +1,12 @@
 import SwiftUI
 
-/// Parakeet is the only primary transcription engine; its card reuses the shared model-list chrome.
+/// Parakeet is the only primary transcription engine; word alignment backs its word-level timing
+/// for every accent. Both cards reuse the shared model-list chrome.
 struct TranscriptionModelsSection: View {
   @Environment(EchoStore.self) private var store
   @Environment(\.locale) private var locale
   @Environment(\.parakeetModelManager) private var parakeet
+  @Environment(\.alignmentModelManager) private var alignment
   @State private var expanded = false
 
   var body: some View {
@@ -16,6 +18,10 @@ struct TranscriptionModelsSection: View {
       if let parakeet {
         if let failure = parakeet.failure { EchoNotice(copy: EchoCopy(failure), error: true) }
         parakeetCard(parakeet)
+      }
+      if let alignment {
+        if let failure = alignment.failure { EchoNotice(copy: EchoCopy(failure), error: true) }
+        alignmentCard(alignment)
       }
     }
   }
@@ -55,6 +61,32 @@ struct TranscriptionModelsSection: View {
         .font(EchoFont.body(size: 13)).foregroundStyle(EchoTheme.secondaryText)
         .frame(maxWidth: .infinity, alignment: .leading)
       }
+    }
+    .task { await manager.refresh() }
+  }
+
+  /// Word alignment backs word-level timing for every practice session, not a selectable
+  /// transcription engine, so this card has no activate/switch control — only install/retry.
+  private func alignmentCard(_ manager: AlignmentModelManager) -> some View {
+    ModelCardView(
+      title: "Word Alignment · CTC",
+      statusLine: label(manager.isInstalling ? "transcription.alignment.installing"
+        : manager.isInstalled ? "settings.model.status.installed" : "settings.model.status.not_installed"),
+      isActive: manager.isInstalled,
+      activeLabel: label("settings.model.in_use")
+    ) {
+      if manager.isInstalling {
+        EchoButton(label("settings.model.downloading_button"), size: .regular) {}.disabled(true)
+      } else if !manager.isInstalled {
+        EchoButton(label(manager.failure == nil ? "settings.model.download" : "settings.model.retry"),
+          symbol: "arrow.down.circle", size: .regular) {
+            Task { await manager.install() }
+          }
+      }
+    } footer: {
+      EchoLocalizedText("transcription.alignment.details")
+        .font(EchoFont.body(size: 13)).foregroundStyle(EchoTheme.secondaryText)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     .task { await manager.refresh() }
   }

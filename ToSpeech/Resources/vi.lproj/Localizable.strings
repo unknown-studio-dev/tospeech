@@ -935,6 +935,10 @@
 
 "transcription.package.install_failed" = "Tải hoặc kiểm tra Parakeet thất bại. Kiểm tra kết nối, dung lượng trống rồi thử lại.";
 
+"transcription.alignment.install_failed" = "Tải hoặc kiểm tra gói căn chỉnh từ thất bại. Kiểm tra kết nối, dung lượng trống rồi thử lại.";
+"transcription.alignment.installing" = "Đang tải và kiểm tra gói căn chỉnh từ…";
+"transcription.alignment.details" = "Căn chỉnh từng từ trong câu đã nhập với audio để làm nổi bật khi phát; dùng cho mọi buổi luyện tập.";
+
 "transcription.retry.selected" = "Thử lại bằng model trong Cài đặt";
 "transcription.model.preparing" = "Đang chuẩn bị model transcript";
 
