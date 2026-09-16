@@ -232,4 +232,8 @@ class CTCEvidenceTests(unittest.TestCase):
         self.assertEqual(c['total'],4); self.assertEqual(c['scored'],3)
         self.assertEqual(c['correct'],2); self.assertEqual(c['incorrect'],1)
         self.assertEqual(c['unassessed'],1); self.assertAlmostEqual(c['coverage'],0.75)
+    def test_coverage_zero_when_no_rows(self):
+        from evidence import coverage
+        c=coverage([])
+        self.assertEqual(c,{'total':0,'scored':0,'correct':0,'incorrect':0,'unassessed':0,'coverage':0.0})
 if __name__=='__main__':unittest.main()

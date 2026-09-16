@@ -30,6 +30,7 @@ from collections import namedtuple
 import numpy as np
 
 from evidence import assess_phones
+from runtime import load_thresholds
 
 Case = namedtuple('Case', 'name lp phones vocab duration planted')
 # `planted`: set of indices into `phones` that are genuine, confusable substitutions the
@@ -102,9 +103,10 @@ def cases():
 
 
 def main():
+    thresholds, _ = load_thresholds()
     tp = fp = planted = 0
     for case in cases():
-        rows = assess_phones(case.lp, case.phones, case.vocab, case.duration)
+        rows = assess_phones(case.lp, case.phones, case.vocab, case.duration, thresholds=thresholds)
         flagged = [i for i, r in enumerate(rows) if r['status'] == 'likelyIncorrect']
         planted += len(case.planted)
         for i in flagged:
