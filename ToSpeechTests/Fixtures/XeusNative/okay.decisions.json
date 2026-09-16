@@ -1,0 +1,2513 @@
+{
+  "caseName": "okay-source-self",
+  "sourceLogits": "okay.logits.npy",
+  "takeLogits": "okay.logits.npy",
+  "sourceDuration": 2.72,
+  "takeDuration": 2.72,
+  "request": {
+    "source": "fixtures/okay-source.f32",
+    "take": "fixtures/okay-source.f32",
+    "words": [
+      {
+        "id": "speech-4-word-0",
+        "text": "Okay,",
+        "variants": [
+          [
+            "əʊ",
+            "k",
+            "eɪ"
+          ]
+        ]
+      },
+      {
+        "id": "speech-4-word-1",
+        "text": "let's",
+        "variants": [
+          [
+            "l",
+            "ɛ",
+            "t",
+            "s"
+          ]
+        ]
+      },
+      {
+        "id": "speech-4-word-2",
+        "text": "get",
+        "variants": [
+          [
+            "g",
+            "ɛ",
+            "t"
+          ]
+        ]
+      },
+      {
+        "id": "speech-4-word-3",
+        "text": "started.",
+        "variants": [
+          [
+            "s",
+            "t",
+            "ɑː",
+            "t",
+            "ɪ",
+            "d"
+          ]
+        ]
+      }
+    ]
+  },
+  "result": {
+    "revision": "8d83dee94817a07dc150f87d08f7e0ee01bdb66d",
+    "policy": "xeus-uk-decision-v6-word-gated",
+    "mapping": "xeus-uk-inventory-v4",
+    "referencePolicy": "xeus-reference-diagnostics-v2",
+    "device": "cpu",
+    "dtype": "float32",
+    "duration": 2.72,
+    "sourceDuration": 2.72,
+    "sourceShape": [
+      135,
+      428
+    ],
+    "takeShape": [
+      135,
+      428
+    ],
+    "inferenceSeconds": 0,
+    "words": [
+      {
+        "id": "speech-4-word-0",
+        "phones": [
+          {
+            "status": "uncertain",
+            "reason": "referenceUnmapped",
+            "start": 0.14,
+            "end": 0.2,
+            "emissionStart": 0.14,
+            "emissionEnd": 0.18,
+            "windowStart": 7,
+            "windowEnd": 10,
+            "expectedProbability": 0.100188203156,
+            "expectedTokenProbability": 0.100012108684,
+            "expectedLogLikelihood": -3.103739753041,
+            "alternativeLogLikelihood": -2.041113491589,
+            "deletionLogLikelihood": -3.042883634567,
+            "logMargin": -1.062626261452,
+            "closestPhone": "o",
+            "confidence": 0.74319210731,
+            "unitID": "speech-4-word-0:0",
+            "licence": "unmapped",
+            "licensedRealization": null,
+            "referenceRealization": "o l",
+            "referenceStatus": "uncertain",
+            "takeStatus": "uncertain",
+            "takeReason": "ambiguous",
+            "referenceMatch": true,
+            "sourceStart": 0.14,
+            "sourceEnd": 0.2,
+            "sourceStatus": "uncertain",
+            "expected": "əʊ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-0",
+              "state": "REFERENCE_UNMAPPED",
+              "sourceHypothesis": {
+                "status": "uncertain",
+                "reason": "ambiguous",
+                "expectedProbability": 0.100188203156,
+                "expectedTokenProbability": 0.100012108684,
+                "logMargin": -1.062626261452,
+                "closestPhone": "o"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceUnmapped",
+                "expectedProbability": 0.100188203156,
+                "expectedTokenProbability": 0.100012108684,
+                "logMargin": -1.062626261452,
+                "closestPhone": "o"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-0:0",
+              "licence": "unmapped"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 0.2,
+            "end": 0.26,
+            "emissionStart": 0.22,
+            "emissionEnd": 0.24,
+            "windowStart": 10,
+            "windowEnd": 13,
+            "expectedProbability": 0.989134013653,
+            "expectedTokenProbability": 0.546554028988,
+            "expectedLogLikelihood": -0.02125203874,
+            "alternativeLogLikelihood": -7.588647011582,
+            "deletionLogLikelihood": -4.755013942719,
+            "logMargin": 4.733761903978,
+            "closestPhone": "h",
+            "confidence": 0.991283319559,
+            "unitID": "speech-4-word-0:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "kʰ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.2,
+            "sourceEnd": 0.26,
+            "sourceStatus": "correct",
+            "expected": "k",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-1",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.989134013653,
+                "expectedTokenProbability": 0.546554028988,
+                "logMargin": 4.733761903978,
+                "closestPhone": "h"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.989134013653,
+                "expectedTokenProbability": 0.546554028988,
+                "logMargin": 4.733761903978,
+                "closestPhone": "h"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-0:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 0.26,
+            "end": 0.6,
+            "emissionStart": 0.28,
+            "emissionEnd": 0.34,
+            "windowStart": 13,
+            "windowEnd": 30,
+            "expectedProbability": 0.856060922146,
+            "expectedTokenProbability": 0.846763551235,
+            "expectedLogLikelihood": -0.195074301175,
+            "alternativeLogLikelihood": -2.096687807968,
+            "deletionLogLikelihood": -6.236654281616,
+            "logMargin": 1.901613506794,
+            "closestPhone": "e",
+            "confidence": 0.87007403379,
+            "unitID": "speech-4-word-0:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "e ɪ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.26,
+            "sourceEnd": 0.6,
+            "sourceStatus": "correct",
+            "expected": "eɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-2",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.856060922146,
+                "expectedTokenProbability": 0.846763551235,
+                "logMargin": 1.901613506794,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.856060922146,
+                "expectedTokenProbability": 0.846763551235,
+                "logMargin": 1.901613506794,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-0:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "əʊ",
+          "k",
+          "eɪ"
+        ]
+      },
+      {
+        "id": "speech-4-word-1",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.6,
+            "end": 0.92,
+            "emissionStart": 0.88,
+            "emissionEnd": 0.92,
+            "windowStart": 30,
+            "windowEnd": 46,
+            "expectedProbability": 0.925405263901,
+            "expectedTokenProbability": 0.925384283066,
+            "expectedLogLikelihood": -0.004067099585,
+            "alternativeLogLikelihood": -8.647359542265,
+            "deletionLogLikelihood": -8.791793823242,
+            "logMargin": 8.64329244268,
+            "closestPhone": "ð",
+            "confidence": 0.999823725608,
+            "unitID": "speech-4-word-1:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "l",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.6,
+            "sourceEnd": 0.92,
+            "sourceStatus": "correct",
+            "expected": "l",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-3",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.925405263901,
+                "expectedTokenProbability": 0.925384283066,
+                "logMargin": 8.64329244268,
+                "closestPhone": "ð"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.925405263901,
+                "expectedTokenProbability": 0.925384283066,
+                "logMargin": 8.64329244268,
+                "closestPhone": "ð"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-1:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.92,
+            "end": 0.96,
+            "emissionStart": 0.94,
+            "emissionEnd": 0.96,
+            "windowStart": 46,
+            "windowEnd": 48,
+            "expectedProbability": 0.998253881931,
+            "expectedTokenProbability": 0.997807085514,
+            "expectedLogLikelihood": -0.002712180865,
+            "alternativeLogLikelihood": -7.248662204952,
+            "deletionLogLikelihood": -8.708961486816,
+            "logMargin": 7.245950024087,
+            "closestPhone": "æ",
+            "confidence": 0.999287451677,
+            "unitID": "speech-4-word-1:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɛ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.92,
+            "sourceEnd": 0.96,
+            "sourceStatus": "correct",
+            "expected": "ɛ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-4",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.998253881931,
+                "expectedTokenProbability": 0.997807085514,
+                "logMargin": 7.245950024087,
+                "closestPhone": "æ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.998253881931,
+                "expectedTokenProbability": 0.997807085514,
+                "logMargin": 7.245950024087,
+                "closestPhone": "æ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-1:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.96,
+            "end": 1.02,
+            "emissionStart": 0.98,
+            "emissionEnd": 1.02,
+            "windowStart": 48,
+            "windowEnd": 51,
+            "expectedProbability": 0.953969061375,
+            "expectedTokenProbability": 0.953873872757,
+            "expectedLogLikelihood": -0.004105012945,
+            "alternativeLogLikelihood": -9.266237251252,
+            "deletionLogLikelihood": -7.794373035431,
+            "logMargin": 7.790268022486,
+            "closestPhone": "e",
+            "confidence": 0.999586429135,
+            "unitID": "speech-4-word-1:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.96,
+            "sourceEnd": 1.02,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-5",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.953969061375,
+                "expectedTokenProbability": 0.953873872757,
+                "logMargin": 7.790268022486,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.953969061375,
+                "expectedTokenProbability": 0.953873872757,
+                "logMargin": 7.790268022486,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-1:2",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.02,
+            "end": 1.08,
+            "emissionStart": 1.04,
+            "emissionEnd": 1.06,
+            "windowStart": 51,
+            "windowEnd": 54,
+            "expectedProbability": 0.994798541069,
+            "expectedTokenProbability": 0.994798541069,
+            "expectedLogLikelihood": -0.598523237954,
+            "alternativeLogLikelihood": -6.206822806734,
+            "deletionLogLikelihood": -7.961896896362,
+            "logMargin": 5.60829956878,
+            "closestPhone": "z",
+            "confidence": 0.996346099898,
+            "unitID": "speech-4-word-1:3",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "s",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.02,
+            "sourceEnd": 1.08,
+            "sourceStatus": "correct",
+            "expected": "s",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-6",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.994798541069,
+                "expectedTokenProbability": 0.994798541069,
+                "logMargin": 5.60829956878,
+                "closestPhone": "z"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.994798541069,
+                "expectedTokenProbability": 0.994798541069,
+                "logMargin": 5.60829956878,
+                "closestPhone": "z"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-1:3",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "l",
+          "ɛ",
+          "t",
+          "s"
+        ]
+      },
+      {
+        "id": "speech-4-word-2",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.08,
+            "end": 1.12,
+            "emissionStart": 1.1,
+            "emissionEnd": 1.12,
+            "windowStart": 54,
+            "windowEnd": 56,
+            "expectedProbability": 0.996395647526,
+            "expectedTokenProbability": 0.984178602695,
+            "expectedLogLikelihood": -0.005907402357,
+            "alternativeLogLikelihood": -6.513358442778,
+            "deletionLogLikelihood": -6.931405544281,
+            "logMargin": 6.507451040422,
+            "closestPhone": "kʰ",
+            "confidence": 0.99850994494,
+            "unitID": "speech-4-word-2:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "k",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.08,
+            "sourceEnd": 1.12,
+            "sourceStatus": "correct",
+            "expected": "g",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-7",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.996395647526,
+                "expectedTokenProbability": 0.984178602695,
+                "logMargin": 6.507451040422,
+                "closestPhone": "kʰ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.996395647526,
+                "expectedTokenProbability": 0.984178602695,
+                "logMargin": 6.507451040422,
+                "closestPhone": "kʰ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-2:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.12,
+            "end": 1.18,
+            "emissionStart": 1.14,
+            "emissionEnd": 1.16,
+            "windowStart": 56,
+            "windowEnd": 59,
+            "expectedProbability": 0.983993589878,
+            "expectedTokenProbability": 0.981238484383,
+            "expectedLogLikelihood": -0.246556421596,
+            "alternativeLogLikelihood": -6.143703255993,
+            "deletionLogLikelihood": -5.233103752136,
+            "logMargin": 4.98654733054,
+            "closestPhone": "k",
+            "confidence": 0.993217118857,
+            "unitID": "speech-4-word-2:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɛ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.12,
+            "sourceEnd": 1.18,
+            "sourceStatus": "correct",
+            "expected": "ɛ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-8",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.983993589878,
+                "expectedTokenProbability": 0.981238484383,
+                "logMargin": 4.98654733054,
+                "closestPhone": "k"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.983993589878,
+                "expectedTokenProbability": 0.981238484383,
+                "logMargin": 4.98654733054,
+                "closestPhone": "k"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-2:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.18,
+            "end": 1.28,
+            "emissionStart": 1.22,
+            "emissionEnd": 1.26,
+            "windowStart": 59,
+            "windowEnd": 64,
+            "expectedProbability": 0.951787114143,
+            "expectedTokenProbability": 0.950842499733,
+            "expectedLogLikelihood": -0.567140557398,
+            "alternativeLogLikelihood": -7.308025050312,
+            "deletionLogLikelihood": -7.22128534317,
+            "logMargin": 6.654144785773,
+            "closestPhone": "ɛ",
+            "confidence": 0.998712988772,
+            "unitID": "speech-4-word-2:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.18,
+            "sourceEnd": 1.28,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-9",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.951787114143,
+                "expectedTokenProbability": 0.950842499733,
+                "logMargin": 6.654144785773,
+                "closestPhone": "ɛ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.951787114143,
+                "expectedTokenProbability": 0.950842499733,
+                "logMargin": 6.654144785773,
+                "closestPhone": "ɛ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-2:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "g",
+          "ɛ",
+          "t"
+        ]
+      },
+      {
+        "id": "speech-4-word-3",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.28,
+            "end": 1.34,
+            "emissionStart": 1.3,
+            "emissionEnd": 1.32,
+            "windowStart": 64,
+            "windowEnd": 67,
+            "expectedProbability": 0.999610841274,
+            "expectedTokenProbability": 0.999610841274,
+            "expectedLogLikelihood": -0.000595109138,
+            "alternativeLogLikelihood": -9.43789052181,
+            "deletionLogLikelihood": -8.74401473999,
+            "logMargin": 8.743419630852,
+            "closestPhone": "ʃ",
+            "confidence": 0.999840517941,
+            "unitID": "speech-4-word-3:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "s",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.28,
+            "sourceEnd": 1.34,
+            "sourceStatus": "correct",
+            "expected": "s",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-10",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999610841274,
+                "expectedTokenProbability": 0.999610841274,
+                "logMargin": 8.743419630852,
+                "closestPhone": "ʃ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999610841274,
+                "expectedTokenProbability": 0.999610841274,
+                "logMargin": 8.743419630852,
+                "closestPhone": "ʃ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-3:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.34,
+            "end": 1.38,
+            "emissionStart": 1.36,
+            "emissionEnd": 1.38,
+            "windowStart": 67,
+            "windowEnd": 69,
+            "expectedProbability": 0.99981123209,
+            "expectedTokenProbability": 0.999780237675,
+            "expectedLogLikelihood": -0.000220737318,
+            "alternativeLogLikelihood": -11.336292823648,
+            "deletionLogLikelihood": -9.161667823792,
+            "logMargin": 9.161447086474,
+            "closestPhone": "d",
+            "confidence": 0.999895000198,
+            "unitID": "speech-4-word-3:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.34,
+            "sourceEnd": 1.38,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-11",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99981123209,
+                "expectedTokenProbability": 0.999780237675,
+                "logMargin": 9.161447086474,
+                "closestPhone": "d"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99981123209,
+                "expectedTokenProbability": 0.999780237675,
+                "logMargin": 9.161447086474,
+                "closestPhone": "d"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-3:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.38,
+            "end": 1.52,
+            "emissionStart": 1.4,
+            "emissionEnd": 1.5,
+            "windowStart": 69,
+            "windowEnd": 76,
+            "expectedProbability": 0.956594586372,
+            "expectedTokenProbability": 0.956594586372,
+            "expectedLogLikelihood": -0.000851600691,
+            "alternativeLogLikelihood": -12.806670916514,
+            "deletionLogLikelihood": -25.591131210327,
+            "logMargin": 12.805819315823,
+            "closestPhone": "ɹ",
+            "confidence": 0.999997255254,
+            "unitID": "speech-4-word-3:2",
+            "licence": "classD",
+            "licensedRealization": "ɑ ɹ",
+            "referenceRealization": "ɑ ɹ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.38,
+            "sourceEnd": 1.52,
+            "sourceStatus": "correct",
+            "expected": "ɑː",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-12",
+              "state": "SUPPORTED_BY_REFERENCE_CLASS",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.956594586372,
+                "expectedTokenProbability": 0.956594586372,
+                "logMargin": 12.805819315823,
+                "closestPhone": "ɹ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.956594586372,
+                "expectedTokenProbability": 0.956594586372,
+                "logMargin": 12.805819315823,
+                "closestPhone": "ɹ"
+              },
+              "lengthStatus": "UNVERIFIED",
+              "unitID": "speech-4-word-3:2",
+              "licence": "classD"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.52,
+            "end": 1.58,
+            "emissionStart": 1.54,
+            "emissionEnd": 1.56,
+            "windowStart": 76,
+            "windowEnd": 79,
+            "expectedProbability": 0.999900758266,
+            "expectedTokenProbability": 0.999869704247,
+            "expectedLogLikelihood": -0.000112953644,
+            "alternativeLogLikelihood": -12.049666255932,
+            "deletionLogLikelihood": -9.670770645142,
+            "logMargin": 9.670657691497,
+            "closestPhone": "d",
+            "confidence": 0.999936895647,
+            "unitID": "speech-4-word-3:3",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.52,
+            "sourceEnd": 1.58,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-13",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999900758266,
+                "expectedTokenProbability": 0.999869704247,
+                "logMargin": 9.670657691497,
+                "closestPhone": "d"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999900758266,
+                "expectedTokenProbability": 0.999869704247,
+                "logMargin": 9.670657691497,
+                "closestPhone": "d"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-3:3",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.58,
+            "end": 1.64,
+            "emissionStart": 1.6,
+            "emissionEnd": 1.62,
+            "windowStart": 79,
+            "windowEnd": 82,
+            "expectedProbability": 0.999295473099,
+            "expectedTokenProbability": 0.972433507442,
+            "expectedLogLikelihood": -0.000748137703,
+            "alternativeLogLikelihood": -8.952644866954,
+            "deletionLogLikelihood": -7.893972396851,
+            "logMargin": 7.893224259148,
+            "closestPhone": "ɛ",
+            "confidence": 0.999626875142,
+            "unitID": "speech-4-word-3:4",
+            "licence": "classD",
+            "licensedRealization": "ə",
+            "referenceRealization": "ə",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.58,
+            "sourceEnd": 1.64,
+            "sourceStatus": "correct",
+            "expected": "ɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-14",
+              "state": "SUPPORTED_BY_REFERENCE_CLASS",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999295473099,
+                "expectedTokenProbability": 0.972433507442,
+                "logMargin": 7.893224259148,
+                "closestPhone": "ɛ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999295473099,
+                "expectedTokenProbability": 0.972433507442,
+                "logMargin": 7.893224259148,
+                "closestPhone": "ɛ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-3:4",
+              "licence": "classD"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.64,
+            "end": 1.7,
+            "emissionStart": 1.68,
+            "emissionEnd": 1.7,
+            "windowStart": 82,
+            "windowEnd": 85,
+            "expectedProbability": 0.999912083149,
+            "expectedTokenProbability": 0.999819099903,
+            "expectedLogLikelihood": -8.9490265e-05,
+            "alternativeLogLikelihood": -12.452894528713,
+            "deletionLogLikelihood": -9.738056182861,
+            "logMargin": 9.737966692597,
+            "closestPhone": "ð",
+            "confidence": 0.999941003102,
+            "unitID": "speech-4-word-3:5",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "d",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.64,
+            "sourceEnd": 1.7,
+            "sourceStatus": "correct",
+            "expected": "d",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-15",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999912083149,
+                "expectedTokenProbability": 0.999819099903,
+                "logMargin": 9.737966692597,
+                "closestPhone": "ð"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999912083149,
+                "expectedTokenProbability": 0.999819099903,
+                "logMargin": 9.737966692597,
+                "closestPhone": "ð"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "speech-4-word-3:5",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "s",
+          "t",
+          "ɑː",
+          "t",
+          "ɪ",
+          "d"
+        ]
+      }
+    ],
+    "coverage": {
+      "total": 16,
+      "scored": 13,
+      "correct": 13,
+      "incorrect": 0,
+      "unassessed": 3,
+      "coverage": 0.8125
+    },
+    "reference": {
+      "policy": "xeus-reference-diagnostics-v2",
+      "groups": [
+        {
+          "id": "group-0",
+          "members": [
+            {
+              "wordID": "speech-4-word-0",
+              "phoneIndex": 0,
+              "displayPhone": "əʊ"
+            }
+          ],
+          "source": {
+            "startFrame": 7,
+            "endFrame": 10,
+            "start": 0.14,
+            "end": 0.2,
+            "tokens": [
+              {
+                "symbol": "o",
+                "startFrame": 7,
+                "endFrame": 8,
+                "posterior": 0.405621886253
+              },
+              {
+                "symbol": "l",
+                "startFrame": 8,
+                "endFrame": 9,
+                "posterior": 0.505910277367
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.475819349289,
+            "topCandidates": [
+              {
+                "symbol": "l",
+                "posterior": 0.255399852991
+              },
+              {
+                "symbol": "o",
+                "posterior": 0.206244960427
+              },
+              {
+                "symbol": "ɔ",
+                "posterior": 0.142495721579
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 7,
+            "endFrame": 10,
+            "start": 0.14,
+            "end": 0.2,
+            "tokens": [
+              {
+                "symbol": "o",
+                "startFrame": 7,
+                "endFrame": 8,
+                "posterior": 0.405621886253
+              },
+              {
+                "symbol": "l",
+                "startFrame": 8,
+                "endFrame": 9,
+                "posterior": 0.505910277367
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.475819349289,
+            "topCandidates": [
+              {
+                "symbol": "l",
+                "posterior": 0.255399852991
+              },
+              {
+                "symbol": "o",
+                "posterior": 0.206244960427
+              },
+              {
+                "symbol": "ɔ",
+                "posterior": 0.142495721579
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-1",
+          "members": [
+            {
+              "wordID": "speech-4-word-0",
+              "phoneIndex": 1,
+              "displayPhone": "k"
+            }
+          ],
+          "source": {
+            "startFrame": 10,
+            "endFrame": 13,
+            "start": 0.2,
+            "end": 0.26,
+            "tokens": [
+              {
+                "symbol": "kʰ",
+                "startFrame": 11,
+                "endFrame": 12,
+                "posterior": 0.546554028988
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.663858473301,
+            "topCandidates": [
+              {
+                "symbol": "kʰ",
+                "posterior": 0.546554028988
+              },
+              {
+                "symbol": "k",
+                "posterior": 0.442579984665
+              },
+              {
+                "symbol": "h",
+                "posterior": 0.000512033876
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 10,
+            "endFrame": 13,
+            "start": 0.2,
+            "end": 0.26,
+            "tokens": [
+              {
+                "symbol": "kʰ",
+                "startFrame": 11,
+                "endFrame": 12,
+                "posterior": 0.546554028988
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.663858473301,
+            "topCandidates": [
+              {
+                "symbol": "kʰ",
+                "posterior": 0.546554028988
+              },
+              {
+                "symbol": "k",
+                "posterior": 0.442579984665
+              },
+              {
+                "symbol": "h",
+                "posterior": 0.000512033876
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-2",
+          "members": [
+            {
+              "wordID": "speech-4-word-0",
+              "phoneIndex": 2,
+              "displayPhone": "eɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 13,
+            "endFrame": 30,
+            "start": 0.26,
+            "end": 0.6,
+            "tokens": [
+              {
+                "symbol": "e",
+                "startFrame": 14,
+                "endFrame": 15,
+                "posterior": 0.971240282059
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 16,
+                "endFrame": 17,
+                "posterior": 0.846763551235
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.889533042908,
+            "topCandidates": [
+              {
+                "symbol": "e",
+                "posterior": 0.485802322626
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.423487007618
+              },
+              {
+                "symbol": "ɪ̃",
+                "posterior": 0.004740919918
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 13,
+            "endFrame": 30,
+            "start": 0.26,
+            "end": 0.6,
+            "tokens": [
+              {
+                "symbol": "e",
+                "startFrame": 14,
+                "endFrame": 15,
+                "posterior": 0.971240282059
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 16,
+                "endFrame": 17,
+                "posterior": 0.846763551235
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.889533042908,
+            "topCandidates": [
+              {
+                "symbol": "e",
+                "posterior": 0.485802322626
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.423487007618
+              },
+              {
+                "symbol": "ɪ̃",
+                "posterior": 0.004740919918
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-3",
+          "members": [
+            {
+              "wordID": "speech-4-word-1",
+              "phoneIndex": 0,
+              "displayPhone": "l"
+            }
+          ],
+          "source": {
+            "startFrame": 30,
+            "endFrame": 46,
+            "start": 0.6,
+            "end": 0.92,
+            "tokens": [
+              {
+                "symbol": "l",
+                "startFrame": 44,
+                "endFrame": 46,
+                "posterior": 0.925384283066
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.884028792381,
+            "topCandidates": [
+              {
+                "symbol": "l",
+                "posterior": 0.925384283066
+              },
+              {
+                "symbol": "ð",
+                "posterior": 0.000804487499
+              },
+              {
+                "symbol": "n",
+                "posterior": 0.000219954149
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 30,
+            "endFrame": 46,
+            "start": 0.6,
+            "end": 0.92,
+            "tokens": [
+              {
+                "symbol": "l",
+                "startFrame": 44,
+                "endFrame": 46,
+                "posterior": 0.925384283066
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.884028792381,
+            "topCandidates": [
+              {
+                "symbol": "l",
+                "posterior": 0.925384283066
+              },
+              {
+                "symbol": "ð",
+                "posterior": 0.000804487499
+              },
+              {
+                "symbol": "n",
+                "posterior": 0.000219954149
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-4",
+          "members": [
+            {
+              "wordID": "speech-4-word-1",
+              "phoneIndex": 1,
+              "displayPhone": "ɛ"
+            }
+          ],
+          "source": {
+            "startFrame": 46,
+            "endFrame": 48,
+            "start": 0.92,
+            "end": 0.96,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 47,
+                "endFrame": 48,
+                "posterior": 0.997807085514
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.498831033707,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.997807085514
+              },
+              {
+                "symbol": "æ",
+                "posterior": 0.000712908746
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 0.000417763396
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 46,
+            "endFrame": 48,
+            "start": 0.92,
+            "end": 0.96,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 47,
+                "endFrame": 48,
+                "posterior": 0.997807085514
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.498831033707,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.997807085514
+              },
+              {
+                "symbol": "æ",
+                "posterior": 0.000712908746
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 0.000417763396
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-5",
+          "members": [
+            {
+              "wordID": "speech-4-word-1",
+              "phoneIndex": 2,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 48,
+            "endFrame": 51,
+            "start": 0.96,
+            "end": 1.02,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 49,
+                "endFrame": 51,
+                "posterior": 0.953873872757
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.362789541483,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.953873872757
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.000834509905
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000209988415
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 48,
+            "endFrame": 51,
+            "start": 0.96,
+            "end": 1.02,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 49,
+                "endFrame": 51,
+                "posterior": 0.953873872757
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.362789541483,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.953873872757
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.000834509905
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000209988415
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-6",
+          "members": [
+            {
+              "wordID": "speech-4-word-1",
+              "phoneIndex": 3,
+              "displayPhone": "s"
+            }
+          ],
+          "source": {
+            "startFrame": 51,
+            "endFrame": 54,
+            "start": 1.02,
+            "end": 1.08,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 52,
+                "endFrame": 53,
+                "posterior": 0.994798541069
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.508197486401,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.994798541069
+              },
+              {
+                "symbol": "z",
+                "posterior": 0.003809398739
+              },
+              {
+                "symbol": "t",
+                "posterior": 0.000212576793
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 51,
+            "endFrame": 54,
+            "start": 1.02,
+            "end": 1.08,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 52,
+                "endFrame": 53,
+                "posterior": 0.994798541069
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.508197486401,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.994798541069
+              },
+              {
+                "symbol": "z",
+                "posterior": 0.003809398739
+              },
+              {
+                "symbol": "t",
+                "posterior": 0.000212576793
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-7",
+          "members": [
+            {
+              "wordID": "speech-4-word-2",
+              "phoneIndex": 0,
+              "displayPhone": "g"
+            }
+          ],
+          "source": {
+            "startFrame": 54,
+            "endFrame": 56,
+            "start": 1.08,
+            "end": 1.12,
+            "tokens": [
+              {
+                "symbol": "k",
+                "startFrame": 55,
+                "endFrame": 56,
+                "posterior": 0.984178602695
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.495870113373,
+            "topCandidates": [
+              {
+                "symbol": "k",
+                "posterior": 0.984178602695
+              },
+              {
+                "symbol": "ɡ",
+                "posterior": 0.012217053212
+              },
+              {
+                "symbol": "kʰ",
+                "posterior": 0.001497160178
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 54,
+            "endFrame": 56,
+            "start": 1.08,
+            "end": 1.12,
+            "tokens": [
+              {
+                "symbol": "k",
+                "startFrame": 55,
+                "endFrame": 56,
+                "posterior": 0.984178602695
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.495870113373,
+            "topCandidates": [
+              {
+                "symbol": "k",
+                "posterior": 0.984178602695
+              },
+              {
+                "symbol": "ɡ",
+                "posterior": 0.012217053212
+              },
+              {
+                "symbol": "kʰ",
+                "posterior": 0.001497160178
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-8",
+          "members": [
+            {
+              "wordID": "speech-4-word-2",
+              "phoneIndex": 1,
+              "displayPhone": "ɛ"
+            }
+          ],
+          "source": {
+            "startFrame": 56,
+            "endFrame": 59,
+            "start": 1.12,
+            "end": 1.18,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 57,
+                "endFrame": 58,
+                "posterior": 0.981238484383
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.594296753407,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.981238484383
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.002542135073
+              },
+              {
+                "symbol": "ə",
+                "posterior": 0.002263834234
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 56,
+            "endFrame": 59,
+            "start": 1.12,
+            "end": 1.18,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 57,
+                "endFrame": 58,
+                "posterior": 0.981238484383
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.594296753407,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.981238484383
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.002542135073
+              },
+              {
+                "symbol": "ə",
+                "posterior": 0.002263834234
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-9",
+          "members": [
+            {
+              "wordID": "speech-4-word-2",
+              "phoneIndex": 2,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 59,
+            "endFrame": 64,
+            "start": 1.18,
+            "end": 1.28,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 61,
+                "endFrame": 63,
+                "posterior": 0.950842499733
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.516121089458,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.950842499733
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.003510282375
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.001456819475
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 59,
+            "endFrame": 64,
+            "start": 1.18,
+            "end": 1.28,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 61,
+                "endFrame": 63,
+                "posterior": 0.950842499733
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.516121089458,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.950842499733
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.003510282375
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.001456819475
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-10",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 0,
+              "displayPhone": "s"
+            }
+          ],
+          "source": {
+            "startFrame": 64,
+            "endFrame": 67,
+            "start": 1.28,
+            "end": 1.34,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 65,
+                "endFrame": 66,
+                "posterior": 0.999610841274
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.617519795895,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.999610841274
+              },
+              {
+                "symbol": "ʃ",
+                "posterior": 9.3426584e-05
+              },
+              {
+                "symbol": "f",
+                "posterior": 3.0110261e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 64,
+            "endFrame": 67,
+            "start": 1.28,
+            "end": 1.34,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 65,
+                "endFrame": 66,
+                "posterior": 0.999610841274
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.617519795895,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.999610841274
+              },
+              {
+                "symbol": "ʃ",
+                "posterior": 9.3426584e-05
+              },
+              {
+                "symbol": "f",
+                "posterior": 3.0110261e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-11",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 1,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 67,
+            "endFrame": 69,
+            "start": 1.34,
+            "end": 1.38,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 68,
+                "endFrame": 69,
+                "posterior": 0.999780237675
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.4999756217,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999780237675
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.0992083e-05
+              },
+              {
+                "symbol": "d",
+                "posterior": 1.1933755e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 67,
+            "endFrame": 69,
+            "start": 1.34,
+            "end": 1.38,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 68,
+                "endFrame": 69,
+                "posterior": 0.999780237675
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.4999756217,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999780237675
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.0992083e-05
+              },
+              {
+                "symbol": "d",
+                "posterior": 1.1933755e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-12",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 2,
+              "displayPhone": "ɑː"
+            }
+          ],
+          "source": {
+            "startFrame": 69,
+            "endFrame": 76,
+            "start": 1.38,
+            "end": 1.52,
+            "tokens": [
+              {
+                "symbol": "ɑ",
+                "startFrame": 70,
+                "endFrame": 71,
+                "posterior": 0.999910354614
+              },
+              {
+                "symbol": "ɹ",
+                "startFrame": 73,
+                "endFrame": 75,
+                "posterior": 0.956594586372
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.565419435501,
+            "topCandidates": [
+              {
+                "symbol": "ɹ",
+                "posterior": 0.637729883194
+              },
+              {
+                "symbol": "ɑ",
+                "posterior": 0.333365529776
+              },
+              {
+                "symbol": "ʀ",
+                "posterior": 2.8756964e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 69,
+            "endFrame": 76,
+            "start": 1.38,
+            "end": 1.52,
+            "tokens": [
+              {
+                "symbol": "ɑ",
+                "startFrame": 70,
+                "endFrame": 71,
+                "posterior": 0.999910354614
+              },
+              {
+                "symbol": "ɹ",
+                "startFrame": 73,
+                "endFrame": 75,
+                "posterior": 0.956594586372
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.565419435501,
+            "topCandidates": [
+              {
+                "symbol": "ɹ",
+                "posterior": 0.637729883194
+              },
+              {
+                "symbol": "ɑ",
+                "posterior": 0.333365529776
+              },
+              {
+                "symbol": "ʀ",
+                "posterior": 2.8756964e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 3,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-13",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 3,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 76,
+            "endFrame": 79,
+            "start": 1.52,
+            "end": 1.58,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 77,
+                "endFrame": 78,
+                "posterior": 0.999869704247
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.662486732006,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999869704247
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.1027186e-05
+              },
+              {
+                "symbol": "d",
+                "posterior": 5.921089e-06
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 76,
+            "endFrame": 79,
+            "start": 1.52,
+            "end": 1.58,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 77,
+                "endFrame": 78,
+                "posterior": 0.999869704247
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.662486732006,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999869704247
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.1027186e-05
+              },
+              {
+                "symbol": "d",
+                "posterior": 5.921089e-06
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-14",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 4,
+              "displayPhone": "ɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 79,
+            "endFrame": 82,
+            "start": 1.58,
+            "end": 1.64,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 80,
+                "endFrame": 81,
+                "posterior": 0.972433507442
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666773617268,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.972433507442
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.026804156601
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.000129401204
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 79,
+            "endFrame": 82,
+            "start": 1.58,
+            "end": 1.64,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 80,
+                "endFrame": 81,
+                "posterior": 0.972433507442
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666773617268,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.972433507442
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.026804156601
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.000129401204
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-15",
+          "members": [
+            {
+              "wordID": "speech-4-word-3",
+              "phoneIndex": 5,
+              "displayPhone": "d"
+            }
+          ],
+          "source": {
+            "startFrame": 82,
+            "endFrame": 85,
+            "start": 1.64,
+            "end": 1.7,
+            "tokens": [
+              {
+                "symbol": "d",
+                "startFrame": 84,
+                "endFrame": 85,
+                "posterior": 0.999819099903
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666683673859,
+            "topCandidates": [
+              {
+                "symbol": "d",
+                "posterior": 0.999819099903
+              },
+              {
+                "symbol": "t",
+                "posterior": 9.2977367e-05
+              },
+              {
+                "symbol": "ð",
+                "posterior": 3.90643e-06
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 82,
+            "endFrame": 85,
+            "start": 1.64,
+            "end": 1.7,
+            "tokens": [
+              {
+                "symbol": "d",
+                "startFrame": 84,
+                "endFrame": 85,
+                "posterior": 0.999819099903
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666683673859,
+            "topCandidates": [
+              {
+                "symbol": "d",
+                "posterior": 0.999819099903
+              },
+              {
+                "symbol": "t",
+                "posterior": 9.2977367e-05
+              },
+              {
+                "symbol": "ð",
+                "posterior": 3.90643e-06
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        }
+      ]
+    },
+    "contrastHead": null,
+    "thresholds": {
+      "support": 0.3,
+      "margin": 1.386294,
+      "entropy": 0.55,
+      "competitor": 1.8,
+      "strength": 0.65
+    },
+    "calibration": "native-zero-false-sai-v1",
+    "sourceRecognizedPhones": [
+      {
+        "symbol": "o",
+        "start": 0.14,
+        "end": 0.16,
+        "posterior": 0.405621886253
+      },
+      {
+        "symbol": "l",
+        "start": 0.16,
+        "end": 0.18,
+        "posterior": 0.505910277367
+      },
+      {
+        "symbol": "kʰ",
+        "start": 0.22,
+        "end": 0.24,
+        "posterior": 0.546554028988
+      },
+      {
+        "symbol": "e",
+        "start": 0.28,
+        "end": 0.3,
+        "posterior": 0.971240282059
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.32,
+        "end": 0.34,
+        "posterior": 0.846763551235
+      },
+      {
+        "symbol": "l",
+        "start": 0.88,
+        "end": 0.92,
+        "posterior": 0.925384283066
+      },
+      {
+        "symbol": "ɛ",
+        "start": 0.94,
+        "end": 0.96,
+        "posterior": 0.997807085514
+      },
+      {
+        "symbol": "t",
+        "start": 0.98,
+        "end": 1.02,
+        "posterior": 0.953873872757
+      },
+      {
+        "symbol": "s",
+        "start": 1.04,
+        "end": 1.06,
+        "posterior": 0.994798541069
+      },
+      {
+        "symbol": "k",
+        "start": 1.1,
+        "end": 1.12,
+        "posterior": 0.984178602695
+      },
+      {
+        "symbol": "ɛ",
+        "start": 1.14,
+        "end": 1.16,
+        "posterior": 0.981238484383
+      },
+      {
+        "symbol": "t",
+        "start": 1.22,
+        "end": 1.26,
+        "posterior": 0.950842499733
+      },
+      {
+        "symbol": "s",
+        "start": 1.3,
+        "end": 1.32,
+        "posterior": 0.999610841274
+      },
+      {
+        "symbol": "t",
+        "start": 1.36,
+        "end": 1.38,
+        "posterior": 0.999780237675
+      },
+      {
+        "symbol": "ɑ",
+        "start": 1.4,
+        "end": 1.42,
+        "posterior": 0.999910354614
+      },
+      {
+        "symbol": "ɹ",
+        "start": 1.46,
+        "end": 1.5,
+        "posterior": 0.956594586372
+      },
+      {
+        "symbol": "t",
+        "start": 1.54,
+        "end": 1.56,
+        "posterior": 0.999869704247
+      },
+      {
+        "symbol": "ə",
+        "start": 1.6,
+        "end": 1.62,
+        "posterior": 0.972433507442
+      },
+      {
+        "symbol": "d",
+        "start": 1.68,
+        "end": 1.7,
+        "posterior": 0.999819099903
+      }
+    ],
+    "recognizedPhones": [
+      {
+        "symbol": "o",
+        "start": 0.14,
+        "end": 0.16,
+        "posterior": 0.405621886253
+      },
+      {
+        "symbol": "l",
+        "start": 0.16,
+        "end": 0.18,
+        "posterior": 0.505910277367
+      },
+      {
+        "symbol": "kʰ",
+        "start": 0.22,
+        "end": 0.24,
+        "posterior": 0.546554028988
+      },
+      {
+        "symbol": "e",
+        "start": 0.28,
+        "end": 0.3,
+        "posterior": 0.971240282059
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.32,
+        "end": 0.34,
+        "posterior": 0.846763551235
+      },
+      {
+        "symbol": "l",
+        "start": 0.88,
+        "end": 0.92,
+        "posterior": 0.925384283066
+      },
+      {
+        "symbol": "ɛ",
+        "start": 0.94,
+        "end": 0.96,
+        "posterior": 0.997807085514
+      },
+      {
+        "symbol": "t",
+        "start": 0.98,
+        "end": 1.02,
+        "posterior": 0.953873872757
+      },
+      {
+        "symbol": "s",
+        "start": 1.04,
+        "end": 1.06,
+        "posterior": 0.994798541069
+      },
+      {
+        "symbol": "k",
+        "start": 1.1,
+        "end": 1.12,
+        "posterior": 0.984178602695
+      },
+      {
+        "symbol": "ɛ",
+        "start": 1.14,
+        "end": 1.16,
+        "posterior": 0.981238484383
+      },
+      {
+        "symbol": "t",
+        "start": 1.22,
+        "end": 1.26,
+        "posterior": 0.950842499733
+      },
+      {
+        "symbol": "s",
+        "start": 1.3,
+        "end": 1.32,
+        "posterior": 0.999610841274
+      },
+      {
+        "symbol": "t",
+        "start": 1.36,
+        "end": 1.38,
+        "posterior": 0.999780237675
+      },
+      {
+        "symbol": "ɑ",
+        "start": 1.4,
+        "end": 1.42,
+        "posterior": 0.999910354614
+      },
+      {
+        "symbol": "ɹ",
+        "start": 1.46,
+        "end": 1.5,
+        "posterior": 0.956594586372
+      },
+      {
+        "symbol": "t",
+        "start": 1.54,
+        "end": 1.56,
+        "posterior": 0.999869704247
+      },
+      {
+        "symbol": "ə",
+        "start": 1.6,
+        "end": 1.62,
+        "posterior": 0.972433507442
+      },
+      {
+        "symbol": "d",
+        "start": 1.68,
+        "end": 1.7,
+        "posterior": 0.999819099903
+      }
+    ],
+    "peakRSS": 48152576
+  }
+}

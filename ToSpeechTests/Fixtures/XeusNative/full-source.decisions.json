@@ -1,0 +1,4205 @@
+{
+  "caseName": "full-source-source-self",
+  "sourceLogits": "full-source.logits.npy",
+  "takeLogits": "full-source.logits.npy",
+  "sourceDuration": 2.408375,
+  "takeDuration": 2.408375,
+  "request": {
+    "source": "/Users/nat/Desktop/UnknownStudio/education-project/english-shadowing/native/docs/evidence/pronunciation-2026-09-12/full-source.caf",
+    "take": "/Users/nat/Desktop/UnknownStudio/education-project/english-shadowing/native/docs/evidence/pronunciation-2026-09-12/full-source.caf",
+    "words": [
+      {
+        "id": "w0",
+        "text": "I",
+        "variants": [
+          [
+            "aɪ"
+          ]
+        ]
+      },
+      {
+        "id": "w1",
+        "text": "never",
+        "variants": [
+          [
+            "n",
+            "ɛ",
+            "v",
+            "ə"
+          ]
+        ]
+      },
+      {
+        "id": "w2",
+        "text": "thought",
+        "variants": [
+          [
+            "θ",
+            "ɔː",
+            "t"
+          ]
+        ]
+      },
+      {
+        "id": "w3",
+        "text": "it",
+        "variants": [
+          [
+            "ɪ",
+            "t"
+          ]
+        ]
+      },
+      {
+        "id": "w4",
+        "text": "would",
+        "variants": [
+          [
+            "w",
+            "ʊ",
+            "d"
+          ]
+        ]
+      },
+      {
+        "id": "w5",
+        "text": "make",
+        "variants": [
+          [
+            "m",
+            "eɪ",
+            "k"
+          ]
+        ]
+      },
+      {
+        "id": "w6",
+        "text": "such",
+        "variants": [
+          [
+            "s",
+            "ʌ",
+            "tʃ"
+          ]
+        ]
+      },
+      {
+        "id": "w7",
+        "text": "a",
+        "variants": [
+          [
+            "ə"
+          ],
+          [
+            "eɪ"
+          ]
+        ]
+      },
+      {
+        "id": "w8",
+        "text": "difference",
+        "variants": [
+          [
+            "d",
+            "ɪ",
+            "f",
+            "ɹ",
+            "ə",
+            "n",
+            "s"
+          ],
+          [
+            "d",
+            "ɪ",
+            "f",
+            "ə",
+            "ɹ",
+            "ə",
+            "n",
+            "s"
+          ]
+        ]
+      }
+    ]
+  },
+  "result": {
+    "revision": "8d83dee94817a07dc150f87d08f7e0ee01bdb66d",
+    "policy": "xeus-uk-decision-v6-word-gated",
+    "mapping": "xeus-uk-inventory-v4",
+    "referencePolicy": "xeus-reference-diagnostics-v2",
+    "device": "cpu",
+    "dtype": "float32",
+    "duration": 2.408375,
+    "sourceDuration": 2.408375,
+    "sourceShape": [
+      120,
+      428
+    ],
+    "takeShape": [
+      120,
+      428
+    ],
+    "inferenceSeconds": 0.0,
+    "words": [
+      {
+        "id": "w0",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.06,
+            "end": 0.18,
+            "emissionStart": 0.06,
+            "emissionEnd": 0.14,
+            "windowStart": 3,
+            "windowEnd": 9,
+            "expectedProbability": 0.994720816612,
+            "expectedTokenProbability": 0.994720697403,
+            "expectedLogLikelihood": -0.008048722968,
+            "alternativeLogLikelihood": -5.356160224192,
+            "deletionLogLikelihood": -12.577936172485,
+            "logMargin": 5.348111501224,
+            "closestPhone": "ɪ",
+            "confidence": 0.995265396757,
+            "unitID": "w0:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "a ɪ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.06,
+            "sourceEnd": 0.18,
+            "sourceStatus": "correct",
+            "expected": "aɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-0",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.994720816612,
+                "expectedTokenProbability": 0.994720697403,
+                "logMargin": 5.348111501224,
+                "closestPhone": "ɪ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.994720816612,
+                "expectedTokenProbability": 0.994720697403,
+                "logMargin": 5.348111501224,
+                "closestPhone": "ɪ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w0:0",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "aɪ"
+        ]
+      },
+      {
+        "id": "w1",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.18,
+            "end": 0.26,
+            "emissionStart": 0.22,
+            "emissionEnd": 0.24,
+            "windowStart": 9,
+            "windowEnd": 13,
+            "expectedProbability": 0.99969124794,
+            "expectedTokenProbability": 0.99969124794,
+            "expectedLogLikelihood": -0.00104988824,
+            "alternativeLogLikelihood": -10.223262685204,
+            "deletionLogLikelihood": -8.95086479187,
+            "logMargin": 8.94981490363,
+            "closestPhone": "m",
+            "confidence": 0.99987025566,
+            "unitID": "w1:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "n",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.18,
+            "sourceEnd": 0.26,
+            "sourceStatus": "correct",
+            "expected": "n",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-1",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99969124794,
+                "expectedTokenProbability": 0.99969124794,
+                "logMargin": 8.94981490363,
+                "closestPhone": "m"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99969124794,
+                "expectedTokenProbability": 0.99969124794,
+                "logMargin": 8.94981490363,
+                "closestPhone": "m"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w1:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.26,
+            "end": 0.32,
+            "emissionStart": 0.28,
+            "emissionEnd": 0.3,
+            "windowStart": 13,
+            "windowEnd": 16,
+            "expectedProbability": 0.999879479408,
+            "expectedTokenProbability": 0.99985575676,
+            "expectedLogLikelihood": -0.000143594459,
+            "alternativeLogLikelihood": -10.661533756298,
+            "deletionLogLikelihood": -9.635711669922,
+            "logMargin": 9.635568075463,
+            "closestPhone": "ɪ",
+            "confidence": 0.999934642178,
+            "unitID": "w1:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɛ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.26,
+            "sourceEnd": 0.32,
+            "sourceStatus": "correct",
+            "expected": "ɛ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-2",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999879479408,
+                "expectedTokenProbability": 0.99985575676,
+                "logMargin": 9.635568075463,
+                "closestPhone": "ɪ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999879479408,
+                "expectedTokenProbability": 0.99985575676,
+                "logMargin": 9.635568075463,
+                "closestPhone": "ɪ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w1:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.32,
+            "end": 0.38,
+            "emissionStart": 0.36,
+            "emissionEnd": 0.38,
+            "windowStart": 16,
+            "windowEnd": 19,
+            "expectedProbability": 0.999696612358,
+            "expectedTokenProbability": 0.999696612358,
+            "expectedLogLikelihood": -0.000315454707,
+            "alternativeLogLikelihood": -9.510787584717,
+            "deletionLogLikelihood": -8.908543586731,
+            "logMargin": 8.908228132024,
+            "closestPhone": "f",
+            "confidence": 0.999864746991,
+            "unitID": "w1:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "v",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.32,
+            "sourceEnd": 0.38,
+            "sourceStatus": "correct",
+            "expected": "v",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-3",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999696612358,
+                "expectedTokenProbability": 0.999696612358,
+                "logMargin": 8.908228132024,
+                "closestPhone": "f"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999696612358,
+                "expectedTokenProbability": 0.999696612358,
+                "logMargin": 8.908228132024,
+                "closestPhone": "f"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w1:2",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.38,
+            "end": 0.46,
+            "emissionStart": 0.4,
+            "emissionEnd": 0.42,
+            "windowStart": 19,
+            "windowEnd": 23,
+            "expectedProbability": 0.978898823261,
+            "expectedTokenProbability": 0.978827357292,
+            "expectedLogLikelihood": -0.021486374395,
+            "alternativeLogLikelihood": -3.896804342751,
+            "deletionLogLikelihood": -9.882022857666,
+            "logMargin": 3.875317968355,
+            "closestPhone": "ɜ˞",
+            "confidence": 0.979673979287,
+            "unitID": "w1:3",
+            "licence": "classD",
+            "licensedRealization": "ə˞",
+            "referenceRealization": "ə˞",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.38,
+            "sourceEnd": 0.46,
+            "sourceStatus": "correct",
+            "expected": "ə",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-4",
+              "state": "SUPPORTED_BY_REFERENCE_CLASS",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.978898823261,
+                "expectedTokenProbability": 0.978827357292,
+                "logMargin": 3.875317968355,
+                "closestPhone": "ɜ˞"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.978898823261,
+                "expectedTokenProbability": 0.978827357292,
+                "logMargin": 3.875317968355,
+                "closestPhone": "ɜ˞"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w1:3",
+              "licence": "classD"
+            }
+          }
+        ],
+        "variant": [
+          "n",
+          "ɛ",
+          "v",
+          "ə"
+        ]
+      },
+      {
+        "id": "w2",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.46,
+            "end": 0.56,
+            "emissionStart": 0.52,
+            "emissionEnd": 0.54,
+            "windowStart": 23,
+            "windowEnd": 28,
+            "expectedProbability": 0.999720275402,
+            "expectedTokenProbability": 0.999720275402,
+            "expectedLogLikelihood": -0.000307848842,
+            "alternativeLogLikelihood": -9.218284101724,
+            "deletionLogLikelihood": -12.760646820068,
+            "logMargin": 9.217976252881,
+            "closestPhone": "tʰ",
+            "confidence": 0.999900770528,
+            "unitID": "w2:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "θ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.46,
+            "sourceEnd": 0.56,
+            "sourceStatus": "correct",
+            "expected": "θ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-5",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999720275402,
+                "expectedTokenProbability": 0.999720275402,
+                "logMargin": 9.217976252881,
+                "closestPhone": "tʰ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999720275402,
+                "expectedTokenProbability": 0.999720275402,
+                "logMargin": 9.217976252881,
+                "closestPhone": "tʰ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w2:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.56,
+            "end": 0.68,
+            "emissionStart": 0.6,
+            "emissionEnd": 0.62,
+            "windowStart": 28,
+            "windowEnd": 34,
+            "expectedProbability": 0.999943375587,
+            "expectedTokenProbability": 0.999933481216,
+            "expectedLogLikelihood": -0.031816874494,
+            "alternativeLogLikelihood": -9.086475663334,
+            "deletionLogLikelihood": -11.750266075134,
+            "logMargin": 9.05465878884,
+            "closestPhone": "ɔɪ",
+            "confidence": 0.999883168242,
+            "unitID": "w2:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɔ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.56,
+            "sourceEnd": 0.68,
+            "sourceStatus": "correct",
+            "expected": "ɔː",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-6",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999943375587,
+                "expectedTokenProbability": 0.999933481216,
+                "logMargin": 9.05465878884,
+                "closestPhone": "ɔɪ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999943375587,
+                "expectedTokenProbability": 0.999933481216,
+                "logMargin": 9.05465878884,
+                "closestPhone": "ɔɪ"
+              },
+              "lengthStatus": "UNVERIFIED",
+              "unitID": "w2:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.68,
+            "end": 0.78,
+            "emissionStart": 0.74,
+            "emissionEnd": 0.76,
+            "windowStart": 34,
+            "windowEnd": 39,
+            "expectedProbability": 0.999701857567,
+            "expectedTokenProbability": 0.999686360359,
+            "expectedLogLikelihood": -0.00057502162,
+            "alternativeLogLikelihood": -10.782629176878,
+            "deletionLogLikelihood": -8.466623306274,
+            "logMargin": 8.466048284654,
+            "closestPhone": "d",
+            "confidence": 0.99978954922,
+            "unitID": "w2:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.68,
+            "sourceEnd": 0.78,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-7",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999701857567,
+                "expectedTokenProbability": 0.999686360359,
+                "logMargin": 8.466048284654,
+                "closestPhone": "d"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999701857567,
+                "expectedTokenProbability": 0.999686360359,
+                "logMargin": 8.466048284654,
+                "closestPhone": "d"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w2:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "θ",
+          "ɔː",
+          "t"
+        ]
+      },
+      {
+        "id": "w3",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.78,
+            "end": 0.84,
+            "emissionStart": 0.8,
+            "emissionEnd": 0.82,
+            "windowStart": 39,
+            "windowEnd": 42,
+            "expectedProbability": 0.999893903732,
+            "expectedTokenProbability": 0.999883770943,
+            "expectedLogLikelihood": -0.000312517344,
+            "alternativeLogLikelihood": -10.568419198723,
+            "deletionLogLikelihood": -10.650319099426,
+            "logMargin": 10.568106681379,
+            "closestPhone": "e",
+            "confidence": 0.99997427719,
+            "unitID": "w3:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɪ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.78,
+            "sourceEnd": 0.84,
+            "sourceStatus": "correct",
+            "expected": "ɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-8",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999893903732,
+                "expectedTokenProbability": 0.999883770943,
+                "logMargin": 10.568106681379,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999893903732,
+                "expectedTokenProbability": 0.999883770943,
+                "logMargin": 10.568106681379,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w3:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.84,
+            "end": 0.9,
+            "emissionStart": 0.86,
+            "emissionEnd": 0.88,
+            "windowStart": 42,
+            "windowEnd": 45,
+            "expectedProbability": 0.999675571918,
+            "expectedTokenProbability": 0.999653697014,
+            "expectedLogLikelihood": -0.000437404724,
+            "alternativeLogLikelihood": -8.491753066627,
+            "deletionLogLikelihood": -10.457537651062,
+            "logMargin": 8.491315661903,
+            "closestPhone": "d",
+            "confidence": 0.999794799064,
+            "unitID": "w3:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.84,
+            "sourceEnd": 0.9,
+            "sourceStatus": "correct",
+            "expected": "t",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-9",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999675571918,
+                "expectedTokenProbability": 0.999653697014,
+                "logMargin": 8.491315661903,
+                "closestPhone": "d"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999675571918,
+                "expectedTokenProbability": 0.999653697014,
+                "logMargin": 8.491315661903,
+                "closestPhone": "d"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w3:1",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "ɪ",
+          "t"
+        ]
+      },
+      {
+        "id": "w4",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.9,
+            "end": 0.96,
+            "emissionStart": 0.94,
+            "emissionEnd": 0.96,
+            "windowStart": 45,
+            "windowEnd": 48,
+            "expectedProbability": 0.999733746052,
+            "expectedTokenProbability": 0.999733746052,
+            "expectedLogLikelihood": -0.000742837817,
+            "alternativeLogLikelihood": -9.783367540066,
+            "deletionLogLikelihood": -10.070639610291,
+            "logMargin": 9.782624702248,
+            "closestPhone": "ʊ",
+            "confidence": 0.999943579677,
+            "unitID": "w4:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "w",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.9,
+            "sourceEnd": 0.96,
+            "sourceStatus": "correct",
+            "expected": "w",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-10",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999733746052,
+                "expectedTokenProbability": 0.999733746052,
+                "logMargin": 9.782624702248,
+                "closestPhone": "ʊ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999733746052,
+                "expectedTokenProbability": 0.999733746052,
+                "logMargin": 9.782624702248,
+                "closestPhone": "ʊ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w4:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 0.96,
+            "end": 1.02,
+            "emissionStart": 0.98,
+            "emissionEnd": 1.0,
+            "windowStart": 48,
+            "windowEnd": 51,
+            "expectedProbability": 0.999601244926,
+            "expectedTokenProbability": 0.999588549137,
+            "expectedLogLikelihood": -0.001502014722,
+            "alternativeLogLikelihood": -8.624199903362,
+            "deletionLogLikelihood": -11.773738861084,
+            "logMargin": 8.62269788864,
+            "closestPhone": "ɪ",
+            "confidence": 0.999820058336,
+            "unitID": "w4:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ʊ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 0.96,
+            "sourceEnd": 1.02,
+            "sourceStatus": "correct",
+            "expected": "ʊ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-11",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999601244926,
+                "expectedTokenProbability": 0.999588549137,
+                "logMargin": 8.62269788864,
+                "closestPhone": "ɪ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999601244926,
+                "expectedTokenProbability": 0.999588549137,
+                "logMargin": 8.62269788864,
+                "closestPhone": "ɪ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w4:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.02,
+            "end": 1.08,
+            "emissionStart": 1.04,
+            "emissionEnd": 1.06,
+            "windowStart": 51,
+            "windowEnd": 54,
+            "expectedProbability": 0.999606192112,
+            "expectedTokenProbability": 0.99939084053,
+            "expectedLogLikelihood": -0.000536683852,
+            "alternativeLogLikelihood": -9.29298964983,
+            "deletionLogLikelihood": -10.426952362061,
+            "logMargin": 9.292452965977,
+            "closestPhone": "z",
+            "confidence": 0.999907891661,
+            "unitID": "w4:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "d",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.02,
+            "sourceEnd": 1.08,
+            "sourceStatus": "correct",
+            "expected": "d",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-12",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999606192112,
+                "expectedTokenProbability": 0.99939084053,
+                "logMargin": 9.292452965977,
+                "closestPhone": "z"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999606192112,
+                "expectedTokenProbability": 0.99939084053,
+                "logMargin": 9.292452965977,
+                "closestPhone": "z"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w4:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "w",
+          "ʊ",
+          "d"
+        ]
+      },
+      {
+        "id": "w5",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.08,
+            "end": 1.14,
+            "emissionStart": 1.12,
+            "emissionEnd": 1.14,
+            "windowStart": 54,
+            "windowEnd": 57,
+            "expectedProbability": 0.999637126923,
+            "expectedTokenProbability": 0.999637126923,
+            "expectedLogLikelihood": -0.000553650195,
+            "alternativeLogLikelihood": -8.971713769418,
+            "deletionLogLikelihood": -11.276061058044,
+            "logMargin": 8.971160119223,
+            "closestPhone": "mʲ",
+            "confidence": 0.999872995385,
+            "unitID": "w5:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "m",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.08,
+            "sourceEnd": 1.14,
+            "sourceStatus": "correct",
+            "expected": "m",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-13",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999637126923,
+                "expectedTokenProbability": 0.999637126923,
+                "logMargin": 8.971160119223,
+                "closestPhone": "mʲ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999637126923,
+                "expectedTokenProbability": 0.999637126923,
+                "logMargin": 8.971160119223,
+                "closestPhone": "mʲ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w5:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.14,
+            "end": 1.24,
+            "emissionStart": 1.16,
+            "emissionEnd": 1.24,
+            "windowStart": 57,
+            "windowEnd": 62,
+            "expectedProbability": 0.955367684364,
+            "expectedTokenProbability": 0.955312013626,
+            "expectedLogLikelihood": -0.000660031666,
+            "alternativeLogLikelihood": -9.90016510051,
+            "deletionLogLikelihood": -20.429430007935,
+            "logMargin": 9.899505068844,
+            "closestPhone": "e",
+            "confidence": 0.999949802999,
+            "unitID": "w5:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "e ɪ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.14,
+            "sourceEnd": 1.24,
+            "sourceStatus": "correct",
+            "expected": "eɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-14",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.955367684364,
+                "expectedTokenProbability": 0.955312013626,
+                "logMargin": 9.899505068844,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.955367684364,
+                "expectedTokenProbability": 0.955312013626,
+                "logMargin": 9.899505068844,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w5:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.24,
+            "end": 1.32,
+            "emissionStart": 1.26,
+            "emissionEnd": 1.28,
+            "windowStart": 62,
+            "windowEnd": 66,
+            "expectedProbability": 0.99993288517,
+            "expectedTokenProbability": 0.999930381775,
+            "expectedLogLikelihood": -0.000929156336,
+            "alternativeLogLikelihood": -10.95560476506,
+            "deletionLogLikelihood": -10.820656776428,
+            "logMargin": 10.819727620092,
+            "closestPhone": "ɡ",
+            "confidence": 0.999979999387,
+            "unitID": "w5:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "k",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.24,
+            "sourceEnd": 1.32,
+            "sourceStatus": "correct",
+            "expected": "k",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-15",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99993288517,
+                "expectedTokenProbability": 0.999930381775,
+                "logMargin": 10.819727620092,
+                "closestPhone": "ɡ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99993288517,
+                "expectedTokenProbability": 0.999930381775,
+                "logMargin": 10.819727620092,
+                "closestPhone": "ɡ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w5:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "m",
+          "eɪ",
+          "k"
+        ]
+      },
+      {
+        "id": "w6",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.32,
+            "end": 1.42,
+            "emissionStart": 1.38,
+            "emissionEnd": 1.4,
+            "windowStart": 66,
+            "windowEnd": 71,
+            "expectedProbability": 0.999840497971,
+            "expectedTokenProbability": 0.999840497971,
+            "expectedLogLikelihood": -0.00036659163,
+            "alternativeLogLikelihood": -10.711268514349,
+            "deletionLogLikelihood": -9.704073905945,
+            "logMargin": 9.703707314315,
+            "closestPhone": "z",
+            "confidence": 0.999938947009,
+            "unitID": "w6:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "s",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.32,
+            "sourceEnd": 1.42,
+            "sourceStatus": "correct",
+            "expected": "s",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-16",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999840497971,
+                "expectedTokenProbability": 0.999840497971,
+                "logMargin": 9.703707314315,
+                "closestPhone": "z"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999840497971,
+                "expectedTokenProbability": 0.999840497971,
+                "logMargin": 9.703707314315,
+                "closestPhone": "z"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w6:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.42,
+            "end": 1.48,
+            "emissionStart": 1.44,
+            "emissionEnd": 1.46,
+            "windowStart": 71,
+            "windowEnd": 74,
+            "expectedProbability": 0.980468153954,
+            "expectedTokenProbability": 0.980468034744,
+            "expectedLogLikelihood": -0.01973253321,
+            "alternativeLogLikelihood": -3.972054459157,
+            "deletionLogLikelihood": -10.55401134491,
+            "logMargin": 3.952321925947,
+            "closestPhone": "ə",
+            "confidence": 0.981152024816,
+            "unitID": "w6:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ʌ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.42,
+            "sourceEnd": 1.48,
+            "sourceStatus": "correct",
+            "expected": "ʌ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-17",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.980468153954,
+                "expectedTokenProbability": 0.980468034744,
+                "logMargin": 3.952321925947,
+                "closestPhone": "ə"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.980468153954,
+                "expectedTokenProbability": 0.980468034744,
+                "logMargin": 3.952321925947,
+                "closestPhone": "ə"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w6:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.48,
+            "end": 1.6,
+            "emissionStart": 1.52,
+            "emissionEnd": 1.58,
+            "windowStart": 74,
+            "windowEnd": 80,
+            "expectedProbability": 0.984988689423,
+            "expectedTokenProbability": 0.984981715679,
+            "expectedLogLikelihood": -0.000692251723,
+            "alternativeLogLikelihood": -9.017509868967,
+            "deletionLogLikelihood": -19.535306930542,
+            "logMargin": 9.016817617244,
+            "closestPhone": "ʃ",
+            "confidence": 0.999878663024,
+            "unitID": "w6:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t ʃ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.48,
+            "sourceEnd": 1.6,
+            "sourceStatus": "correct",
+            "expected": "tʃ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-18",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.984988689423,
+                "expectedTokenProbability": 0.984981715679,
+                "logMargin": 9.016817617244,
+                "closestPhone": "ʃ"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.984988689423,
+                "expectedTokenProbability": 0.984981715679,
+                "logMargin": 9.016817617244,
+                "closestPhone": "ʃ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w6:2",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "s",
+          "ʌ",
+          "tʃ"
+        ]
+      },
+      {
+        "id": "w7",
+        "phones": [
+          {
+            "status": "correct",
+            "reason": null,
+            "start": 1.6,
+            "end": 1.66,
+            "emissionStart": 1.62,
+            "emissionEnd": 1.64,
+            "windowStart": 80,
+            "windowEnd": 83,
+            "expectedProbability": 0.986920952797,
+            "expectedTokenProbability": 0.986920595169,
+            "expectedLogLikelihood": -0.022857076123,
+            "alternativeLogLikelihood": -4.487759780444,
+            "deletionLogLikelihood": -7.322982788086,
+            "logMargin": 4.46490270432,
+            "closestPhone": "e",
+            "confidence": 0.988625062754,
+            "unitID": "w7:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ə",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.6,
+            "sourceEnd": 1.66,
+            "sourceStatus": "correct",
+            "expected": "ə",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-19",
+              "state": "SUPPORTED",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.986920952797,
+                "expectedTokenProbability": 0.986920595169,
+                "logMargin": 4.46490270432,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.986920952797,
+                "expectedTokenProbability": 0.986920595169,
+                "logMargin": 4.46490270432,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w7:0",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "ə"
+        ]
+      },
+      {
+        "id": "w8",
+        "phones": [
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 1.66,
+            "end": 1.74,
+            "emissionStart": 1.7,
+            "emissionEnd": 1.72,
+            "windowStart": 83,
+            "windowEnd": 87,
+            "expectedProbability": 0.99983561039,
+            "expectedTokenProbability": 0.999493360519,
+            "expectedLogLikelihood": -0.079886451056,
+            "alternativeLogLikelihood": -10.259612273632,
+            "deletionLogLikelihood": -10.480241775513,
+            "logMargin": 10.179725822576,
+            "closestPhone": "tʰ",
+            "confidence": 0.999962069831,
+            "unitID": "w8:0",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "t",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.66,
+            "sourceEnd": 1.74,
+            "sourceStatus": "correct",
+            "expected": "d",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-20",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99983561039,
+                "expectedTokenProbability": 0.999493360519,
+                "logMargin": 10.179725822576,
+                "closestPhone": "tʰ"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.99983561039,
+                "expectedTokenProbability": 0.999493360519,
+                "logMargin": 10.179725822576,
+                "closestPhone": "tʰ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:0",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 1.74,
+            "end": 1.8,
+            "emissionStart": 1.76,
+            "emissionEnd": 1.78,
+            "windowStart": 87,
+            "windowEnd": 90,
+            "expectedProbability": 0.999706089497,
+            "expectedTokenProbability": 0.999701321125,
+            "expectedLogLikelihood": -0.000385011397,
+            "alternativeLogLikelihood": -8.383514413848,
+            "deletionLogLikelihood": -12.024978637695,
+            "logMargin": 8.383129402451,
+            "closestPhone": "e",
+            "confidence": 0.999771359137,
+            "unitID": "w8:1",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ɪ",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.74,
+            "sourceEnd": 1.8,
+            "sourceStatus": "correct",
+            "expected": "ɪ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-21",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999706089497,
+                "expectedTokenProbability": 0.999701321125,
+                "logMargin": 8.383129402451,
+                "closestPhone": "e"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.999706089497,
+                "expectedTokenProbability": 0.999701321125,
+                "logMargin": 8.383129402451,
+                "closestPhone": "e"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:1",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 1.8,
+            "end": 1.88,
+            "emissionStart": 1.84,
+            "emissionEnd": 1.86,
+            "windowStart": 90,
+            "windowEnd": 94,
+            "expectedProbability": 0.999621748924,
+            "expectedTokenProbability": 0.999621748924,
+            "expectedLogLikelihood": -0.000676080131,
+            "alternativeLogLikelihood": -10.958671555646,
+            "deletionLogLikelihood": -8.781169891357,
+            "logMargin": 8.780493811226,
+            "closestPhone": "θ",
+            "confidence": 0.999846321454,
+            "unitID": "w8:2",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "f",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.8,
+            "sourceEnd": 1.88,
+            "sourceStatus": "correct",
+            "expected": "f",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-22",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999621748924,
+                "expectedTokenProbability": 0.999621748924,
+                "logMargin": 8.780493811226,
+                "closestPhone": "θ"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.999621748924,
+                "expectedTokenProbability": 0.999621748924,
+                "logMargin": 8.780493811226,
+                "closestPhone": "θ"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:2",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceWeak",
+            "start": 1.88,
+            "end": 1.96,
+            "emissionStart": 1.92,
+            "emissionEnd": 1.94,
+            "windowStart": 94,
+            "windowEnd": 98,
+            "expectedProbability": 0.749199032784,
+            "expectedTokenProbability": 0.749199032784,
+            "expectedLogLikelihood": -0.290191333747,
+            "alternativeLogLikelihood": -1.411357702168,
+            "deletionLogLikelihood": -7.026673316956,
+            "logMargin": 1.121166368421,
+            "closestPhone": "ə˞",
+            "confidence": 0.754205001717,
+            "unitID": "w8:3",
+            "licence": "weak",
+            "licensedRealization": null,
+            "referenceRealization": "ɹ",
+            "referenceStatus": "uncertain",
+            "takeStatus": "uncertain",
+            "takeReason": "ambiguous",
+            "referenceMatch": true,
+            "sourceStart": 1.88,
+            "sourceEnd": 1.96,
+            "sourceStatus": "uncertain",
+            "expected": "ɹ",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-23",
+              "state": "REFERENCE_WEAK",
+              "sourceHypothesis": {
+                "status": "uncertain",
+                "reason": "ambiguous",
+                "expectedProbability": 0.749199032784,
+                "expectedTokenProbability": 0.749199032784,
+                "logMargin": 1.121166368421,
+                "closestPhone": "ə˞"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceWeak",
+                "expectedProbability": 0.749199032784,
+                "expectedTokenProbability": 0.749199032784,
+                "logMargin": 1.121166368421,
+                "closestPhone": "ə˞"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:3",
+              "licence": "weak"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 1.96,
+            "end": 2.06,
+            "emissionStart": 2.0,
+            "emissionEnd": 2.02,
+            "windowStart": 98,
+            "windowEnd": 103,
+            "expectedProbability": 0.999548912048,
+            "expectedTokenProbability": 0.999547660351,
+            "expectedLogLikelihood": -0.000634815713,
+            "alternativeLogLikelihood": -8.188979087241,
+            "deletionLogLikelihood": -9.656952857971,
+            "logMargin": 8.188344271528,
+            "closestPhone": "ɛ̃",
+            "confidence": 0.999722203606,
+            "unitID": "w8:4",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "ə",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 1.96,
+            "sourceEnd": 2.06,
+            "sourceStatus": "correct",
+            "expected": "ə",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-24",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999548912048,
+                "expectedTokenProbability": 0.999547660351,
+                "logMargin": 8.188344271528,
+                "closestPhone": "ɛ̃"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.999548912048,
+                "expectedTokenProbability": 0.999547660351,
+                "logMargin": 8.188344271528,
+                "closestPhone": "ɛ̃"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:4",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 2.06,
+            "end": 2.18,
+            "emissionStart": 2.1,
+            "emissionEnd": 2.12,
+            "windowStart": 103,
+            "windowEnd": 109,
+            "expectedProbability": 0.999727427959,
+            "expectedTokenProbability": 0.999727427959,
+            "expectedLogLikelihood": -0.000654710817,
+            "alternativeLogLikelihood": -9.475518343055,
+            "deletionLogLikelihood": -9.78289604187,
+            "logMargin": 9.474863632239,
+            "closestPhone": "m",
+            "confidence": 0.999923248712,
+            "unitID": "w8:5",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "n",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 2.06,
+            "sourceEnd": 2.18,
+            "sourceStatus": "correct",
+            "expected": "n",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-25",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.999727427959,
+                "expectedTokenProbability": 0.999727427959,
+                "logMargin": 9.474863632239,
+                "closestPhone": "m"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.999727427959,
+                "expectedTokenProbability": 0.999727427959,
+                "logMargin": 9.474863632239,
+                "closestPhone": "m"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:5",
+              "licence": "accepted"
+            }
+          },
+          {
+            "status": "uncertain",
+            "reason": "referenceNotConfident",
+            "start": 2.18,
+            "end": 2.26,
+            "emissionStart": 2.24,
+            "emissionEnd": 2.26,
+            "windowStart": 109,
+            "windowEnd": 113,
+            "expectedProbability": 0.99774736166,
+            "expectedTokenProbability": 0.99774736166,
+            "expectedLogLikelihood": -0.002360362678,
+            "alternativeLogLikelihood": -6.784479656724,
+            "deletionLogLikelihood": -8.826041221619,
+            "logMargin": 6.782119294046,
+            "closestPhone": "z",
+            "confidence": 0.998867414856,
+            "unitID": "w8:6",
+            "licence": "accepted",
+            "licensedRealization": null,
+            "referenceRealization": "s",
+            "referenceStatus": "correct",
+            "takeStatus": "correct",
+            "takeReason": null,
+            "referenceMatch": true,
+            "sourceStart": 2.18,
+            "sourceEnd": 2.26,
+            "sourceStatus": "correct",
+            "expected": "s",
+            "shared": false,
+            "diagnostic": {
+              "groupID": "group-26",
+              "state": "INSUFFICIENT_EVIDENCE",
+              "sourceHypothesis": {
+                "status": "correct",
+                "reason": null,
+                "expectedProbability": 0.99774736166,
+                "expectedTokenProbability": 0.99774736166,
+                "logMargin": 6.782119294046,
+                "closestPhone": "z"
+              },
+              "takeHypothesis": {
+                "status": "uncertain",
+                "reason": "referenceNotConfident",
+                "expectedProbability": 0.99774736166,
+                "expectedTokenProbability": 0.99774736166,
+                "logMargin": 6.782119294046,
+                "closestPhone": "z"
+              },
+              "lengthStatus": "NOT_SEPARATELY_ASSESSED",
+              "unitID": "w8:6",
+              "licence": "accepted"
+            }
+          }
+        ],
+        "variant": [
+          "d",
+          "ɪ",
+          "f",
+          "ɹ",
+          "ə",
+          "n",
+          "s"
+        ]
+      }
+    ],
+    "coverage": {
+      "total": 27,
+      "scored": 20,
+      "correct": 20,
+      "incorrect": 0,
+      "unassessed": 7,
+      "coverage": 0.740740740741
+    },
+    "reference": {
+      "policy": "xeus-reference-diagnostics-v2",
+      "groups": [
+        {
+          "id": "group-0",
+          "members": [
+            {
+              "wordID": "w0",
+              "phoneIndex": 0,
+              "displayPhone": "aɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 3,
+            "endFrame": 9,
+            "start": 0.06,
+            "end": 0.18,
+            "tokens": [
+              {
+                "symbol": "a",
+                "startFrame": 3,
+                "endFrame": 4,
+                "posterior": 0.994720697403
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 6,
+                "endFrame": 7,
+                "posterior": 0.998498678207
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.615610182285,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.499255090952
+              },
+              {
+                "symbol": "a",
+                "posterior": 0.497361123562
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.000105052197
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 3,
+            "endFrame": 9,
+            "start": 0.06,
+            "end": 0.18,
+            "tokens": [
+              {
+                "symbol": "a",
+                "startFrame": 3,
+                "endFrame": 4,
+                "posterior": 0.994720697403
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 6,
+                "endFrame": 7,
+                "posterior": 0.998498678207
+              }
+            ],
+            "speechFrames": 2,
+            "blankMean": 0.615610182285,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.499255090952
+              },
+              {
+                "symbol": "a",
+                "posterior": 0.497361123562
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.000105052197
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 2,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-1",
+          "members": [
+            {
+              "wordID": "w1",
+              "phoneIndex": 0,
+              "displayPhone": "n"
+            }
+          ],
+          "source": {
+            "startFrame": 9,
+            "endFrame": 13,
+            "start": 0.18,
+            "end": 0.26,
+            "tokens": [
+              {
+                "symbol": "n",
+                "startFrame": 11,
+                "endFrame": 12,
+                "posterior": 0.99969124794
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.747590184212,
+            "topCandidates": [
+              {
+                "symbol": "n",
+                "posterior": 0.99969124794
+              },
+              {
+                "symbol": "m",
+                "posterior": 3.6672343e-05
+              },
+              {
+                "symbol": "nʲ",
+                "posterior": 2.4311958e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 9,
+            "endFrame": 13,
+            "start": 0.18,
+            "end": 0.26,
+            "tokens": [
+              {
+                "symbol": "n",
+                "startFrame": 11,
+                "endFrame": 12,
+                "posterior": 0.99969124794
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.747590184212,
+            "topCandidates": [
+              {
+                "symbol": "n",
+                "posterior": 0.99969124794
+              },
+              {
+                "symbol": "m",
+                "posterior": 3.6672343e-05
+              },
+              {
+                "symbol": "nʲ",
+                "posterior": 2.4311958e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-2",
+          "members": [
+            {
+              "wordID": "w1",
+              "phoneIndex": 1,
+              "displayPhone": "ɛ"
+            }
+          ],
+          "source": {
+            "startFrame": 13,
+            "endFrame": 16,
+            "start": 0.26,
+            "end": 0.32,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 14,
+                "endFrame": 15,
+                "posterior": 0.99985575676
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.66659039259,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.99985575676
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 2.3435654e-05
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 1.9810963e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 13,
+            "endFrame": 16,
+            "start": 0.26,
+            "end": 0.32,
+            "tokens": [
+              {
+                "symbol": "ɛ",
+                "startFrame": 14,
+                "endFrame": 15,
+                "posterior": 0.99985575676
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.66659039259,
+            "topCandidates": [
+              {
+                "symbol": "ɛ",
+                "posterior": 0.99985575676
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 2.3435654e-05
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 1.9810963e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-3",
+          "members": [
+            {
+              "wordID": "w1",
+              "phoneIndex": 2,
+              "displayPhone": "v"
+            }
+          ],
+          "source": {
+            "startFrame": 16,
+            "endFrame": 19,
+            "start": 0.32,
+            "end": 0.38,
+            "tokens": [
+              {
+                "symbol": "v",
+                "startFrame": 18,
+                "endFrame": 19,
+                "posterior": 0.999696612358
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666642248631,
+            "topCandidates": [
+              {
+                "symbol": "v",
+                "posterior": 0.999696612358
+              },
+              {
+                "symbol": "f",
+                "posterior": 7.4064068e-05
+              },
+              {
+                "symbol": "ð",
+                "posterior": 2.526424e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 16,
+            "endFrame": 19,
+            "start": 0.32,
+            "end": 0.38,
+            "tokens": [
+              {
+                "symbol": "v",
+                "startFrame": 18,
+                "endFrame": 19,
+                "posterior": 0.999696612358
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666642248631,
+            "topCandidates": [
+              {
+                "symbol": "v",
+                "posterior": 0.999696612358
+              },
+              {
+                "symbol": "f",
+                "posterior": 7.4064068e-05
+              },
+              {
+                "symbol": "ð",
+                "posterior": 2.526424e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-4",
+          "members": [
+            {
+              "wordID": "w1",
+              "phoneIndex": 3,
+              "displayPhone": "ə"
+            }
+          ],
+          "source": {
+            "startFrame": 19,
+            "endFrame": 23,
+            "start": 0.38,
+            "end": 0.46,
+            "tokens": [
+              {
+                "symbol": "ə˞",
+                "startFrame": 20,
+                "endFrame": 21,
+                "posterior": 0.978827357292
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.749959826469,
+            "topCandidates": [
+              {
+                "symbol": "ə˞",
+                "posterior": 0.978827357292
+              },
+              {
+                "symbol": "ɜ˞",
+                "posterior": 0.020310672
+              },
+              {
+                "symbol": "ɹ",
+                "posterior": 0.000666060019
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 19,
+            "endFrame": 23,
+            "start": 0.38,
+            "end": 0.46,
+            "tokens": [
+              {
+                "symbol": "ə˞",
+                "startFrame": 20,
+                "endFrame": 21,
+                "posterior": 0.978827357292
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.749959826469,
+            "topCandidates": [
+              {
+                "symbol": "ə˞",
+                "posterior": 0.978827357292
+              },
+              {
+                "symbol": "ɜ˞",
+                "posterior": 0.020310672
+              },
+              {
+                "symbol": "ɹ",
+                "posterior": 0.000666060019
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-5",
+          "members": [
+            {
+              "wordID": "w2",
+              "phoneIndex": 0,
+              "displayPhone": "θ"
+            }
+          ],
+          "source": {
+            "startFrame": 23,
+            "endFrame": 28,
+            "start": 0.46,
+            "end": 0.56,
+            "tokens": [
+              {
+                "symbol": "θ",
+                "startFrame": 26,
+                "endFrame": 27,
+                "posterior": 0.999720275402
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.79999089241,
+            "topCandidates": [
+              {
+                "symbol": "θ",
+                "posterior": 0.999720275402
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 9.9213546e-05
+              },
+              {
+                "symbol": "f",
+                "posterior": 6.740183e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 23,
+            "endFrame": 28,
+            "start": 0.46,
+            "end": 0.56,
+            "tokens": [
+              {
+                "symbol": "θ",
+                "startFrame": 26,
+                "endFrame": 27,
+                "posterior": 0.999720275402
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.79999089241,
+            "topCandidates": [
+              {
+                "symbol": "θ",
+                "posterior": 0.999720275402
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 9.9213546e-05
+              },
+              {
+                "symbol": "f",
+                "posterior": 6.740183e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-6",
+          "members": [
+            {
+              "wordID": "w2",
+              "phoneIndex": 1,
+              "displayPhone": "ɔː"
+            }
+          ],
+          "source": {
+            "startFrame": 28,
+            "endFrame": 34,
+            "start": 0.56,
+            "end": 0.68,
+            "tokens": [
+              {
+                "symbol": "ɔ",
+                "startFrame": 30,
+                "endFrame": 31,
+                "posterior": 0.999933481216
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.828113734722,
+            "topCandidates": [
+              {
+                "symbol": "ɔ",
+                "posterior": 0.999933481216
+              },
+              {
+                "symbol": "ɑ",
+                "posterior": 1.395868e-05
+              },
+              {
+                "symbol": "o",
+                "posterior": 1.0056572e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 28,
+            "endFrame": 34,
+            "start": 0.56,
+            "end": 0.68,
+            "tokens": [
+              {
+                "symbol": "ɔ",
+                "startFrame": 30,
+                "endFrame": 31,
+                "posterior": 0.999933481216
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.828113734722,
+            "topCandidates": [
+              {
+                "symbol": "ɔ",
+                "posterior": 0.999933481216
+              },
+              {
+                "symbol": "ɑ",
+                "posterior": 1.395868e-05
+              },
+              {
+                "symbol": "o",
+                "posterior": 1.0056572e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-7",
+          "members": [
+            {
+              "wordID": "w2",
+              "phoneIndex": 2,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 34,
+            "endFrame": 39,
+            "start": 0.68,
+            "end": 0.78,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 37,
+                "endFrame": 38,
+                "posterior": 0.999686360359
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.783163666725,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999686360359
+              },
+              {
+                "symbol": "d",
+                "posterior": 2.2657412e-05
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 1.5486374e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 34,
+            "endFrame": 39,
+            "start": 0.68,
+            "end": 0.78,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 37,
+                "endFrame": 38,
+                "posterior": 0.999686360359
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.783163666725,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999686360359
+              },
+              {
+                "symbol": "d",
+                "posterior": 2.2657412e-05
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 1.5486374e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-8",
+          "members": [
+            {
+              "wordID": "w3",
+              "phoneIndex": 0,
+              "displayPhone": "ɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 39,
+            "endFrame": 42,
+            "start": 0.78,
+            "end": 0.84,
+            "tokens": [
+              {
+                "symbol": "ɪ",
+                "startFrame": 40,
+                "endFrame": 41,
+                "posterior": 0.999883770943
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.665273606777,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.999883770943
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 2.582388e-05
+              },
+              {
+                "symbol": "i",
+                "posterior": 2.2763972e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 39,
+            "endFrame": 42,
+            "start": 0.78,
+            "end": 0.84,
+            "tokens": [
+              {
+                "symbol": "ɪ",
+                "startFrame": 40,
+                "endFrame": 41,
+                "posterior": 0.999883770943
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.665273606777,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.999883770943
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 2.582388e-05
+              },
+              {
+                "symbol": "i",
+                "posterior": 2.2763972e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-9",
+          "members": [
+            {
+              "wordID": "w3",
+              "phoneIndex": 1,
+              "displayPhone": "t"
+            }
+          ],
+          "source": {
+            "startFrame": 42,
+            "endFrame": 45,
+            "start": 0.84,
+            "end": 0.9,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 43,
+                "endFrame": 44,
+                "posterior": 0.999653697014
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.662453472614,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999653697014
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000207781806
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 2.1848911e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 42,
+            "endFrame": 45,
+            "start": 0.84,
+            "end": 0.9,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 43,
+                "endFrame": 44,
+                "posterior": 0.999653697014
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.662453472614,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999653697014
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000207781806
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 2.1848911e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-10",
+          "members": [
+            {
+              "wordID": "w4",
+              "phoneIndex": 0,
+              "displayPhone": "w"
+            }
+          ],
+          "source": {
+            "startFrame": 45,
+            "endFrame": 48,
+            "start": 0.9,
+            "end": 0.96,
+            "tokens": [
+              {
+                "symbol": "w",
+                "startFrame": 47,
+                "endFrame": 48,
+                "posterior": 0.999733746052
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.652892827988,
+            "topCandidates": [
+              {
+                "symbol": "w",
+                "posterior": 0.999733746052
+              },
+              {
+                "symbol": "ʊ",
+                "posterior": 5.8812137e-05
+              },
+              {
+                "symbol": "ɹ",
+                "posterior": 2.2368407e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 45,
+            "endFrame": 48,
+            "start": 0.9,
+            "end": 0.96,
+            "tokens": [
+              {
+                "symbol": "w",
+                "startFrame": 47,
+                "endFrame": 48,
+                "posterior": 0.999733746052
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.652892827988,
+            "topCandidates": [
+              {
+                "symbol": "w",
+                "posterior": 0.999733746052
+              },
+              {
+                "symbol": "ʊ",
+                "posterior": 5.8812137e-05
+              },
+              {
+                "symbol": "ɹ",
+                "posterior": 2.2368407e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-11",
+          "members": [
+            {
+              "wordID": "w4",
+              "phoneIndex": 1,
+              "displayPhone": "ʊ"
+            }
+          ],
+          "source": {
+            "startFrame": 48,
+            "endFrame": 51,
+            "start": 0.96,
+            "end": 1.02,
+            "tokens": [
+              {
+                "symbol": "ʊ",
+                "startFrame": 49,
+                "endFrame": 50,
+                "posterior": 0.999588549137
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666248142719,
+            "topCandidates": [
+              {
+                "symbol": "ʊ",
+                "posterior": 0.999588549137
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.000179930808
+              },
+              {
+                "symbol": "u",
+                "posterior": 5.2791762e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 48,
+            "endFrame": 51,
+            "start": 0.96,
+            "end": 1.02,
+            "tokens": [
+              {
+                "symbol": "ʊ",
+                "startFrame": 49,
+                "endFrame": 50,
+                "posterior": 0.999588549137
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666248142719,
+            "topCandidates": [
+              {
+                "symbol": "ʊ",
+                "posterior": 0.999588549137
+              },
+              {
+                "symbol": "ɪ",
+                "posterior": 0.000179930808
+              },
+              {
+                "symbol": "u",
+                "posterior": 5.2791762e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-12",
+          "members": [
+            {
+              "wordID": "w4",
+              "phoneIndex": 2,
+              "displayPhone": "d"
+            }
+          ],
+          "source": {
+            "startFrame": 51,
+            "endFrame": 54,
+            "start": 1.02,
+            "end": 1.08,
+            "tokens": [
+              {
+                "symbol": "d",
+                "startFrame": 52,
+                "endFrame": 53,
+                "posterior": 0.99939084053
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.664593756199,
+            "topCandidates": [
+              {
+                "symbol": "d",
+                "posterior": 0.99939084053
+              },
+              {
+                "symbol": "t",
+                "posterior": 0.000215361928
+              },
+              {
+                "symbol": "z",
+                "posterior": 9.2644383e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 51,
+            "endFrame": 54,
+            "start": 1.02,
+            "end": 1.08,
+            "tokens": [
+              {
+                "symbol": "d",
+                "startFrame": 52,
+                "endFrame": 53,
+                "posterior": 0.99939084053
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.664593756199,
+            "topCandidates": [
+              {
+                "symbol": "d",
+                "posterior": 0.99939084053
+              },
+              {
+                "symbol": "t",
+                "posterior": 0.000215361928
+              },
+              {
+                "symbol": "z",
+                "posterior": 9.2644383e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-13",
+          "members": [
+            {
+              "wordID": "w5",
+              "phoneIndex": 0,
+              "displayPhone": "m"
+            }
+          ],
+          "source": {
+            "startFrame": 54,
+            "endFrame": 57,
+            "start": 1.08,
+            "end": 1.14,
+            "tokens": [
+              {
+                "symbol": "m",
+                "startFrame": 56,
+                "endFrame": 57,
+                "posterior": 0.999637126923
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666470944881,
+            "topCandidates": [
+              {
+                "symbol": "m",
+                "posterior": 0.999637126923
+              },
+              {
+                "symbol": "mʲ",
+                "posterior": 0.000127026578
+              },
+              {
+                "symbol": "n",
+                "posterior": 0.000122989775
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 54,
+            "endFrame": 57,
+            "start": 1.08,
+            "end": 1.14,
+            "tokens": [
+              {
+                "symbol": "m",
+                "startFrame": 56,
+                "endFrame": 57,
+                "posterior": 0.999637126923
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666470944881,
+            "topCandidates": [
+              {
+                "symbol": "m",
+                "posterior": 0.999637126923
+              },
+              {
+                "symbol": "mʲ",
+                "posterior": 0.000127026578
+              },
+              {
+                "symbol": "n",
+                "posterior": 0.000122989775
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-14",
+          "members": [
+            {
+              "wordID": "w5",
+              "phoneIndex": 1,
+              "displayPhone": "eɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 57,
+            "endFrame": 62,
+            "start": 1.14,
+            "end": 1.24,
+            "tokens": [
+              {
+                "symbol": "e",
+                "startFrame": 58,
+                "endFrame": 59,
+                "posterior": 0.999861240387
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 60,
+                "endFrame": 62,
+                "posterior": 0.955312013626
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.414896577597,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.636878490448
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.333296626806
+              },
+              {
+                "symbol": "ʊ",
+                "posterior": 4.8988575e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 57,
+            "endFrame": 62,
+            "start": 1.14,
+            "end": 1.24,
+            "tokens": [
+              {
+                "symbol": "e",
+                "startFrame": 58,
+                "endFrame": 59,
+                "posterior": 0.999861240387
+              },
+              {
+                "symbol": "ɪ",
+                "startFrame": 60,
+                "endFrame": 62,
+                "posterior": 0.955312013626
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.414896577597,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.636878490448
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.333296626806
+              },
+              {
+                "symbol": "ʊ",
+                "posterior": 4.8988575e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 3,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-15",
+          "members": [
+            {
+              "wordID": "w5",
+              "phoneIndex": 2,
+              "displayPhone": "k"
+            }
+          ],
+          "source": {
+            "startFrame": 62,
+            "endFrame": 66,
+            "start": 1.24,
+            "end": 1.32,
+            "tokens": [
+              {
+                "symbol": "k",
+                "startFrame": 63,
+                "endFrame": 64,
+                "posterior": 0.999930381775
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.733653068542,
+            "topCandidates": [
+              {
+                "symbol": "k",
+                "posterior": 0.999930381775
+              },
+              {
+                "symbol": "ɡ",
+                "posterior": 1.8680168e-05
+              },
+              {
+                "symbol": "p",
+                "posterior": 6.162645e-06
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 62,
+            "endFrame": 66,
+            "start": 1.24,
+            "end": 1.32,
+            "tokens": [
+              {
+                "symbol": "k",
+                "startFrame": 63,
+                "endFrame": 64,
+                "posterior": 0.999930381775
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.733653068542,
+            "topCandidates": [
+              {
+                "symbol": "k",
+                "posterior": 0.999930381775
+              },
+              {
+                "symbol": "ɡ",
+                "posterior": 1.8680168e-05
+              },
+              {
+                "symbol": "p",
+                "posterior": 6.162645e-06
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-16",
+          "members": [
+            {
+              "wordID": "w6",
+              "phoneIndex": 0,
+              "displayPhone": "s"
+            }
+          ],
+          "source": {
+            "startFrame": 66,
+            "endFrame": 71,
+            "start": 1.32,
+            "end": 1.42,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 69,
+                "endFrame": 70,
+                "posterior": 0.999840497971
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.799851715565,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.999840497971
+              },
+              {
+                "symbol": "z",
+                "posterior": 2.2310012e-05
+              },
+              {
+                "symbol": "t͡s",
+                "posterior": 1.2785406e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 66,
+            "endFrame": 71,
+            "start": 1.32,
+            "end": 1.42,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 69,
+                "endFrame": 70,
+                "posterior": 0.999840497971
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.799851715565,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.999840497971
+              },
+              {
+                "symbol": "z",
+                "posterior": 2.2310012e-05
+              },
+              {
+                "symbol": "t͡s",
+                "posterior": 1.2785406e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-17",
+          "members": [
+            {
+              "wordID": "w6",
+              "phoneIndex": 1,
+              "displayPhone": "ʌ"
+            }
+          ],
+          "source": {
+            "startFrame": 71,
+            "endFrame": 74,
+            "start": 1.42,
+            "end": 1.48,
+            "tokens": [
+              {
+                "symbol": "ʌ",
+                "startFrame": 72,
+                "endFrame": 73,
+                "posterior": 0.980468034744
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666672885418,
+            "topCandidates": [
+              {
+                "symbol": "ʌ",
+                "posterior": 0.980468034744
+              },
+              {
+                "symbol": "ə",
+                "posterior": 0.018834814429
+              },
+              {
+                "symbol": "a",
+                "posterior": 0.000241140093
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 71,
+            "endFrame": 74,
+            "start": 1.42,
+            "end": 1.48,
+            "tokens": [
+              {
+                "symbol": "ʌ",
+                "startFrame": 72,
+                "endFrame": 73,
+                "posterior": 0.980468034744
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666672885418,
+            "topCandidates": [
+              {
+                "symbol": "ʌ",
+                "posterior": 0.980468034744
+              },
+              {
+                "symbol": "ə",
+                "posterior": 0.018834814429
+              },
+              {
+                "symbol": "a",
+                "posterior": 0.000241140093
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-18",
+          "members": [
+            {
+              "wordID": "w6",
+              "phoneIndex": 2,
+              "displayPhone": "tʃ"
+            }
+          ],
+          "source": {
+            "startFrame": 74,
+            "endFrame": 80,
+            "start": 1.48,
+            "end": 1.6,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 76,
+                "endFrame": 78,
+                "posterior": 0.984981715679
+              },
+              {
+                "symbol": "ʃ",
+                "startFrame": 78,
+                "endFrame": 79,
+                "posterior": 0.99969959259
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.504867136478,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.656655132771
+              },
+              {
+                "symbol": "ʃ",
+                "posterior": 0.333276003599
+              },
+              {
+                "symbol": "k",
+                "posterior": 3.6337657e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 74,
+            "endFrame": 80,
+            "start": 1.48,
+            "end": 1.6,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 76,
+                "endFrame": 78,
+                "posterior": 0.984981715679
+              },
+              {
+                "symbol": "ʃ",
+                "startFrame": 78,
+                "endFrame": 79,
+                "posterior": 0.99969959259
+              }
+            ],
+            "speechFrames": 3,
+            "blankMean": 0.504867136478,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.656655132771
+              },
+              {
+                "symbol": "ʃ",
+                "posterior": 0.333276003599
+              },
+              {
+                "symbol": "k",
+                "posterior": 3.6337657e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 3,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-19",
+          "members": [
+            {
+              "wordID": "w7",
+              "phoneIndex": 0,
+              "displayPhone": "ə"
+            }
+          ],
+          "source": {
+            "startFrame": 80,
+            "endFrame": 83,
+            "start": 1.6,
+            "end": 1.66,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 81,
+                "endFrame": 82,
+                "posterior": 0.986920595169
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.663385152817,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.986920595169
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.011363770813
+              },
+              {
+                "symbol": "æ̃",
+                "posterior": 0.000481816562
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 80,
+            "endFrame": 83,
+            "start": 1.6,
+            "end": 1.66,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 81,
+                "endFrame": 82,
+                "posterior": 0.986920595169
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.663385152817,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.986920595169
+              },
+              {
+                "symbol": "e",
+                "posterior": 0.011363770813
+              },
+              {
+                "symbol": "æ̃",
+                "posterior": 0.000481816562
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-20",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 0,
+              "displayPhone": "d"
+            }
+          ],
+          "source": {
+            "startFrame": 83,
+            "endFrame": 87,
+            "start": 1.66,
+            "end": 1.74,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 85,
+                "endFrame": 86,
+                "posterior": 0.999493360519
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.730721354485,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999493360519
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000342271087
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.7942358e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 83,
+            "endFrame": 87,
+            "start": 1.66,
+            "end": 1.74,
+            "tokens": [
+              {
+                "symbol": "t",
+                "startFrame": 85,
+                "endFrame": 86,
+                "posterior": 0.999493360519
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.730721354485,
+            "topCandidates": [
+              {
+                "symbol": "t",
+                "posterior": 0.999493360519
+              },
+              {
+                "symbol": "d",
+                "posterior": 0.000342271087
+              },
+              {
+                "symbol": "tʰ",
+                "posterior": 3.7942358e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-21",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 1,
+              "displayPhone": "ɪ"
+            }
+          ],
+          "source": {
+            "startFrame": 87,
+            "endFrame": 90,
+            "start": 1.74,
+            "end": 1.8,
+            "tokens": [
+              {
+                "symbol": "ɪ",
+                "startFrame": 88,
+                "endFrame": 89,
+                "posterior": 0.999701321125
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666547954082,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.999701321125
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.00022868732
+              },
+              {
+                "symbol": "ə",
+                "posterior": 9.162912e-06
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 87,
+            "endFrame": 90,
+            "start": 1.74,
+            "end": 1.8,
+            "tokens": [
+              {
+                "symbol": "ɪ",
+                "startFrame": 88,
+                "endFrame": 89,
+                "posterior": 0.999701321125
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.666547954082,
+            "topCandidates": [
+              {
+                "symbol": "ɪ",
+                "posterior": 0.999701321125
+              },
+              {
+                "symbol": "ɛ",
+                "posterior": 0.00022868732
+              },
+              {
+                "symbol": "ə",
+                "posterior": 9.162912e-06
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-22",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 2,
+              "displayPhone": "f"
+            }
+          ],
+          "source": {
+            "startFrame": 90,
+            "endFrame": 94,
+            "start": 1.8,
+            "end": 1.88,
+            "tokens": [
+              {
+                "symbol": "f",
+                "startFrame": 92,
+                "endFrame": 93,
+                "posterior": 0.999621748924
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.658145666122,
+            "topCandidates": [
+              {
+                "symbol": "f",
+                "posterior": 0.999621748924
+              },
+              {
+                "symbol": "θ",
+                "posterior": 2.7514739e-05
+              },
+              {
+                "symbol": "fʲ",
+                "posterior": 2.2824708e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 90,
+            "endFrame": 94,
+            "start": 1.8,
+            "end": 1.88,
+            "tokens": [
+              {
+                "symbol": "f",
+                "startFrame": 92,
+                "endFrame": 93,
+                "posterior": 0.999621748924
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.658145666122,
+            "topCandidates": [
+              {
+                "symbol": "f",
+                "posterior": 0.999621748924
+              },
+              {
+                "symbol": "θ",
+                "posterior": 2.7514739e-05
+              },
+              {
+                "symbol": "fʲ",
+                "posterior": 2.2824708e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-23",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 3,
+              "displayPhone": "ɹ"
+            }
+          ],
+          "source": {
+            "startFrame": 94,
+            "endFrame": 98,
+            "start": 1.88,
+            "end": 1.96,
+            "tokens": [
+              {
+                "symbol": "ɹ",
+                "startFrame": 96,
+                "endFrame": 97,
+                "posterior": 0.749199032784
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.747092366219,
+            "topCandidates": [
+              {
+                "symbol": "ɹ",
+                "posterior": 0.749199032784
+              },
+              {
+                "symbol": "ə˞",
+                "posterior": 0.246881335974
+              },
+              {
+                "symbol": "ɜ˞",
+                "posterior": 0.00152072683
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 94,
+            "endFrame": 98,
+            "start": 1.88,
+            "end": 1.96,
+            "tokens": [
+              {
+                "symbol": "ɹ",
+                "startFrame": 96,
+                "endFrame": 97,
+                "posterior": 0.749199032784
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.747092366219,
+            "topCandidates": [
+              {
+                "symbol": "ɹ",
+                "posterior": 0.749199032784
+              },
+              {
+                "symbol": "ə˞",
+                "posterior": 0.246881335974
+              },
+              {
+                "symbol": "ɜ˞",
+                "posterior": 0.00152072683
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-24",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 4,
+              "displayPhone": "ə"
+            }
+          ],
+          "source": {
+            "startFrame": 98,
+            "endFrame": 103,
+            "start": 1.96,
+            "end": 2.06,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 100,
+                "endFrame": 101,
+                "posterior": 0.999547660351
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.798830389977,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.999547660351
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 0.00027934619
+              },
+              {
+                "symbol": "ɪ̃",
+                "posterior": 3.1906246e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 98,
+            "endFrame": 103,
+            "start": 1.96,
+            "end": 2.06,
+            "tokens": [
+              {
+                "symbol": "ə",
+                "startFrame": 100,
+                "endFrame": 101,
+                "posterior": 0.999547660351
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.798830389977,
+            "topCandidates": [
+              {
+                "symbol": "ə",
+                "posterior": 0.999547660351
+              },
+              {
+                "symbol": "ɛ̃",
+                "posterior": 0.00027934619
+              },
+              {
+                "symbol": "ɪ̃",
+                "posterior": 3.1906246e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-25",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 5,
+              "displayPhone": "n"
+            }
+          ],
+          "source": {
+            "startFrame": 103,
+            "endFrame": 109,
+            "start": 2.06,
+            "end": 2.18,
+            "tokens": [
+              {
+                "symbol": "n",
+                "startFrame": 105,
+                "endFrame": 106,
+                "posterior": 0.999727427959
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.771451771259,
+            "topCandidates": [
+              {
+                "symbol": "n",
+                "posterior": 0.999727427959
+              },
+              {
+                "symbol": "m",
+                "posterior": 0.000121989717
+              },
+              {
+                "symbol": "ŋ",
+                "posterior": 1.4923725e-05
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 103,
+            "endFrame": 109,
+            "start": 2.06,
+            "end": 2.18,
+            "tokens": [
+              {
+                "symbol": "n",
+                "startFrame": 105,
+                "endFrame": 106,
+                "posterior": 0.999727427959
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.771451771259,
+            "topCandidates": [
+              {
+                "symbol": "n",
+                "posterior": 0.999727427959
+              },
+              {
+                "symbol": "m",
+                "posterior": 0.000121989717
+              },
+              {
+                "symbol": "ŋ",
+                "posterior": 1.4923725e-05
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        },
+        {
+          "id": "group-26",
+          "members": [
+            {
+              "wordID": "w8",
+              "phoneIndex": 6,
+              "displayPhone": "s"
+            }
+          ],
+          "source": {
+            "startFrame": 109,
+            "endFrame": 113,
+            "start": 2.18,
+            "end": 2.26,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 112,
+                "endFrame": 113,
+                "posterior": 0.99774736166
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.749228000641,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.99774736166
+              },
+              {
+                "symbol": "z",
+                "posterior": 0.001134861377
+              },
+              {
+                "symbol": "t͡s",
+                "posterior": 0.000490703562
+              }
+            ]
+          },
+          "take": {
+            "startFrame": 109,
+            "endFrame": 113,
+            "start": 2.18,
+            "end": 2.26,
+            "tokens": [
+              {
+                "symbol": "s",
+                "startFrame": 112,
+                "endFrame": 113,
+                "posterior": 0.99774736166
+              }
+            ],
+            "speechFrames": 1,
+            "blankMean": 0.749228000641,
+            "topCandidates": [
+              {
+                "symbol": "s",
+                "posterior": 0.99774736166
+              },
+              {
+                "symbol": "z",
+                "posterior": 0.001134861377
+              },
+              {
+                "symbol": "t͡s",
+                "posterior": 0.000490703562
+              }
+            ]
+          },
+          "shared": false,
+          "comparison": {
+            "state": "UNCALIBRATED",
+            "jsDistance": 0.0,
+            "pathSteps": 1,
+            "sequenceEditDistance": 0
+          }
+        }
+      ]
+    },
+    "contrastHead": {
+      "version": "uk-contrast-head-v1",
+      "layer": 13,
+      "contrasts": [
+        "ɑː-æ",
+        "ɒ-ɑ",
+        "ɒ-ɔː"
+      ],
+      "sha256": "bc186e6836a8a0ec368f346d36dca7d42434a0e46f4b2e20a71d6b897ea7bee7"
+    },
+    "thresholds": {
+      "support": 0.3,
+      "margin": 1.386294,
+      "entropy": 0.55,
+      "competitor": 1.8,
+      "strength": 0.65
+    },
+    "calibration": "native-zero-false-sai-v1",
+    "sourceRecognizedPhones": [
+      {
+        "symbol": "a",
+        "start": 0.06,
+        "end": 0.08,
+        "posterior": 0.994720697403
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.12,
+        "end": 0.14,
+        "posterior": 0.998498678207
+      },
+      {
+        "symbol": "n",
+        "start": 0.22,
+        "end": 0.24,
+        "posterior": 0.99969124794
+      },
+      {
+        "symbol": "ɛ",
+        "start": 0.28,
+        "end": 0.3,
+        "posterior": 0.99985575676
+      },
+      {
+        "symbol": "v",
+        "start": 0.36,
+        "end": 0.38,
+        "posterior": 0.999696612358
+      },
+      {
+        "symbol": "ə˞",
+        "start": 0.4,
+        "end": 0.42,
+        "posterior": 0.978827357292
+      },
+      {
+        "symbol": "θ",
+        "start": 0.52,
+        "end": 0.54,
+        "posterior": 0.999720275402
+      },
+      {
+        "symbol": "ɔ",
+        "start": 0.6,
+        "end": 0.62,
+        "posterior": 0.999933481216
+      },
+      {
+        "symbol": "t",
+        "start": 0.74,
+        "end": 0.76,
+        "posterior": 0.999686360359
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.8,
+        "end": 0.82,
+        "posterior": 0.999883770943
+      },
+      {
+        "symbol": "t",
+        "start": 0.86,
+        "end": 0.88,
+        "posterior": 0.999653697014
+      },
+      {
+        "symbol": "w",
+        "start": 0.94,
+        "end": 0.96,
+        "posterior": 0.999733746052
+      },
+      {
+        "symbol": "ʊ",
+        "start": 0.98,
+        "end": 1.0,
+        "posterior": 0.999588549137
+      },
+      {
+        "symbol": "d",
+        "start": 1.04,
+        "end": 1.06,
+        "posterior": 0.99939084053
+      },
+      {
+        "symbol": "m",
+        "start": 1.12,
+        "end": 1.14,
+        "posterior": 0.999637126923
+      },
+      {
+        "symbol": "e",
+        "start": 1.16,
+        "end": 1.18,
+        "posterior": 0.999861240387
+      },
+      {
+        "symbol": "ɪ",
+        "start": 1.2,
+        "end": 1.24,
+        "posterior": 0.955312013626
+      },
+      {
+        "symbol": "k",
+        "start": 1.26,
+        "end": 1.28,
+        "posterior": 0.999930381775
+      },
+      {
+        "symbol": "s",
+        "start": 1.38,
+        "end": 1.4,
+        "posterior": 0.999840497971
+      },
+      {
+        "symbol": "ʌ",
+        "start": 1.44,
+        "end": 1.46,
+        "posterior": 0.980468034744
+      },
+      {
+        "symbol": "t",
+        "start": 1.52,
+        "end": 1.56,
+        "posterior": 0.984981715679
+      },
+      {
+        "symbol": "ʃ",
+        "start": 1.56,
+        "end": 1.58,
+        "posterior": 0.99969959259
+      },
+      {
+        "symbol": "ə",
+        "start": 1.62,
+        "end": 1.64,
+        "posterior": 0.986920595169
+      },
+      {
+        "symbol": "t",
+        "start": 1.7,
+        "end": 1.72,
+        "posterior": 0.999493360519
+      },
+      {
+        "symbol": "ɪ",
+        "start": 1.76,
+        "end": 1.78,
+        "posterior": 0.999701321125
+      },
+      {
+        "symbol": "f",
+        "start": 1.84,
+        "end": 1.86,
+        "posterior": 0.999621748924
+      },
+      {
+        "symbol": "ɹ",
+        "start": 1.92,
+        "end": 1.94,
+        "posterior": 0.749199032784
+      },
+      {
+        "symbol": "ə",
+        "start": 2.0,
+        "end": 2.02,
+        "posterior": 0.999547660351
+      },
+      {
+        "symbol": "n",
+        "start": 2.1,
+        "end": 2.12,
+        "posterior": 0.999727427959
+      },
+      {
+        "symbol": "s",
+        "start": 2.24,
+        "end": 2.26,
+        "posterior": 0.99774736166
+      }
+    ],
+    "recognizedPhones": [
+      {
+        "symbol": "a",
+        "start": 0.06,
+        "end": 0.08,
+        "posterior": 0.994720697403
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.12,
+        "end": 0.14,
+        "posterior": 0.998498678207
+      },
+      {
+        "symbol": "n",
+        "start": 0.22,
+        "end": 0.24,
+        "posterior": 0.99969124794
+      },
+      {
+        "symbol": "ɛ",
+        "start": 0.28,
+        "end": 0.3,
+        "posterior": 0.99985575676
+      },
+      {
+        "symbol": "v",
+        "start": 0.36,
+        "end": 0.38,
+        "posterior": 0.999696612358
+      },
+      {
+        "symbol": "ə˞",
+        "start": 0.4,
+        "end": 0.42,
+        "posterior": 0.978827357292
+      },
+      {
+        "symbol": "θ",
+        "start": 0.52,
+        "end": 0.54,
+        "posterior": 0.999720275402
+      },
+      {
+        "symbol": "ɔ",
+        "start": 0.6,
+        "end": 0.62,
+        "posterior": 0.999933481216
+      },
+      {
+        "symbol": "t",
+        "start": 0.74,
+        "end": 0.76,
+        "posterior": 0.999686360359
+      },
+      {
+        "symbol": "ɪ",
+        "start": 0.8,
+        "end": 0.82,
+        "posterior": 0.999883770943
+      },
+      {
+        "symbol": "t",
+        "start": 0.86,
+        "end": 0.88,
+        "posterior": 0.999653697014
+      },
+      {
+        "symbol": "w",
+        "start": 0.94,
+        "end": 0.96,
+        "posterior": 0.999733746052
+      },
+      {
+        "symbol": "ʊ",
+        "start": 0.98,
+        "end": 1.0,
+        "posterior": 0.999588549137
+      },
+      {
+        "symbol": "d",
+        "start": 1.04,
+        "end": 1.06,
+        "posterior": 0.99939084053
+      },
+      {
+        "symbol": "m",
+        "start": 1.12,
+        "end": 1.14,
+        "posterior": 0.999637126923
+      },
+      {
+        "symbol": "e",
+        "start": 1.16,
+        "end": 1.18,
+        "posterior": 0.999861240387
+      },
+      {
+        "symbol": "ɪ",
+        "start": 1.2,
+        "end": 1.24,
+        "posterior": 0.955312013626
+      },
+      {
+        "symbol": "k",
+        "start": 1.26,
+        "end": 1.28,
+        "posterior": 0.999930381775
+      },
+      {
+        "symbol": "s",
+        "start": 1.38,
+        "end": 1.4,
+        "posterior": 0.999840497971
+      },
+      {
+        "symbol": "ʌ",
+        "start": 1.44,
+        "end": 1.46,
+        "posterior": 0.980468034744
+      },
+      {
+        "symbol": "t",
+        "start": 1.52,
+        "end": 1.56,
+        "posterior": 0.984981715679
+      },
+      {
+        "symbol": "ʃ",
+        "start": 1.56,
+        "end": 1.58,
+        "posterior": 0.99969959259
+      },
+      {
+        "symbol": "ə",
+        "start": 1.62,
+        "end": 1.64,
+        "posterior": 0.986920595169
+      },
+      {
+        "symbol": "t",
+        "start": 1.7,
+        "end": 1.72,
+        "posterior": 0.999493360519
+      },
+      {
+        "symbol": "ɪ",
+        "start": 1.76,
+        "end": 1.78,
+        "posterior": 0.999701321125
+      },
+      {
+        "symbol": "f",
+        "start": 1.84,
+        "end": 1.86,
+        "posterior": 0.999621748924
+      },
+      {
+        "symbol": "ɹ",
+        "start": 1.92,
+        "end": 1.94,
+        "posterior": 0.749199032784
+      },
+      {
+        "symbol": "ə",
+        "start": 2.0,
+        "end": 2.02,
+        "posterior": 0.999547660351
+      },
+      {
+        "symbol": "n",
+        "start": 2.1,
+        "end": 2.12,
+        "posterior": 0.999727427959
+      },
+      {
+        "symbol": "s",
+        "start": 2.24,
+        "end": 2.26,
+        "posterior": 0.99774736166
+      }
+    ],
+    "peakRSS": 4899471360
+  }
+}

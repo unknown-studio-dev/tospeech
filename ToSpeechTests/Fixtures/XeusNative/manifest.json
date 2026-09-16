@@ -1,0 +1,16 @@
+{
+  "generatedBy": "scripts/assessment/phoneticxeus/dump_golden.py",
+  "policy": "xeus-uk-decision-v6-word-gated",
+  "mapping": "xeus-uk-inventory-v4",
+  "note": "Fields inferenceSeconds/peakRSS/device/loadSeconds inside *.decisions.json are run- and machine-dependent; Swift parity tests should ignore them and compare everything else (status/reason/licence/start/end/logMargin/closestPhone/coverage/etc.) exactly.",
+  "files": {
+    "okay.logits.npy": "Real \"Okay, let's get started.\" source logits (pre-saved fixture, reused).",
+    "okay.decisions.json": "assemble_from_logits(okay, okay) - source-self, the OkayFixtureTests case.",
+    "vest-uk.logits.npy": "Real XEUS CTC log-probs [frames,428] for vest-uk.caf (16k mono, ffmpeg-decoded).",
+    "west-uk.logits.npy": "Real XEUS CTC log-probs for west-uk.caf (used only as a take here).",
+    "full-source.logits.npy": "Real XEUS CTC log-probs [frames,428] for full-source.caf (16k mono, ffmpeg-decoded).",
+    "vest-uk.decisions.json": "assemble_from_logits(vest-uk, vest-uk) - source-self, \"Please wear the vest.\"",
+    "full-source.decisions.json": "assemble_from_logits(full-source, full-source) - source-self, \"I never thought it would make such a difference.\"",
+    "vest-uk-vs-west-uk.decisions.json": "assemble_from_logits(vest-uk, west-uk) - real /v/->/w/ substitution at \"vest\" (take audio says \"west\")."
+  }
+}
