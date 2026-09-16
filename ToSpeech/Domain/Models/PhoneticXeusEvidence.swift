@@ -30,7 +30,11 @@ struct PhoneticXeusPhoneEvidence: Codable, Equatable, Sendable {
 
 /// Contrast-head decision for RP vowels the CTC labels collapse (BATH, LOT). Never a score.
 struct XeusContrast: Codable, Equatable, Sendable { let name: String; let pUK: Double; let decision: String }
-struct XeusContrastHead: Codable, Equatable, Sendable { let version: String; let layer: Int; let contrasts: [String]; let sha256: String }
+/// JSON summary of a loaded contrast head (`ContrastHead.summary()` in `uk_contrast_head.py`:
+/// `dict(version=VERSION,layer=self.layer,contrasts=sorted(self.contrasts),sha256=self.sha256)`).
+/// Named `...Summary` to avoid colliding with the native head port `XeusContrastHead` (the struct
+/// that actually holds/evaluates the loaded logistic weights) in `XeusNative/XeusContrastHead.swift`.
+struct XeusContrastHeadSummary: Codable, Equatable, Sendable { let version: String; let layer: Int; let contrasts: [String]; let sha256: String }
 
 struct PhoneticXeusEvidence: Codable, Equatable, Sendable {
   struct Word: Codable, Equatable, Sendable {
@@ -56,7 +60,7 @@ struct PhoneticXeusEvidence: Codable, Equatable, Sendable {
   var reference: XeusReferenceDiagnostics? = nil
   var deliveryError: String? = nil
   var referencePolicy: String? = nil
-  var contrastHead: XeusContrastHead? = nil
+  var contrastHead: XeusContrastHeadSummary? = nil
 }
 
 struct XeusPhoneDiagnostic: Codable, Equatable, Sendable {
