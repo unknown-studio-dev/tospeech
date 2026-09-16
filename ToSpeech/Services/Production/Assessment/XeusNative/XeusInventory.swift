@@ -104,35 +104,105 @@ enum XeusInventory {
     options.reduce([[]]) { partial, choice in partial.flatMap { prefix in choice.map { prefix + [$0] } } }
   }
 
+  /// Code-point-exact (non-canonicalizing) key wrapper for vocab lookups.
+  ///
+  /// Python's `dict[str, int]` compares/hashes `str` by its exact Unicode code point sequence.
+  /// Swift's native `String` (and therefore `[String: Int]`'s `==`/`Hashable`) is
+  /// canonical-equivalence-aware: a precomposed key such as `"ẽ"` (U+1EBD) and a decomposed
+  /// sequence `"e" + "\u{0303}"` (combining tilde) compare EQUAL and hash identically in Swift,
+  /// even though they are two different entries — or a present vs. absent one — in the Python
+  /// vocab dict. `ipa_vocab.json` is exactly this: some entries are stored precomposed, some
+  /// decomposed (see `nasalVariants`, which builds decomposed lookup keys). Comparing/hashing the
+  /// raw `unicodeScalars` values instead reproduces Python's exact code-point equality, so a
+  /// precomposed vocab key and a decomposed lookup are treated as DISTINCT, never matched — the
+  /// same as Python, and never NFC/NFD-normalized to make them match.
+  private struct ExactKey: Hashable {
+    let scalars: [UInt32]
+    init(_ string: String) { scalars = string.unicodeScalars.map(\.value) }
+  }
+
+  /// Rebuilds `vocab` into a code-point-exact lookup table once per public entry point; every
+  /// nested/private helper below takes this table (not the raw `[String: Int]`) so a single call
+  /// tree does exactly one exact-equality-safe conversion, not one per lookup.
+  private static func exactVocab(_ vocab: [String: Int]) -> [ExactKey: Int] {
+    var result: [ExactKey: Int] = [:]
+    result.reserveCapacity(vocab.count)
+    for (key, value) in vocab { result[ExactKey(key)] = value }
+    return result
+  }
+
+  /// Code-point-exact membership/lookup against an already-converted vocab table.
+  private static func exactID(_ symbol: String, _ vocab: [ExactKey: Int]) -> Int? {
+    vocab[ExactKey(symbol)]
+  }
+
   /// Port of `_nasal`: for each symbol in `sequence`, optionally add its nasalized variant
-  /// (combining tilde U+0303) when the vocab has that token, then take the cartesian product.
-  private static func nasalVariants(_ sequence: [String], _ vocab: [String: Int]) -> [[String]] {
+  /// (combining tilde U+0303) when the vocab has that EXACT token, then take the cartesian product.
+  private static func nasalVariants(_ sequence: [String], _ vocab: [ExactKey: Int]) -> [[String]] {
     let options: [[String]] = sequence.map { symbol in
       let nasalized = symbol + "\u{0303}"
-      return vocab[nasalized] != nil ? [symbol, nasalized] : [symbol]
+      return exactID(nasalized, vocab) != nil ? [symbol, nasalized] : [symbol]
     }
     return cartesianProduct(options)
   }
 
   /// Port of `_expand`: nasalized variants of each candidate sequence, token-encoded, keeping
-  /// only variants whose every symbol is present in `vocab`.
-  private static func expand(_ sequences: [[String]], _ vocab: [String: Int]) -> [[Int]] {
+  /// only variants whose every symbol is present (code-point-exact) in `vocab`.
+  private static func expand(_ sequences: [[String]], _ vocab: [ExactKey: Int]) -> [[Int]] {
     var result: [[Int]] = []
     for sequence in sequences {
-      for variant in nasalVariants(sequence, vocab) where variant.allSatisfy({ vocab[$0] != nil }) {
-        result.append(variant.map { vocab[$0]! })
+      for variant in nasalVariants(sequence, vocab) where variant.allSatisfy({ exactID($0, vocab) != nil }) {
+        result.append(variant.map { exactID($0, vocab)! })
       }
     }
     return result
   }
 
   /// Port of `encode`: spelling/alias-normalized token-id sequence for one phone, or `nil` if the
-  /// vocab does not have it (or maps it to a special/reserved id < 4).
-  static func encode(_ phone: String, _ vocab: [String: Int]) -> [Int]? {
+  /// vocab does not have it (code-point-exact) or maps it to a special/reserved id < 4.
+  private static func encodeExact(_ phone: String, _ vocab: [ExactKey: Int]) -> [Int]? {
     let alias = ["r": "ɹ", "g": "ɡ", "e": "ɛ", "tʃ": "t͡ʃ", "dʒ": "d͡ʒ"][phone] ?? phone
     let symbols = DIPHTHONGS[phone] ?? [alias]
-    if symbols.contains(where: { (vocab[$0] ?? -1) < reservedIDCeiling }) { return nil }
-    return symbols.map { vocab[$0]! }
+    if symbols.contains(where: { (exactID($0, vocab) ?? -1) < reservedIDCeiling }) { return nil }
+    return symbols.map { exactID($0, vocab)! }
+  }
+
+  /// Port of `encode`: spelling/alias-normalized token-id sequence for one phone, or `nil` if the
+  /// vocab does not have it (or maps it to a special/reserved id < 4).
+  static func encode(_ phone: String, _ vocab: [String: Int]) -> [Int]? {
+    encodeExact(phone, exactVocab(vocab))
+  }
+
+  /// Port of `accepted`, against an already-converted (code-point-exact) vocab table.
+  private static func acceptedExact(_ phone: String, _ vocab: [ExactKey: Int], wordInitial: Bool) -> [[Int]] {
+    guard let base = encodeExact(phone, vocab) else { return [] }
+    if wordInitial, let aspiratedSymbol = ASPIRATED[phone], let id = exactID(aspiratedSymbol, vocab) {
+      return [[id]]
+    }
+    var result: [[Int]] = [base]
+    let symbol = ["r": "ɹ", "g": "ɡ", "e": "ɛ"][phone] ?? phone
+    var alternatives: [String] = [
+      "p": ["pʰ"], "t": ["tʰ"], "k": ["kʰ"], "l": ["l̴", "lˠ"],
+      "tʃ": ["t͡ʃʰ"], "e": ["e"], "ɛ": ["e"],
+    ][phone] ?? []
+    if ukVowelPrefix.contains(phone) { alternatives.append(symbol + "\u{0303}") }
+    for alt in alternatives { if let id = exactID(alt, vocab) { result.append([id]) } }
+    let splitSequences: [[String]]
+    switch phone {
+    case "tʃ": splitSequences = [["t", "ʃ"], ["tʰ", "ʃ"]]
+    case "dʒ": splitSequences = [["d", "ʒ"]]
+    default: splitSequences = []
+    }
+    for sequence in splitSequences where sequence.allSatisfy({ exactID($0, vocab) != nil }) {
+      result.append(sequence.map { exactID($0, vocab)! })
+    }
+    if let parts = DIPHTHONGS[phone] {
+      for variant in nasalVariants(parts, vocab) { result.append(variant.map { exactID($0, vocab)! }) }
+    }
+    if let lengthless = LENGTHLESS[phone] { result += expand([[lengthless]], vocab) }
+    result += expand(GOAT[phone] ?? [], vocab)
+    if let devoiced = DEVOICED[phone], let id = exactID(devoiced, vocab) { result.append([id]) }
+    return dedupe(result)
   }
 
   /// Port of `accepted`. Phonetic realizations of one UK phoneme: allophones plus label-convention
@@ -141,44 +211,29 @@ enum XeusInventory {
   /// Never a LOT/PALM, BATH/TRAP, rhoticity or quality merge. `wordInitial` applies the aspiration
   /// rule: initial /p t k/ accept only [pʰ tʰ kʰ], so /b d g/→[p t k] stays separable.
   static func accepted(_ phone: String, _ vocab: [String: Int], wordInitial: Bool = false) -> [[Int]] {
-    guard let base = encode(phone, vocab) else { return [] }
-    if wordInitial, let aspiratedSymbol = ASPIRATED[phone], let id = vocab[aspiratedSymbol] { return [[id]] }
-    var result: [[Int]] = [base]
-    let symbol = ["r": "ɹ", "g": "ɡ", "e": "ɛ"][phone] ?? phone
-    var alternatives: [String] = [
-      "p": ["pʰ"], "t": ["tʰ"], "k": ["kʰ"], "l": ["l̴", "lˠ"],
-      "tʃ": ["t͡ʃʰ"], "e": ["e"], "ɛ": ["e"],
-    ][phone] ?? []
-    if ukVowelPrefix.contains(phone) { alternatives.append(symbol + "\u{0303}") }
-    for alt in alternatives where vocab[alt] != nil { result.append([vocab[alt]!]) }
-    let splitSequences: [[String]]
-    switch phone {
-    case "tʃ": splitSequences = [["t", "ʃ"], ["tʰ", "ʃ"]]
-    case "dʒ": splitSequences = [["d", "ʒ"]]
-    default: splitSequences = []
-    }
-    for sequence in splitSequences where sequence.allSatisfy({ vocab[$0] != nil }) {
-      result.append(sequence.map { vocab[$0]! })
-    }
-    if let parts = DIPHTHONGS[phone] {
-      for variant in nasalVariants(parts, vocab) { result.append(variant.map { vocab[$0]! }) }
-    }
-    if let lengthless = LENGTHLESS[phone] { result += expand([[lengthless]], vocab) }
-    result += expand(GOAT[phone] ?? [], vocab)
-    if let devoiced = DEVOICED[phone], let id = vocab[devoiced] { result.append([id]) }
-    return dedupe(result)
+    acceptedExact(phone, exactVocab(vocab), wordInitial: wordInitial)
+  }
+
+  /// Port of `conditional`, against an already-converted (code-point-exact) vocab table.
+  private static func conditionalExact(_ phone: String, _ vocab: [ExactKey: Int]) -> [[Int]] {
+    let allowed = Set(acceptedExact(phone, vocab, wordInitial: false))
+    return dedupe(expand(CONDITIONAL[phone] ?? [], vocab)).filter { !allowed.contains($0) }
   }
 
   /// Port of `conditional`: Class D realizations for Stage A licensing; excludes anything already
   /// `accepted`.
   static func conditional(_ phone: String, _ vocab: [String: Int]) -> [[Int]] {
-    let allowed = Set(accepted(phone, vocab))
-    return dedupe(expand(CONDITIONAL[phone] ?? [], vocab)).filter { !allowed.contains($0) }
+    conditionalExact(phone, exactVocab(vocab))
+  }
+
+  /// Port of `pair_realizations`, against an already-converted (code-point-exact) vocab table.
+  private static func pairRealizationsExact(_ p: String, _ q: String, _ vocab: [ExactKey: Int]) -> [[Int]] {
+    dedupe(expand(PAIRS[PhonePair(p, q)] ?? [], vocab))
   }
 
   /// Port of `pair_realizations`.
   static func pairRealizations(_ p: String, _ q: String, _ vocab: [String: Int]) -> [[Int]] {
-    dedupe(expand(PAIRS[PhonePair(p, q)] ?? [], vocab))
+    pairRealizationsExact(p, q, exactVocab(vocab))
   }
 
   /// One scoring unit: 1-2 display phones of one word, their accepted and class-D token sequences.
@@ -195,6 +250,7 @@ enum XeusInventory {
   /// Port of `build_units`. `words`: `(word_id, [phones])` of the selected variants. Adjacent
   /// `PAIRS` become one unit.
   static func buildUnits(_ words: [(String, [String])], _ vocab: [String: Int]) throws -> [Unit] {
+    let exact = exactVocab(vocab)
     var units: [Unit] = []
     for (wid, phones) in words {
       var i = 0
@@ -202,24 +258,24 @@ enum XeusInventory {
         let p = phones[i]
         if i + 1 < phones.count, PAIRS[PhonePair(p, phones[i + 1])] != nil {
           let q = phones[i + 1]
-          let ga = accepted(p, vocab, wordInitial: i == 0)
-          let gb = accepted(q, vocab)
+          let ga = acceptedExact(p, exact, wordInitial: i == 0)
+          let gb = acceptedExact(q, exact, wordInitial: false)
           guard !ga.isEmpty, !gb.isEmpty else {
             throw XeusInventoryError.unsupportedTargetPhone("\(p) \(q)")
           }
           let allowed = dedupe(ga.flatMap { a in gb.map { b in a + b } })
           let allowedSet = Set(allowed)
-          let condP = conditional(p, vocab)
-          let condQ = conditional(q, vocab)
+          let condP = conditionalExact(p, exact)
+          let condQ = conditionalExact(q, exact)
           let combos = (ga + condP).flatMap { a in (gb + condQ).map { b in a + b } }
-          let cond = dedupe(pairRealizations(p, q, vocab) + combos).filter { !allowedSet.contains($0) }
+          let cond = dedupe(pairRealizationsExact(p, q, exact) + combos).filter { !allowedSet.contains($0) }
           units.append(Unit(word: wid, indices: [i, i + 1], display: [p, q], allowed: allowed, cond: cond, wordInitial: i == 0))
           i += 2
         } else {
-          let allowed = accepted(p, vocab, wordInitial: i == 0)
+          let allowed = acceptedExact(p, exact, wordInitial: i == 0)
           guard !allowed.isEmpty else { throw XeusInventoryError.unsupportedTargetPhone(p) }
           let allowedSet = Set(allowed)
-          let cond = conditional(p, vocab).filter { !allowedSet.contains($0) }
+          let cond = conditionalExact(p, exact).filter { !allowedSet.contains($0) }
           units.append(Unit(word: wid, indices: [i], display: [p], allowed: allowed, cond: cond, wordInitial: i == 0))
           i += 1
         }

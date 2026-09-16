@@ -75,16 +75,14 @@ import Testing
   /// assert `closestPhone` there either (see `supportFloorThirtyAdmitsOneFrameSpikeWithStrongMargin`
   /// below).
   ///
-  /// `skipNumericFields` carries one known, pre-existing (Task 6, not this file) cross-language
-  /// discrepancy for `missing_glide_cannot_borrow_from_first_vowel`: Python's plain (non-Unicode-
-  /// normalizing) string equality treats the vocab's precomposed `'ẽ'` (U+1EBD) as different from
-  /// the dynamically-built decomposed `'e'+'̃'` `_nasal()` constructs, so
-  /// `evidence.accepted('eɪ', vocab)` finds only 2 of the mathematically-equivalent nasalized
-  /// realizations; Swift's `String` equality is canonical-equivalence-aware (NFC/NFD fold
-  /// together), so `XeusInventory.accepted` correctly finds all 4. This changes `expectedLog
-  /// Likelihood`/`logMargin` by exactly `log(2)` for that one case (verified against the real
-  /// Python `evidence.py`) but not the decision: both margins are already far past the threshold,
-  /// and the Python test itself only asserts `status != 'correct'` here, not any numeric field.
+  /// `skipNumericFields` lets a case opt individual numeric fields out of the golden comparison.
+  /// Previously used for `missing_glide_cannot_borrow_from_first_vowel`, whose fixture vocab has
+  /// a precomposed `'ẽ'` (U+1EBD) key: Python's plain (non-Unicode-normalizing) string equality
+  /// treats that as different from the decomposed `'e'+'̃'` `_nasal()` looks up, so
+  /// `evidence.accepted('eɪ', vocab)` finds only 2 realizations, not the mathematically-equivalent
+  /// 4. `XeusInventory` now does the same code-point-exact vocab lookup (see `XeusInventory
+  /// .ExactKey`/`exactVocab`), so this case matches Python exactly and no longer needs a skip —
+  /// kept as a general-purpose escape hatch for any future case that legitimately needs one.
   private func expectRowMatches(
     _ row: XeusAssess.PhoneRow, _ golden: [String: Any], checkClosestPhone: Bool,
     skipNumericFields: Set<String> = [], tolerance: Double = 1e-6, caseName: String = ""
@@ -146,12 +144,9 @@ import Testing
       let rows = try XeusAssess.assessPhones(matrix, phones, vocab, duration: duration, thresholds: thresholds)
       let goldenRows = c["result"] as! [[String: Any]]
       #expect(rows.count == goldenRows.count, "case \(name)")
-      let skipNumericFields: Set<String> = name == "missing_glide_cannot_borrow_from_first_vowel"
-        ? ["expectedLogLikelihood", "logMargin"] : []
       for (row, goldenRow) in zip(rows, goldenRows) {
         expectRowMatches(
-          row, goldenRow, checkClosestPhone: !skipClosestPhone.contains(name),
-          skipNumericFields: skipNumericFields, caseName: name)
+          row, goldenRow, checkClosestPhone: !skipClosestPhone.contains(name), caseName: name)
       }
     }
   }

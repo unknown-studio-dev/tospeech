@@ -130,6 +130,86 @@ import Testing
     }
   }
 
+  // MARK: exact-code-point vocab lookups (parity with Python's byte-equality `dict[str,int]`)
+
+  /// `ipa_vocab.json` can store a nasal vowel key either precomposed (single code point, e.g.
+  /// 'ẽ' U+1EBD) or decomposed (base + combining tilde U+0303) — `evidence.py`'s `_nasal` always
+  /// builds the DECOMPOSED lookup key (`s + '̃'`). Python's plain `str` dict equality treats
+  /// a precomposed 'ẽ' as a DIFFERENT key from the decomposed 'e'+'̃' it looks up, so it
+  /// never matches; Swift's `String`/`Dictionary` equality is canonical-equivalence-aware (NFC
+  /// 'ẽ' == NFD 'e'+combining-tilde), so an un-fixed port would wrongly match it. This is the
+  /// exact vocab shape used by the real `missing_glide_cannot_borrow_from_first_vowel` golden
+  /// fixture (`XeusAssessTests`) — reproduced here directly against `accepted`.
+  @Test func acceptedTreatsPrecomposedAndDecomposedNasalVowelsAsDistinctKeysLikePython() {
+    let v = vocab428(["e": 4, "ɪ": 5, "\u{1EBD}": 6, "ɪ\u{0303}": 7])  // 'ẽ' precomposed, 'ɪ̃' decomposed
+    let result = XeusInventory.accepted("eɪ", v)
+    // Python ground truth (`evidence.accepted('eɪ', vocab)` with this exact vocab): 2 realizations,
+    // not 4 — 'e' has no DECOMPOSED nasal counterpart in this vocab (only the unrelated precomposed
+    // 'ẽ'), so only 'ɪ' gets a nasal alternative.
+    #expect(result.count == 2, "expected Python's byte-exact count of 2, got \(result)")
+    #expect(Set(result) == Set([[4, 5], [4, 7]]))
+    // The canonical-equivalence bug this guards against: matching the precomposed 'ẽ' (id 6)
+    // against the decomposed lookup key "e"+"\u{0303}" would wrongly add these two realizations.
+    #expect(!result.contains([6, 5]))
+    #expect(!result.contains([6, 7]))
+  }
+
+  // MARK: broad real-vocab parity check (Python ground truth via `evidence.py`)
+
+  /// Ground truth from the real Python pipeline: `evidence.accepted(phone, vocab)` for every
+  /// `UK[:27]` + `DIPHTHONGS` phone (the full nasal-capable vowel/diphthong set), run against the
+  /// REAL `ipa_vocab.json` shipped with the app (not a synthetic vocab). Computed 2026-09-16 with
+  /// `/tmp/echolab-xeus-env/bin/python3` running the actual `scripts/assessment/phoneticxeus/
+  /// evidence.py` against `vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/
+  /// ipa_vocab.json`. The real vocab happens to store every nasal vowel already DECOMPOSED (base
+  /// + U+0303), so this particular set does not itself exercise the precomposed-key bug (see
+  /// `acceptedTreatsPrecomposedAndDecomposedNasalVowelsAsDistinctKeysLikePython` above for that
+  /// scenario) — it is the broader load-bearing parity guarantee that `accepted` returns exactly
+  /// the same token-id sets as Python for the real, shipped vocab.
+  private static let pythonAcceptedGoldenForRealVocab: [String: [[Int]]] = [
+    "iː": [[341], [189], [22]],
+    "ɪ": [[360], [250]],
+    "e": [[51], [181], [29]],
+    "ɛ": [[51], [181], [29]],
+    "æ": [[162], [412]],
+    "ɑː": [[175], [123], [184]],
+    "ɒ": [[40]],
+    "ɔː": [[210], [191], [119]],
+    "ʊ": [[292], [75]],
+    "uː": [[204], [183], [215]],
+    "ʌ": [[53], [326]],
+    "ɐ": [[117], [262]],
+    "ɜː": [[57], [139]],
+    "ə": [[24], [245]],
+    "i": [[189], [22]],
+    "u": [[183], [215]],
+    "eɪ": [[181, 360], [181, 250], [38, 360], [38, 250]],
+    "aɪ": [[227, 360], [227, 250], [114, 360], [114, 250]],
+    "ɔɪ": [[191, 360], [191, 250], [119, 360], [119, 250]],
+    "əʊ": [[24, 292], [24, 75], [245, 292], [245, 75], [185, 292], [185, 75], [179, 292], [179, 75]],
+    "aʊ": [[227, 292], [227, 75], [114, 292], [114, 75]],
+    "ɪə": [[360, 24], [360, 245], [250, 24], [250, 245]],
+    "eə": [[51, 24], [51, 245], [29, 24], [29, 245]],
+    "ʊə": [[292, 24], [292, 245], [75, 24], [75, 245]],
+    "ɛː": [[374], [51], [29]],
+    "ɪː": [[327], [360], [250]],
+    "ʊː": [[252], [292], [75]],
+    "ɛə": [[51, 24], [51, 245], [29, 24], [29, 245]],
+  ]
+
+  @Test func acceptedMatchesPythonGoldenForEveryNasalCapablePhoneOnTheRealVocab() throws {
+    let testFile = URL(fileURLWithPath: #filePath)
+    let repoRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
+    let vocabURL = repoRoot.appendingPathComponent(
+      "vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json")
+    let vocab = try JSONDecoder().decode([String: Int].self, from: Data(contentsOf: vocabURL))
+    for (phone, expected) in Self.pythonAcceptedGoldenForRealVocab {
+      let actual = XeusInventory.accepted(phone, vocab)
+      #expect(actual.count == expected.count, "\(phone): dedupe count mismatch, got \(actual)")
+      #expect(Set(actual) == Set(expected), "\(phone): got \(actual), expected \(expected)")
+    }
+  }
+
   // MARK: test_confusion_gate_flags_only_confusable_substitutions (CONFUSION-table membership)
 
   @Test func confusionTableMembershipIsSymmetricAndScoped() {
