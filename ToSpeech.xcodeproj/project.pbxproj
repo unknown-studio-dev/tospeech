@@ -14,6 +14,7 @@
 		021D21E2E5045B6B213611BF /* PreviewScenariosView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D1FEAAC79F0EC6376CA253E /* PreviewScenariosView.swift */; };
 		037D112440856B9834273064 /* UKPhoneme_14.wav in Resources */ = {isa = PBXBuildFile; fileRef = B0E7EAE1A3EB03D969668D2B /* UKPhoneme_14.wav */; };
 		0548C3B82BBDCE6E8B75ACC0 /* ProgressTakeRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72C6215B6B6BAB48B6E1D2C0 /* ProgressTakeRow.swift */; };
+		061C38AA9A75A66B3FEE8A8B /* XeusLatticeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */; };
 		06BA9D04D5C4BF985AC95039 /* AppleSpeechAnalyzerTranscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45A029C773933B1E1F2FA582 /* AppleSpeechAnalyzerTranscriber.swift */; };
 		07C954DAB11D8225E0263C16 /* ProductionPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B58B0B5B8B8A1EAAD429581D /* ProductionPersistenceTests.swift */; };
 		07DDD1999DDB1602BB19F4A2 /* WordAlignmentPreparationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 515A8A0998608C87EC5FD5A8 /* WordAlignmentPreparationTests.swift */; };
@@ -57,6 +58,7 @@
 		229EDBBE18ECBFE65789611D /* ImportPreparationPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7619C2877B830CC537E /* ImportPreparationPresentation.swift */; };
 		2388EF6A500B138E0B0A809D /* UKPhoneme_20.wav in Resources */ = {isa = PBXBuildFile; fileRef = EB43143B4A369C1046954E58 /* UKPhoneme_20.wav */; };
 		23E995FAE8ADFB1216878A0B /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84BA84211602B2D47851E085 /* AppInfo.swift */; };
+		25B1CAD020DFBBF0DC11397F /* XeusLattice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */; };
 		25EEC289DEB99521754E440D /* AlignmentPackageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA55C972A81E1A10A1B426F6 /* AlignmentPackageTests.swift */; };
 		265947A505A823202EB94124 /* CaptureWriterLiveSamplesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE0E4C39FBDCC24707C91323 /* CaptureWriterLiveSamplesTests.swift */; };
 		26F497EAFE3DC62A73940578 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BFF10BD0D2EC4A7A73892149 /* Icons.xcassets */; };
@@ -473,6 +475,7 @@
 		25F27FBAFB3946AECE97E619 /* DeliveryComparisonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveryComparisonView.swift; sourceTree = "<group>"; };
 		271CA7F61EC244DCE8BDCD09 /* harmonic-120.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "harmonic-120.json"; sourceTree = "<group>"; };
 		2785C0D3070CC4FBD9624BC3 /* UKPhonemes-NOTICE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "UKPhonemes-NOTICE.txt"; sourceTree = "<group>"; };
+		27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusLatticeTests.swift; sourceTree = "<group>"; };
 		28995D76EBC51479DC2A9A4D /* TranscriptionAdapters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionAdapters.swift; sourceTree = "<group>"; };
 		2969DB606AA6C9A3D6EE35DD /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		299A4A8F636F8BA1EFC7E924 /* ReviewSignalAnalyzer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReviewSignalAnalyzer.swift; sourceTree = "<group>"; };
@@ -646,6 +649,7 @@
 		99D6127E8F2553039F6E5E49 /* XeusInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusInventory.swift; sourceTree = "<group>"; };
 		9ADFDF94581C5E6BACDDF8D9 /* UKPhoneme_36.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_36.wav; sourceTree = "<group>"; };
 		9B2D05BA85E865F76679763F /* ContentMatchingProbe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentMatchingProbe.swift; sourceTree = "<group>"; };
+		9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusLattice.swift; sourceTree = "<group>"; };
 		9C68BD4C439F8A3833C8AF08 /* AppLifecycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycle.swift; sourceTree = "<group>"; };
 		9C8CF0B5E84603D5D4550CB0 /* DeleteLessonSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteLessonSheet.swift; sourceTree = "<group>"; };
 		9CA35E65D14CF0B9926D29AE /* ToSpeechApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToSpeechApp.swift; sourceTree = "<group>"; };
@@ -1010,6 +1014,7 @@
 			children = (
 				F737E3E86B49597904013A73 /* XeusCTC.swift */,
 				99D6127E8F2553039F6E5E49 /* XeusInventory.swift */,
+				9B631A13A97F59EBF3EA87DA /* XeusLattice.swift */,
 			);
 			path = XeusNative;
 			sourceTree = "<group>";
@@ -1488,6 +1493,7 @@
 				515A8A0998608C87EC5FD5A8 /* WordAlignmentPreparationTests.swift */,
 				B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */,
 				65BDAE587D204A412BE1E718 /* XeusInventoryTests.swift */,
+				27A77D28D66F79EC385BDAD0 /* XeusLatticeTests.swift */,
 				F3CE216DC899527ECF9FFF8E /* Fixtures */,
 			);
 			path = ToSpeechTests;
@@ -2016,6 +2022,7 @@
 				07DDD1999DDB1602BB19F4A2 /* WordAlignmentPreparationTests.swift in Sources */,
 				AB562FFE33D5577656F2F48F /* XeusCTCTests.swift in Sources */,
 				E3C6C8F85B24124281499346 /* XeusInventoryTests.swift in Sources */,
+				061C38AA9A75A66B3FEE8A8B /* XeusLatticeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2252,6 +2259,7 @@
 				213BE78F86CE0761B02250FC /* XeusCTC.swift in Sources */,
 				DF17325870DA12789F4A0276 /* XeusDiagnosticValidation.swift in Sources */,
 				982B6CF6740A7736A5775D7C /* XeusInventory.swift in Sources */,
+				25B1CAD020DFBBF0DC11397F /* XeusLattice.swift in Sources */,
 				F27594D9D448BD3518DAA897 /* XeusReferenceDetailView.swift in Sources */,
 				CF8A84328DC1F7D46EFBE866 /* YouTubeVideoFollowerView.swift in Sources */,
 			);
