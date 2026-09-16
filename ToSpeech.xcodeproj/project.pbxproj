@@ -51,6 +51,7 @@
 		1E921E8D111250504E80707D /* UKPhoneme_15.wav in Resources */ = {isa = PBXBuildFile; fileRef = 45396368C08851D7E5B06F8B /* UKPhoneme_15.wav */; };
 		1FE09CF4E1AD758E51FA00BE /* ReviewWordPlayback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7A1BA5594537AB0F9879AD /* ReviewWordPlayback.swift */; };
 		2001A0325DC775EEA6B12CFB /* CachedWordAligner.swift in Sources */ = {isa = PBXBuildFile; fileRef = F836121DCE0D59D3E9125DE2 /* CachedWordAligner.swift */; };
+		213BE78F86CE0761B02250FC /* XeusCTC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F737E3E86B49597904013A73 /* XeusCTC.swift */; };
 		218EF240622A1D85FA82CCA5 /* UKSoundCoachView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F237DCE469296605C212857 /* UKSoundCoachView.swift */; };
 		224FAB27E4EB062ACB6D250C /* PreviewRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC96776A9171BFDB4EABEA1 /* PreviewRepository.swift */; };
 		229EDBBE18ECBFE65789611D /* ImportPreparationPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E0D7619C2877B830CC537E /* ImportPreparationPresentation.swift */; };
@@ -256,6 +257,7 @@
 		AB10EBF096B0D464110C85D6 /* EchoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AD098759596DDE5D5035BD /* EchoStore.swift */; };
 		AB442139BBD66956A6B17F50 /* ProductionPracticeController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F03CAF460F4CB4780EE1C14 /* ProductionPracticeController.swift */; };
 		AB523685BF7E574EE0F09639 /* PreviewRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9C88F52EBB13F750EA7FDE /* PreviewRenderer.swift */; };
+		AB562FFE33D5577656F2F48F /* XeusCTCTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */; };
 		ADB1722B62EA263F7F969806 /* PronunciationReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F21330FC7C7DEC13503D54C /* PronunciationReviewView.swift */; };
 		AF5199CDB1A20CD92DC07693 /* UKPhoneme_32.wav in Resources */ = {isa = PBXBuildFile; fileRef = B2C05FD0F0E70AF3EEE45EB0 /* UKPhoneme_32.wav */; };
 		B08B861EAC3AE942C9583D26 /* AppleTranslationPreparer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5BF74E0C6C8FBA6DDEA89A /* AppleTranslationPreparer.swift */; };
@@ -686,6 +688,7 @@
 		B58B0B5B8B8A1EAAD429581D /* ProductionPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductionPersistenceTests.swift; sourceTree = "<group>"; };
 		B58E33C590960434B5B0D899 /* GeneralSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsView.swift; sourceTree = "<group>"; };
 		B6184DA004A3F784B580A081 /* LessonFixtures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LessonFixtures.swift; sourceTree = "<group>"; };
+		B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusCTCTests.swift; sourceTree = "<group>"; };
 		B702EB8ADD810BD1BFE3BF10 /* CombinedTranscriptPreparation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombinedTranscriptPreparation.swift; sourceTree = "<group>"; };
 		B79E105859BE6042057F1158 /* UKPhoneme_30.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = UKPhoneme_30.wav; sourceTree = "<group>"; };
 		B8346273AE4C7105C15C40DC /* PreviewAssessmentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewAssessmentService.swift; sourceTree = "<group>"; };
@@ -763,6 +766,7 @@
 		F5F01903D4971EB0DB27902E /* full-source.logits.npy */ = {isa = PBXFileReference; path = "full-source.logits.npy"; sourceTree = "<group>"; };
 		F5FF87040B60D83BD50A18E5 /* EchoDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoDialog.swift; sourceTree = "<group>"; };
 		F6870A33AB9CD2E0671DA250 /* UKReferenceDownloadTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UKReferenceDownloadTests.swift; sourceTree = "<group>"; };
+		F737E3E86B49597904013A73 /* XeusCTC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XeusCTC.swift; sourceTree = "<group>"; };
 		F7D71DDF5BAA7DFD1AE406CB /* DeepFilterRecordingRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeepFilterRecordingRenderer.swift; sourceTree = "<group>"; };
 		F810258B6C4BEBE14EA10559 /* EchoPlaybackControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPlaybackControls.swift; sourceTree = "<group>"; };
 		F836121DCE0D59D3E9125DE2 /* CachedWordAligner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CachedWordAligner.swift; sourceTree = "<group>"; };
@@ -1004,6 +1008,7 @@
 		4BB268ABAD47C5A40AB5FE39 /* XeusNative */ = {
 			isa = PBXGroup;
 			children = (
+				F737E3E86B49597904013A73 /* XeusCTC.swift */,
 				99D6127E8F2553039F6E5E49 /* XeusInventory.swift */,
 			);
 			path = XeusNative;
@@ -1481,6 +1486,7 @@
 				945A9EDCF2B47BFDD08D988B /* UKReferenceTests.swift */,
 				A893883D7830C4AAC601D86D /* UKSoundCoachingTests.swift */,
 				515A8A0998608C87EC5FD5A8 /* WordAlignmentPreparationTests.swift */,
+				B6C885377E310D5FFC08F77F /* XeusCTCTests.swift */,
 				65BDAE587D204A412BE1E718 /* XeusInventoryTests.swift */,
 				F3CE216DC899527ECF9FFF8E /* Fixtures */,
 			);
@@ -2008,6 +2014,7 @@
 				A484292EB08BF03759AD7FFF /* UKReferenceTests.swift in Sources */,
 				35FC34017ABE5E8BCD0C7412 /* UKSoundCoachingTests.swift in Sources */,
 				07DDD1999DDB1602BB19F4A2 /* WordAlignmentPreparationTests.swift in Sources */,
+				AB562FFE33D5577656F2F48F /* XeusCTCTests.swift in Sources */,
 				E3C6C8F85B24124281499346 /* XeusInventoryTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2242,6 +2249,7 @@
 				CCF45277EB9608B1E76ABF4B /* WordAlignmentAdapter.swift in Sources */,
 				86A0EFF824DED25B6EA6CBA8 /* WordFlowLayout.swift in Sources */,
 				A07D5F2ED22F048B230F573E /* WordPronunciationView.swift in Sources */,
+				213BE78F86CE0761B02250FC /* XeusCTC.swift in Sources */,
 				DF17325870DA12789F4A0276 /* XeusDiagnosticValidation.swift in Sources */,
 				982B6CF6740A7736A5775D7C /* XeusInventory.swift in Sources */,
 				F27594D9D448BD3518DAA897 /* XeusReferenceDetailView.swift in Sources */,
