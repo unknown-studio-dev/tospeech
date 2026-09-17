@@ -20,7 +20,7 @@ ml-dtypes==0.6.0
 mpmath==1.3.0
 networkx==3.6.1
 numpy==2.4.6
-onnx==1.20.1
+onnx==1.22.0
 onnxruntime==1.24.2
 packaging==26.3
 protobuf==7.36.1
@@ -31,12 +31,12 @@ regex==2026.9.10
 rich==15.0.0
 safetensors==0.8.0
 scipy==1.17.0
-setuptools==81.0.0
+setuptools==83.0.0
 shellingham==1.5.4
 soundfile==0.13.1
 sympy==1.14.0
 tokenizers==0.22.2
-torch==2.12.1
+torch==2.13.0
 tqdm==4.70.1
 transformers==5.14.1
 typer==0.27.2
