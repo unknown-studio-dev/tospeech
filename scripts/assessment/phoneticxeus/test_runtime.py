@@ -2,7 +2,7 @@ import json, unittest
 from pathlib import Path
 import numpy as np
 HERE = Path(__file__).resolve().parent
-VOCAB = json.loads((HERE.parent.parent.parent / 'vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json').read_text())
+VOCAB = json.loads((HERE.parent.parent.parent / 'scripts/assessment/phoneticxeus/ipa_vocab.json').read_text())
 
 class OkayFixtureTests(unittest.TestCase):
     def setUp(self):

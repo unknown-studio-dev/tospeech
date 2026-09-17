@@ -8,7 +8,7 @@ set -euo pipefail
 # 0 so the build still succeeds — the engine card simply stays hidden until the assets are present.
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 GRAPH="$ROOT/.build/xeus-onnx/xeus.onnx"
-VOCAB="$ROOT/vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json"
+VOCAB="$ROOT/scripts/assessment/phoneticxeus/ipa_vocab.json"
 HEAD="$ROOT/scripts/assessment/phoneticxeus/uk-contrast-head.json"
 THRESHOLDS="$ROOT/scripts/assessment/phoneticxeus/thresholds.json"
 DEST="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/PhoneticXeus"

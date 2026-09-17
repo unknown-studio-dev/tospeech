@@ -145,7 +145,7 @@ class CTCEvidenceTests(unittest.TestCase):
     def test_contrast_token_sets_stay_disjoint(self):
         from evidence import accepted
         import json; from pathlib import Path
-        vocab=json.loads((Path(__file__).resolve().parents[3]/'vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json').read_text())
+        vocab=json.loads((Path(__file__).resolve().parents[3]/'scripts/assessment/phoneticxeus/ipa_vocab.json').read_text())
         pairs=[('θ','s'),('ð','d'),('v','w'),('f','v'),('ɪ','iː'),('ɪ','i'),('æ','ɛ'),('ʊ','uː'),('ɒ','ɔː'),('ʌ','ɑː'),('ɒ','ɑː'),('ɜː','ə'),('ʃ','s'),('ʒ','ʃ'),('tʃ','ʃ'),('dʒ','tʃ'),('n','ŋ'),('l','ɹ'),('əʊ','ɔː'),('əʊ','ʊ'),('eɪ','ɛ'),('aɪ','ɑː')]
         for a,b in pairs:
             self.assertFalse({tuple(s) for s in accepted(a,vocab)} & {tuple(s) for s in accepted(b,vocab)}, (a,b))

@@ -28,7 +28,7 @@ from pathlib import Path
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
-VOCAB_PATH = HERE.parent.parent.parent / 'vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json'
+VOCAB_PATH = HERE.parent.parent.parent / 'scripts/assessment/phoneticxeus/ipa_vocab.json'
 STEP = .02
 
 # Fixture basenames under fixtures/: <name>-source-logits.npy + <name>-request.json.

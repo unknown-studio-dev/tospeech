@@ -515,7 +515,7 @@ def build_coverage_cases():
 # ==============================================================================================
 def resolve_vocab_path(code_dir):
     candidates = [
-        REPO_ROOT / 'vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json',
+        REPO_ROOT / 'scripts/assessment/phoneticxeus/ipa_vocab.json',
         Path(code_dir) / 'src/model/xeusphoneme/resources/ipa_vocab.json',
     ]
     for c in candidates:
