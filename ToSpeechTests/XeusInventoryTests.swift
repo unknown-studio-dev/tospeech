@@ -115,7 +115,7 @@ import Testing
     let testFile = URL(fileURLWithPath: #filePath)
     let repoRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
     let vocabURL = repoRoot.appendingPathComponent(
-      "vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json")
+      "scripts/assessment/phoneticxeus/ipa_vocab.json")
     let vocab = try JSONDecoder().decode([String: Int].self, from: Data(contentsOf: vocabURL))
     let pairs: [(String, String)] = [
       ("θ", "s"), ("ð", "d"), ("v", "w"), ("f", "v"), ("ɪ", "iː"), ("ɪ", "i"), ("æ", "ɛ"),
@@ -160,8 +160,7 @@ import Testing
   /// `UK[:27]` + `DIPHTHONGS` phone (the full nasal-capable vowel/diphthong set), run against the
   /// REAL `ipa_vocab.json` shipped with the app (not a synthetic vocab). Computed 2026-09-16 with
   /// `/tmp/echolab-xeus-env/bin/python3` running the actual `scripts/assessment/phoneticxeus/
-  /// evidence.py` against `vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/
-  /// ipa_vocab.json`. The real vocab happens to store every nasal vowel already DECOMPOSED (base
+  /// evidence.py` against `scripts/assessment/phoneticxeus/ipa_vocab.json`. The real vocab happens to store every nasal vowel already DECOMPOSED (base
   /// + U+0303), so this particular set does not itself exercise the precomposed-key bug (see
   /// `acceptedTreatsPrecomposedAndDecomposedNasalVowelsAsDistinctKeysLikePython` above for that
   /// scenario) — it is the broader load-bearing parity guarantee that `accepted` returns exactly
@@ -201,7 +200,7 @@ import Testing
     let testFile = URL(fileURLWithPath: #filePath)
     let repoRoot = testFile.deletingLastPathComponent().deletingLastPathComponent()
     let vocabURL = repoRoot.appendingPathComponent(
-      "vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json")
+      "scripts/assessment/phoneticxeus/ipa_vocab.json")
     let vocab = try JSONDecoder().decode([String: Int].self, from: Data(contentsOf: vocabURL))
     for (phone, expected) in Self.pythonAcceptedGoldenForRealVocab {
       let actual = XeusInventory.accepted(phone, vocab)

@@ -260,7 +260,7 @@ import Testing
   /// (inferenceSeconds/peakRSS/device/loadSeconds) are excluded per manifest.json.
   private func assertClipParity(logits: String, decisions: String) throws {
     let vocabURL = repoRoot.appendingPathComponent(
-      "vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json")
+      "scripts/assessment/phoneticxeus/ipa_vocab.json")
     let vocab = try JSONDecoder().decode([String: Int].self, from: Data(contentsOf: vocabURL))
 
     let lp = try Self.loadNpyF32(repoRoot.appendingPathComponent("ToSpeechTests/Fixtures/XeusNative/\(logits)"))

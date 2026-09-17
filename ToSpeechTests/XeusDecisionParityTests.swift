@@ -14,7 +14,7 @@ import Testing
 
   private func shippedVocab() throws -> [String: Int] {
     let url = repoRoot.appendingPathComponent(
-      "vendor/phoneticxeus/_internal/src/model/xeusphoneme/resources/ipa_vocab.json")
+      "scripts/assessment/phoneticxeus/ipa_vocab.json")
     return try JSONDecoder().decode([String: Int].self, from: Data(contentsOf: url))
   }
 
