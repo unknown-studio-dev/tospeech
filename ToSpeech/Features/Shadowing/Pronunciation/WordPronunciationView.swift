@@ -10,6 +10,8 @@ struct WordPronunciationView: View {
   let wordID: String
   let onEditTiming: (String) -> Void
   let onClose: () -> Void
+  /// Present only where the transcript may lose a word (production lessons, not previews).
+  var onRemoveWord: ((String) -> Void)? = nil
   var onPreviewSource: (() -> Void)? = nil
   var onPreviewReference: ((LessonWord, ReferenceAccent) -> Void)? = nil
   var usesPreviewReferenceAudio = true
@@ -18,6 +20,7 @@ struct WordPronunciationView: View {
   var referenceErrorKey: String? = nil
   var runtime: WordPronunciationRuntime? = nil
   @Environment(EchoStore.self) private var store
+  @State private var confirmingRemoval = false
 
   var body: some View {
     EchoModalLayout(width: 520, referenceHeight: 526) {
@@ -93,12 +96,22 @@ struct WordPronunciationView: View {
           EchoLocalizedText("Timing từ chưa đúng?").font(EchoFont.body(size: 13)).foregroundStyle(
             EchoTheme.secondaryText)
           Spacer()
+          if onRemoveWord != nil {
+            EchoButton("word.remove", symbol: "trash", size: .regular) { confirmingRemoval = true }
+              .disabled(word == nil)
+          }
           EchoButton("Chỉnh timing", symbol: "slider.horizontal.3", size: .regular) {
             onEditTiming(wordID)
           }.disabled(word == nil)
         }
       }.padding(.horizontal, 24).padding(.top, 20).padding(.bottom, 24)
     }
+      .confirmationDialog("word.remove.title", isPresented: $confirmingRemoval) {
+        Button("word.remove", role: .destructive) { onRemoveWord?(wordID) } // native-control: confirmation
+        Button("Hủy", role: .cancel) {} // native-control: confirmation
+      } message: {
+        EchoLocalizedText("word.remove.message")
+      }
       .background(EchoTheme.raised).foregroundStyle(EchoTheme.text)
       .environment(\.locale, store.preferences.language.locale)
       .preferredColorScheme(.dark)

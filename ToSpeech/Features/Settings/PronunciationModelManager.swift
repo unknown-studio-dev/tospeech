@@ -6,7 +6,7 @@ final class PronunciationModelManager {
   let phonePackage: PhoneScorerPackage?
   let ukPackage: UKReferencePackage?
   let xeusPackage: PhoneticXeusPackage?
-  /// False when this build carries no PhoneticXeus runtime (Release): the card is not shown.
+  /// False only when a build carries no PhoneticXeus runtime: the card is not shown.
   private(set) var xeusAvailable = false
   private(set) var xeusInstalled = false
   private(set) var xeusInstalling = false
@@ -33,8 +33,8 @@ final class PronunciationModelManager {
     isInstalled = await package.installed()
     phoneInstalled = await phonePackage?.installed() ?? false
   }
-  /// PhoneticXeus reuses UK Reference for VAD, IPA, rhythm and pitch, so they ship as one
-  /// package: install UK Reference first when missing, then XEUS.
+  /// PhoneticXeus and UK Reference are one UK engine (XEUS grades phones, UK Reference measures
+  /// delivery): install UK Reference first when missing, then XEUS; remove both together.
   var xeusReady: Bool { xeusInstalled && ukInstalled }
   func installXeus() {
     guard let xeusPackage, !xeusInstalling else { return }
@@ -60,20 +60,6 @@ final class PronunciationModelManager {
       await refresh()
     }
     catch { xeusFailure = error.localizedDescription; await refresh() }
-  }
-  func installUK() {
-    guard let ukPackage, !ukInstalling else { return }
-    ukInstalling = true; ukFailure = nil
-    Task {
-      defer { ukInstalling = false }
-      do { try await ukPackage.install(); await refresh() }
-      catch { ukFailure = error.localizedDescription; await refresh() }
-    }
-  }
-  func removeUK() async {
-    guard !isBusy(), !ukInstalling else { ukFailure = "assessment.error.busy"; return }
-    do { try await ukPackage?.remove(); await refresh() }
-    catch { ukFailure = error.localizedDescription }
   }
   func installPhone() {
     guard let phonePackage, !phoneInstalling else { return }
@@ -107,8 +93,9 @@ final class PronunciationModelManager {
     catch { failure = error.localizedDescription }
   }
 
-  /// Installs only the scorer compatible with the chosen reference accent.
-  /// Alternative and experimental engines remain opt-in in Settings.
+  /// Installs the scorer for the chosen reference accent. UK practice is one engine: PhoneticXeus
+  /// grades every phone and UK Reference measures delivery, so both packages are downloaded at
+  /// onboarding. There is no UK Reference-only mode; a build without the runtime is an error.
   func installRequired(for accent: ReferenceAccent) async throws -> EngineID {
     switch accent {
     case .uk:
@@ -116,7 +103,11 @@ final class PronunciationModelManager {
       if !(await ukPackage.installed()) { try await ukPackage.install() }
       await refresh()
       guard ukInstalled else { throw ModelInstallationError.verificationFailed("UK Reference") }
-      return .ukReference
+      guard let xeusPackage, xeusAvailable else { throw ModelInstallationError.verificationFailed("PhoneticXeus") }
+      if !xeusInstalled { try await xeusPackage.install() }
+      await refresh()
+      guard xeusReady else { throw ModelInstallationError.verificationFailed("PhoneticXeus") }
+      return .phoneticXeus
     case .us:
       guard let phonePackage else { throw ModelInstallationError.verificationFailed("Phone Scorer") }
       if !(await phonePackage.installed()) { try await phonePackage.install() }
@@ -124,6 +115,26 @@ final class PronunciationModelManager {
       guard phoneInstalled else { throw ModelInstallationError.verificationFailed("Phone Scorer") }
       return .phone
     }
+  }
+
+  /// At launch on a machine that finished onboarding before the combined engine shipped in this
+  /// build: download the missing weights and switch UK practice over to PhoneticXeus. A machine
+  /// that deliberately runs another engine is not touched; a failed download stays in Settings.
+  func adoptXeusIfNeeded(preferences: Preferences) async -> EngineID? {
+    await refresh()
+    guard preferences.accent == .uk, xeusAvailable, let xeusPackage,
+      preferences.productionAssessmentEngine == .ukReference || preferences.productionAssessmentEngine == nil,
+      !xeusInstalling, !ukInstalling else { return nil }
+    if !xeusReady {
+      xeusInstalling = true; xeusFailure = nil
+      defer { xeusInstalling = false }
+      do {
+        if let ukPackage, !(await ukPackage.installed()) { try await ukPackage.install() }
+        if !(await xeusPackage.installed()) { try await xeusPackage.install() }
+      } catch { xeusFailure = error.localizedDescription; await refresh(); return nil }
+      await refresh()
+    }
+    return xeusReady ? .phoneticXeus : nil
   }
 }
 extension EnvironmentValues {

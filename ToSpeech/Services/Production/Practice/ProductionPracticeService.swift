@@ -1,4 +1,5 @@
 import AVFoundation
+import AVFoundation
 import CryptoKit
 import Foundation
 import OSLog
@@ -15,6 +16,41 @@ final class ProductionPracticeService {
     let value = ProductionAudioPlayer()
     storedPlayer = value
     return value
+  }
+
+  func waveformSamples(
+    audioURL: URL, sampleRate: Int, duration: TimeInterval, count: Int = 800
+  ) async throws -> [Double] {
+    guard sampleRate > 0, duration > 0, count > 0 else {
+      throw ProductionPracticeError.invalidPlaybackRange
+    }
+    return try await Task.detached(priority: .utility) {
+      let file = try AVAudioFile(forReading: audioURL)
+      let totalFrames = min(file.length, AVAudioFramePosition(duration * Double(sampleRate)))
+      guard totalFrames > 0 else { throw ProductionPracticeError.sourceUnavailable }
+      file.framePosition = 0
+      var peaks = Array(repeating: Float.zero, count: count)
+      let capacity: AVAudioFrameCount = 8_192
+      guard let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: capacity)
+      else { throw ProductionPracticeError.sourceUnavailable }
+      var consumed: AVAudioFramePosition = 0
+      while consumed < totalFrames {
+        let requested = AVAudioFrameCount(min(AVAudioFramePosition(capacity), totalFrames - consumed))
+        try file.read(into: buffer, frameCount: requested)
+        guard buffer.frameLength > 0, let channels = buffer.floatChannelData else { break }
+        let channelCount = Int(buffer.format.channelCount)
+        for frame in 0..<Int(buffer.frameLength) {
+          var peak = Float.zero
+          for channel in 0..<channelCount { peak = max(peak, abs(channels[channel][frame])) }
+          let absolute = consumed + AVAudioFramePosition(frame)
+          let index = min(count - 1, Int(absolute * AVAudioFramePosition(count) / totalFrames))
+          peaks[index] = max(peaks[index], peak)
+        }
+        consumed += AVAudioFramePosition(buffer.frameLength)
+      }
+      let maximum = max(peaks.max() ?? 0, 0.000_1)
+      return peaks.map { Double($0 / maximum) }
+    }.value
   }
   var recorder: ProductionAudioRecorder {
     if let storedRecorder { return storedRecorder }
@@ -102,6 +138,11 @@ final class ProductionPracticeService {
     try await database.publishTimingRevision(draft)
   }
 
+  func removeTranscriptWord(segmentID: UUID, expectedRevisionID: UUID, tokenID: String) async throws -> StoredTimingRevision {
+    try await database.publishTranscriptRevision(
+      segmentID: segmentID, expectedRevisionID: expectedRevisionID, removingTokenID: tokenID)
+  }
+
   /// A manual translation always targets the language the learner is reading in.
   func storeTranslationOverride(revisionID: UUID, text: String) async throws {
     guard !translationLanguage.isNone else { return }
@@ -110,41 +151,6 @@ final class ProductionPracticeService {
     try await database.storeAnnotationOverride(
       revisionID: revisionID, kind: .translation, lookupKey: translationLanguage.lookupKey,
       source: "manual", value: try JSONEncoder().encode(value))
-  }
-
-  func waveformSamples(
-    audioURL: URL, sampleRate: Int, duration: TimeInterval, count: Int = 800
-  ) async throws -> [Double] {
-    guard sampleRate > 0, duration > 0, count > 0 else {
-      throw ProductionPracticeError.invalidPlaybackRange
-    }
-    return try await Task.detached(priority: .utility) {
-      let file = try AVAudioFile(forReading: audioURL)
-      let totalFrames = min(file.length, AVAudioFramePosition(duration * Double(sampleRate)))
-      guard totalFrames > 0 else { throw ProductionPracticeError.sourceUnavailable }
-      file.framePosition = 0
-      var peaks = Array(repeating: Float.zero, count: count)
-      let capacity: AVAudioFrameCount = 8_192
-      guard let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: capacity)
-      else { throw ProductionPracticeError.sourceUnavailable }
-      var consumed: AVAudioFramePosition = 0
-      while consumed < totalFrames {
-        let requested = AVAudioFrameCount(min(AVAudioFramePosition(capacity), totalFrames - consumed))
-        try file.read(into: buffer, frameCount: requested)
-        guard buffer.frameLength > 0, let channels = buffer.floatChannelData else { break }
-        let channelCount = Int(buffer.format.channelCount)
-        for frame in 0..<Int(buffer.frameLength) {
-          var peak = Float.zero
-          for channel in 0..<channelCount { peak = max(peak, abs(channels[channel][frame])) }
-          let absolute = consumed + AVAudioFramePosition(frame)
-          let index = min(count - 1, Int(absolute * AVAudioFramePosition(count) / totalFrames))
-          peaks[index] = max(peaks[index], peak)
-        }
-        consumed += AVAudioFramePosition(buffer.frameLength)
-      }
-      let maximum = max(peaks.max() ?? 0, 0.000_1)
-      return peaks.map { Double($0 / maximum) }
-    }.value
   }
 
   /// An observed word interval is playable even when flagged for review;

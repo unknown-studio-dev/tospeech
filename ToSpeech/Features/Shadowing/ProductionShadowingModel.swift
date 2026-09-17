@@ -543,6 +543,23 @@ final class ProductionShadowingModel {
     }
   }
 
+  /// Drops a transcript word the ASR invented (a phantom repeat, say). The sentence keeps
+  /// its audio range and the other words keep their timing.
+  func removeWord(_ tokenID: String, from source: ProductionPreparedSentence) async -> Bool {
+    do {
+      let revision = try await service.removeTranscriptWord(
+        segmentID: source.target.segmentID, expectedRevisionID: source.target.segmentRevisionID, tokenID: tokenID)
+      await load()
+      if let replacement = targets.first(where: { $0.segmentRevisionID == revision.revisionID }) {
+        select(replacement)
+      }
+      return true
+    } catch {
+      self.error = EchoCopy.describing(error)
+      return false
+    }
+  }
+
   func applyPreferences(_ preferences: Preferences) {
     practiceOptions = preferences
     service.enhanceRecordings = preferences.enhanceRecordings

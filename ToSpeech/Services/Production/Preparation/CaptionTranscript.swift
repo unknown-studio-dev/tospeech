@@ -256,7 +256,7 @@ enum CaptionTranscriptBuilder {
         sentenceTimingNeedsReview: cue.timingReviewReason != nil,
         wordTimingNeedsReview: !hasTrustedWordTiming || cue.timingReviewReason != nil,
         timingReviewReason: cue.timingReviewReason, originalTokens: words, transcription: provenance)
-      let contentKey = hash(normalized.lowercased())
+      let contentKey = contentKey(for: normalized)
       segments.append(
         PreparedLessonSegment(
           id: UUID(), ordinal: ordinal, text: normalized,
@@ -267,6 +267,8 @@ enum CaptionTranscriptBuilder {
     guard !segments.isEmpty else { throw CaptionTranscriptError.noUsableCues }
     return segments
   }
+
+  static func contentKey(for text: String) -> String { hash(text.lowercased()) }
 
   private static func hash(_ text: String) -> String {
     SHA256.hash(data: Data(text.utf8)).map { String(format: "%02x", $0) }.joined()

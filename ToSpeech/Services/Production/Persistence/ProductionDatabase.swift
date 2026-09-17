@@ -1155,6 +1155,124 @@ actor ProductionDatabase {
     }
   }
 
+  /// Publishes a new revision without one transcript word: the text, tokens and content key
+  /// change together, timing of the other words is untouched, and only that word's IPA
+  /// annotations are left behind. Existing takes keep the revision they were recorded against.
+  func publishTranscriptRevision(
+    segmentID: UUID, expectedRevisionID: UUID, removingTokenID tokenID: String, at date: Date = Date()
+  ) throws -> StoredTimingRevision {
+    try Self.execute(on: requiredHandle, sql: "BEGIN IMMEDIATE")
+    do {
+      let current = try prepare(
+        """
+        SELECT s.current_revision_id, r.revision, r.text, r.audio_asset_id, r.start_frame, r.end_frame,
+               r.tokens_json, r.baseline_json
+        FROM segments s
+        JOIN segment_revisions r ON r.id = s.current_revision_id
+        JOIN lessons l ON l.id = s.lesson_id
+        WHERE s.id = ? AND l.lifecycle = 'ready'
+        """)
+      defer { sqlite3_finalize(current) }
+      bind(segmentID.uuidString, to: 1, in: current)
+      guard sqlite3_step(current) == SQLITE_ROW,
+        let previousText = columnText(current, 0),
+        let previousRevisionID = UUID(uuidString: previousText),
+        previousRevisionID == expectedRevisionID,
+        let text = columnText(current, 2), let audioAssetText = columnText(current, 3),
+        let audioAssetID = UUID(uuidString: audioAssetText),
+        let priorTokensData = columnData(current, 6), let baselineData = columnData(current, 7)
+      else { throw ProductionDatabaseError.staleLessonGeneration(expected: 0) }
+      let startFrame = Int(sqlite3_column_int64(current, 4)), endFrame = Int(sqlite3_column_int64(current, 5))
+      let priorTokens: [TranscriptWordToken]
+      let baseline: CaptionBaseline
+      do {
+        priorTokens = try JSONDecoder().decode([TranscriptWordToken].self, from: priorTokensData)
+        baseline = try JSONDecoder().decode(CaptionBaseline.self, from: baselineData)
+      } catch {
+        throw ProductionDatabaseError.execute("Current revision cannot be decoded")
+      }
+      guard let index = priorTokens.firstIndex(where: { $0.id == tokenID }) else {
+        throw ProductionDatabaseError.constraint("Word is not in the current transcript")
+      }
+      let tokens = priorTokens.enumerated().filter { $0.offset != index }.map(\.element)
+      guard tokens.contains(where: { IPAFormatting.isPronounceable($0.text) }) else {
+        throw ProductionDatabaseError.constraint("A sentence needs at least one word")
+      }
+      let newText = Self.transcriptText(text, tokens: priorTokens, removing: index)
+      let contentKey = CaptionTranscriptBuilder.contentKey(for: newText)
+      let referenceKey = "\(baseline.source.rawValue):\(contentKey)"
+
+      let newRevisionID = UUID()
+      let newRevision = Int(sqlite3_column_int64(current, 1)) + 1
+      let revision = try prepare(
+        """
+        INSERT INTO segment_revisions (
+          id, segment_id, revision, text, content_key, reference_key, audio_asset_id,
+          start_frame, end_frame, tokens_schema_version, tokens_json, baseline_json, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?)
+        """)
+      bind(newRevisionID.uuidString, to: 1, in: revision)
+      bind(segmentID.uuidString, to: 2, in: revision)
+      sqlite3_bind_int64(revision, 3, sqlite3_int64(newRevision))
+      bind(newText, to: 4, in: revision)
+      bind(contentKey, to: 5, in: revision)
+      bind(referenceKey, to: 6, in: revision)
+      bind(audioAssetID.uuidString, to: 7, in: revision)
+      sqlite3_bind_int64(revision, 8, sqlite3_int64(startFrame))
+      sqlite3_bind_int64(revision, 9, sqlite3_int64(endFrame))
+      bind(try JSONEncoder().encode(tokens), to: 10, in: revision)
+      bind(baselineData, to: 11, in: revision)
+      sqlite3_bind_double(revision, 12, date.timeIntervalSince1970)
+      try stepDone(revision)
+      sqlite3_finalize(revision)
+
+      // IPA annotations are keyed "<tokenID>:<accent>"; the removed word's are not carried over.
+      let copyAnnotations = try prepare(
+        """
+        INSERT INTO annotations (
+          id, revision_id, kind, lookup_key, source, schema_version,
+          automatic_value, override_value, created_at
+        )
+        SELECT lower(hex(randomblob(16))), ?, kind, lookup_key, source, schema_version,
+               automatic_value, override_value, ?
+        FROM annotations WHERE revision_id = ?
+          AND NOT (kind = 'ipa' AND lookup_key LIKE ? || ':%')
+        """)
+      bind(newRevisionID.uuidString, to: 1, in: copyAnnotations)
+      sqlite3_bind_double(copyAnnotations, 2, date.timeIntervalSince1970)
+      bind(previousRevisionID.uuidString, to: 3, in: copyAnnotations)
+      bind(tokenID, to: 4, in: copyAnnotations)
+      try stepDone(copyAnnotations)
+      sqlite3_finalize(copyAnnotations)
+
+      let advanceCurrent = try prepare(
+        "UPDATE segments SET current_revision_id = ? WHERE id = ? AND current_revision_id = ?")
+      bind(newRevisionID.uuidString, to: 1, in: advanceCurrent)
+      bind(segmentID.uuidString, to: 2, in: advanceCurrent)
+      bind(previousRevisionID.uuidString, to: 3, in: advanceCurrent)
+      try stepDone(advanceCurrent)
+      guard sqlite3_changes(requiredHandle) == 1 else {
+        throw ProductionDatabaseError.staleLessonGeneration(expected: 0)
+      }
+      try Self.execute(on: requiredHandle, sql: "COMMIT")
+      return StoredTimingRevision(
+        segmentID: segmentID, previousRevisionID: previousRevisionID,
+        revisionID: newRevisionID, revision: newRevision)
+    } catch {
+      try? Self.execute(on: requiredHandle, sql: "ROLLBACK")
+      throw error
+    }
+  }
+
+  /// Caption tokens are the text split on whitespace; speech tokens were joined with
+  /// `TranscriptText`. Either way the text is rebuilt from the words that remain.
+  static func transcriptText(_ text: String, tokens: [TranscriptWordToken], removing index: Int) -> String {
+    let pieces = text.split(whereSeparator: { $0.isWhitespace }).map(String.init)
+    let remaining = tokens.enumerated().filter { $0.offset != index }.map(\.element.text)
+    if pieces == tokens.map(\.text) { return remaining.joined(separator: " ") }
+    return TranscriptText.join(remaining)
+  }
+
   func beginPracticeCapture(
     target: ProductionPracticeTarget, sessionID existingSessionID: UUID?,
     sourceSpeed: Double, targetJSON: String, at date: Date = Date()

@@ -30,7 +30,7 @@ actor UKReferenceAdapter: PhoneScoring {
     let rows: [[Float]]
     let duration: Double
   }
-  private struct Target {
+  struct Target {
     let word: PronunciationWordTarget
     let ipa: String
     let units: [UKPhoneInventory.Unit]
@@ -91,31 +91,16 @@ actor UKReferenceAdapter: PhoneScoring {
     let source = acoustics.source, take = acoustics.take
     try Self.validateTargets(words, vocabulary: vocabulary)
     var mark = ContinuousClock.now
-    var targets: [Target] = []
     // Anchor source words with the lesson's saved alignment; choose UK variants
     // using source evidence, then lock exactly that path for the learner.
     let anchoredWords = try Self.anchor(words, source: source, sourceSpan: sourceSpan, vocabulary: vocabulary)
-    for word in anchoredWords {
-      guard let start = word.sourceStart, let end = word.sourceEnd, end > start else { throw UKReferenceError.wordTiming }
-      let lower = max(0, Int(floor((start-sourceSpan.start)/0.02)))
-      let upper = min(source.rows.count, Int(ceil((end-sourceSpan.start)/0.02)))
-      guard upper > lower else { throw UKReferenceError.wordTiming }
-      let rows = Array(source.rows[lower..<upper])
-      var best: (Target, Double)?
-      for ipa in Array(Set(word.variants)).sorted() {
-        guard let units = UKPhoneInventory.parse(ipa) else { continue }
-        let encoded = units.map { UKPhoneInventory.ctcTokens($0.symbol, vocabulary: vocabulary) }
-        guard encoded.allSatisfy({ $0 != nil }) else { continue }
-        let labels = encoded.compactMap { $0 }
-        guard let spans = try CTCAlignment.align(logProbabilities: rows, labels: labels.flatMap { $0 }) else { continue }
-        let support = UKReferenceMath.support(rows, labels: labels.flatMap { $0 }, spans: spans)
-        let target = Target(word: word, ipa: ipa, units: units, labels: labels,
-          sourceSpans: spans.map { .init(start: $0.start+lower, end: $0.end+lower) })
-        if best == nil || support > best!.1 { best = (target, support) }
-      }
-      guard let best else { throw UKReferenceError.wordAlignment(word.text) }
-      targets.append(best.0)
+    // A word whose saved window cannot hold its phone path (a transcript artefact timed at a
+    // few milliseconds, say) is reported as not assessed; it never fails the whole take.
+    let slots = try anchoredWords.map { word in
+      (word: word, target: try Self.target(for: word, source: source, sourceSpan: sourceSpan, vocabulary: vocabulary))
     }
+    let targets = slots.compactMap(\.target)
+    guard !targets.isEmpty else { throw UKReferenceError.wordAlignment(words[0].text) }
     let labels = targets.flatMap { $0.labels.flatMap { $0 } }
     guard labels.count <= 512, let takeSpans = try CTCAlignment.align(logProbabilities: take.rows, labels: labels) else { throw UKReferenceError.alignment }
     AssessmentStage.log("uk.score.anchor+align", since: mark)
@@ -128,8 +113,12 @@ actor UKReferenceAdapter: PhoneScoring {
     var focus: [UKFocusEvidence] = [], stress: [UKStressEvidence] = []
     var measurements: [String: [UKPhoneMeasurement]] = [:], results: [WordPronunciationEvidence] = []
     var cursor = 0
-    for target in targets {
+    for slot in slots {
       try Task.checkCancellation()
+      guard let target = slot.target else {
+        results.append(.init(target: slot.word, referenceIPA: slot.word.variants.first, phones: [], supported: false, inventory: UKPhoneInventory.version))
+        continue
+      }
       var differences: [PhoneDifference] = [], measured: [UKPhoneMeasurement] = []
       var focusCandidates: [(Double, Double, Double, Double)] = []
       var unitCursor = 0
@@ -297,6 +286,31 @@ actor UKReferenceAdapter: PhoneScoring {
       }
       guard supported else { throw UKReferenceError.wordPhones(word.text) }
     }
+  }
+
+  /// The best-supported UK variant aligned inside the word's saved source window, or nil when
+  /// no variant fits: a window shorter than the phone path (the lesson timed the word at a few
+  /// milliseconds) or one the encoder cannot align. Such a word is reported, not thrown.
+  static func target(for word: PronunciationWordTarget, source: Acoustic,
+    sourceSpan: AudioSpan, vocabulary: [String: Int]) throws -> Target? {
+    guard let start = word.sourceStart, let end = word.sourceEnd, end > start else { return nil }
+    let lower = max(0, Int(floor((start-sourceSpan.start)/0.02)))
+    let upper = min(source.rows.count, Int(ceil((end-sourceSpan.start)/0.02)))
+    guard upper > lower else { return nil }
+    let rows = Array(source.rows[lower..<upper])
+    var best: (Target, Double)?
+    for ipa in Array(Set(word.variants)).sorted() {
+      guard let units = UKPhoneInventory.parse(ipa) else { continue }
+      let encoded = units.map { UKPhoneInventory.ctcTokens($0.symbol, vocabulary: vocabulary) }
+      guard encoded.allSatisfy({ $0 != nil }) else { continue }
+      let labels = encoded.compactMap { $0 }
+      guard let spans = try CTCAlignment.align(logProbabilities: rows, labels: labels.flatMap { $0 }) else { continue }
+      let support = UKReferenceMath.support(rows, labels: labels.flatMap { $0 }, spans: spans)
+      let target = Target(word: word, ipa: ipa, units: units, labels: labels,
+        sourceSpans: spans.map { .init(start: $0.start+lower, end: $0.end+lower) })
+      if best == nil || support > best!.1 { best = (target, support) }
+    }
+    return best?.0
   }
 
   /// Older lessons may not have word timestamps. Align their complete UK phone

@@ -810,6 +810,66 @@ struct ProductionPersistenceTests {
     #expect(restored.sourcePlaybackEndFrame == nil)
   }
 
+  @MainActor @Test func removingAPhantomWordPublishesARevisionWithoutItsTextTokenOrIPA() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let paths = BackendPaths(root: root)
+    try paths.prepare()
+    let database = try ProductionDatabase(url: paths.database)
+    let lesson = try await database.insertLesson(
+      NewLesson(provider: "youtube", externalID: "phantom-lesson", title: "Phantom lesson"))
+    let jobID = UUID(), runToken = UUID()
+    try await database.persistImportJob(
+      id: jobID, lessonID: lesson.id, expectedGeneration: lesson.generation, runToken: runToken,
+      inputJSON: "{}", checkpointJSON: "{}")
+    let cue = CaptionCue(start: 0, end: 1, text: "fortune must must be.", words: [
+      .init(text: "fortune", start: 0, end: 0.4), .init(text: "must", start: 0.4, end: 0.41),
+      .init(text: "must", start: 0.41, end: 0.7), .init(text: "be.", start: 0.7, end: 1)])
+    let segments = try CaptionTranscriptBuilder.build(
+      cues: [cue], source: .parakeet, sampleRate: 48_000, frameCount: 96_000)
+    let audio = MediaAsset(
+      id: UUID(), lessonID: lesson.id, role: .sourceAudio,
+      relativePath: "Media/SourceAudio/phantom.m4a", checksum: "phantom-audio", format: "m4a",
+      sampleRate: 48_000, frameCount: 96_000, createdAt: Date())
+    try await database.publishPreparedLesson(
+      lessonID: lesson.id, expectedGeneration: lesson.generation, jobID: jobID, runToken: runToken,
+      title: "Phantom lesson", author: nil, assets: [audio], segments: segments,
+      checkpointJSON: "{\"phase\":\"ready\"}")
+    let original = try #require(
+      try await database.preparedPracticeSentences(lessonID: lesson.id, paths: paths).first)
+    #expect(original.tokens.map(\.text) == ["fortune", "must", "must", "be."])
+    let phantom = original.tokens[1], kept = original.tokens[2]
+    for token in [phantom, kept] {
+      try await database.storeAutomaticAnnotation(
+        revisionID: original.id, kind: .ipa, lookupKey: "\(token.id):uk", source: "britfone", value: Data("mˈɐst".utf8))
+    }
+    try await database.storeAutomaticAnnotation(
+      revisionID: original.id, kind: .translation, lookupKey: "sentence:vi", source: "auto", value: Data("x".utf8))
+
+    let result = try await database.publishTranscriptRevision(
+      segmentID: original.target.segmentID, expectedRevisionID: original.id, removingTokenID: phantom.id)
+    let current = try #require(
+      try await database.preparedPracticeSentences(lessonID: lesson.id, paths: paths).first)
+    #expect(current.id == result.revisionID && current.revision == original.revision + 1)
+    #expect(current.target.text == "fortune must be.")
+    #expect(current.tokens == original.tokens.filter { $0.id != phantom.id })
+    #expect(current.target.startFrame == original.target.startFrame && current.target.endFrame == original.target.endFrame)
+    #expect(!current.hasManualTiming)
+    let keys = current.annotations.map { "\($0.kind.rawValue)|\($0.lookupKey)" }.sorted()
+    #expect(keys == ["ipa|\(kept.id):uk", "translation|sentence:vi"])
+
+    do {
+      _ = try await database.publishTranscriptRevision(
+        segmentID: original.target.segmentID, expectedRevisionID: original.id, removingTokenID: kept.id)
+      Issue.record("A stale editor must not remove a word from a superseded revision")
+    } catch let error as ProductionDatabaseError {
+      #expect(error == .staleLessonGeneration(expected: 0))
+    }
+    #expect(ProductionDatabase.transcriptText("Hello world.", tokens: [
+      .init(id: "a", text: "Hello", startFrame: nil, endFrame: nil, needsTimingReview: true),
+      .init(id: "b", text: "world.", startFrame: nil, endFrame: nil, needsTimingReview: true)], removing: 0) == "world.")
+  }
+
   @MainActor @Test func timingEditCreatesANewRevisionAndPreservesAnnotationProvenance() async throws {
     let root = temporaryRoot()
     defer { try? FileManager.default.removeItem(at: root) }

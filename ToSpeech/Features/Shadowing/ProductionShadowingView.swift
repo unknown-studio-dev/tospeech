@@ -30,8 +30,8 @@ struct ProductionShadowingView: View {
   @State private var showingReview = false
   @State private var showingRepeatOptions = false
   @State private var showingMicrophone = false
-  @State private var showingRecordingManager = false
   @State private var wordPreviewSpeed = 0.75
+  @State private var showingRecordingManager = false
 
   var body: some View {
     GeometryReader { geometry in
@@ -175,6 +175,9 @@ struct ProductionShadowingView: View {
                 onPrepareReference: { model.prepareForReferencePlayback() },
                 onStopSource: { model.stopAuxiliaryPlayback() },
                 onEditTiming: { present(.timing(id)) },
+                onRemoveWord: {
+                  Task { if await model.removeWord(token.id, from: prepared) { overlay = nil } }
+                },
                 onClose: { overlay = nil },
                 runtime: WordPronunciationRuntime(
                   previewSpeed: $wordPreviewSpeed,

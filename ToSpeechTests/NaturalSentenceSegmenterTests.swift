@@ -92,3 +92,30 @@ struct NaturalSentenceSegmenterTests {
       ])
   }
 }
+
+struct StutterDuplicateTests {
+  private func word(_ text: String, _ start: Double, _ end: Double) -> TimedWord {
+    TimedWord(text: text, start: start, end: end)
+  }
+
+  @Test func phantomRepeatShorterThanAFrameIsDropped() {
+    let words = [word("fortune", 50.06, 51.0), word("must", 51.19, 51.2), word("must", 51.2, 51.6), word("be", 51.6, 51.76)]
+    let cleaned = NaturalSentenceSegmenter.removingStutterDuplicates(words)
+    #expect(cleaned.map(\.text) == ["fortune", "must", "be"])
+    #expect(cleaned[1].start == 51.2 && cleaned[1].end == 51.6)
+    let cues = NaturalSentenceSegmenter.segment(words)
+    #expect(cues.map(\.text) == ["fortune must be"])
+  }
+
+  @Test func phantomAfterTheRealWordKeepsItsPunctuation() {
+    let words = [word("a", 0, 0.2), word("wife", 0.2, 0.9), word("wife.", 0.9, 0.91)]
+    #expect(NaturalSentenceSegmenter.removingStutterDuplicates(words).map(\.text) == ["a", "wife."])
+  }
+
+  @Test func genuineRepetitionAndDifferentWordsSurvive() {
+    let words = [word("very,", 0, 0.3), word("very", 0.35, 0.6), word("good", 0.7, 0.75), word("Good", 0.8, 1.1)]
+    #expect(NaturalSentenceSegmenter.removingStutterDuplicates(words).map(\.text) == ["very,", "very", "Good"])
+    let distinct = [word("of", 0, 0.02), word("a", 0.02, 0.2)]
+    #expect(NaturalSentenceSegmenter.removingStutterDuplicates(distinct) == distinct)
+  }
+}

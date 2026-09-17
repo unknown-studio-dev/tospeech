@@ -30,14 +30,47 @@ enum NaturalSentenceSegmenter {
     _ words: [TimedWord], options: SentenceSegmentationOptions = .default
   ) -> [CaptionCue] {
     guard !words.isEmpty else { return [] }
-    let normalized = words.compactMap { word -> TimedWord? in
+    let normalized = removingStutterDuplicates(words.compactMap { word -> TimedWord? in
       let text = word.text.trimmingCharacters(in: .whitespacesAndNewlines)
       guard !text.isEmpty else { return nil }
       return TimedWord(text: text, start: word.start, end: word.end)
-    }
+    })
     let primary = primaryGroups(normalized, pauseThreshold: options.pauseThreshold)
     let merged = mergeShort(primary, minDuration: options.minDuration)
     return merged.map(cue(from:))
+  }
+
+  /// An ASR engine sometimes emits a word twice, the phantom copy lasting a few milliseconds
+  /// ("fortune must must be", the first "must" 10 ms long). Such a copy cannot hold a single
+  /// phone, so it is dropped. A genuinely repeated word ("very, very") keeps both copies.
+  static let stutterDuration: TimeInterval = 0.08
+  static func removingStutterDuplicates(_ words: [TimedWord]) -> [TimedWord] {
+    guard words.count > 1 else { return words }
+    func key(_ word: TimedWord) -> String {
+      word.text.lowercased().trimmingCharacters(in: .punctuationCharacters)
+    }
+    // The surviving copy keeps whatever sentence punctuation the phantom carried.
+    func keeping(_ kept: TimedWord, punctuationOf dropped: TimedWord) -> TimedWord {
+      let suffix = dropped.text.drop { !$0.isPunctuation }
+      guard kept.text.last?.isPunctuation != true, !suffix.isEmpty, dropped.text.first?.isPunctuation != true
+      else { return kept }
+      return TimedWord(text: kept.text + suffix, start: kept.start, end: kept.end)
+    }
+    var result: [TimedWord] = []
+    for word in words {
+      guard let previous = result.last, key(previous) == key(word), !key(word).isEmpty else {
+        result.append(word); continue
+      }
+      let previousDuration = previous.end - previous.start, duration = word.end - word.start
+      if previousDuration < stutterDuration, previousDuration <= duration {
+        result[result.count - 1] = keeping(word, punctuationOf: previous)
+      } else if duration < stutterDuration {
+        result[result.count - 1] = keeping(previous, punctuationOf: word)
+      } else {
+        result.append(word)
+      }
+    }
+    return result
   }
 
   /// Respect text sentence boundaries; pause splitting is opt-in.

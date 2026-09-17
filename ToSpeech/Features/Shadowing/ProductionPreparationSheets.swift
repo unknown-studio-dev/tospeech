@@ -9,6 +9,7 @@ struct ProductionWordPronunciationSheet: View {
   let onPrepareReference: () -> Bool
   let onStopSource: () -> Void
   let onEditTiming: () -> Void
+  let onRemoveWord: () -> Void
   let onClose: () -> Void
   let runtime: WordPronunciationRuntime
   @State private var referencePlayer = AppleReferenceSpeechPlayer()
@@ -18,6 +19,7 @@ struct ProductionWordPronunciationSheet: View {
       sentence: sentence, wordID: token.id,
       onEditTiming: { _ in stopAudio(); onEditTiming() },
       onClose: { stopAudio(); onClose() },
+      onRemoveWord: { _ in stopAudio(); onRemoveWord() },
       onPreviewSource: { referencePlayer.stop(); onPreview() },
       onPreviewReference: { word, accent in
         if referencePlayer.playingAccent == accent { referencePlayer.stop() }
