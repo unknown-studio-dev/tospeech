@@ -406,7 +406,6 @@ actor ProductionImportService {
               "-f", "bestaudio", "--ffmpeg-location",
               tools.ffmpeg.deletingLastPathComponent().path,
               "--write-info-json", "--write-thumbnail", "--convert-thumbnails", "jpg",
-              "--write-subs", "--sub-langs", "en.*", "--sub-format", "vtt",
               "-o", "\(workspace.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
             ], currentDirectory: workspace)
           let candidates = try FileManager.default.contentsOfDirectory(
@@ -730,10 +729,27 @@ actor ProductionImportService {
     return try await IPAAnnotationBuilder.build(segments: segments, dictionary: ipaDictionary, fallback: fallback)
   }
 
+  /// Captions ride their own yt-dlp passes: the timedtext endpoint rate-limits far
+  /// more aggressively than media downloads, and a failed sub fetch must never abort
+  /// an import whose audio already landed — lessons fall back to on-device speech.
   private func captionFile(
     in workspace: URL, input: StoredInput, tools: BundledImportToolchain.Tools
   ) async throws -> DownloadedCaption? {
     guard input.kind == .youtube else { return nil }
+    if let authorCaption = vttFile(in: workspace) {
+      return DownloadedCaption(url: authorCaption, source: .creatorCaption)
+    }
+    do {
+      _ = try await runner.run(
+        executable: tools.ytDLP,
+        arguments: [
+          "--no-config", "--no-update", "--no-playlist", "--js-runtimes", "quickjs:\(tools.qjs.path)",
+          "--skip-download", "--write-subs", "--sub-langs", "en.*", "--sub-format", "vtt",
+          "-o", "\(workspace.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
+        ], currentDirectory: workspace)
+    } catch {
+      logger.notice("Optional creator captions were unavailable: \(error.localizedDescription, privacy: .public)")
+    }
     if let authorCaption = vttFile(in: workspace) {
       return DownloadedCaption(url: authorCaption, source: .creatorCaption)
     }
@@ -743,13 +759,18 @@ actor ProductionImportService {
     if let cached = vttFile(in: automaticFolder) {
       return DownloadedCaption(url: cached, source: .automaticCaption)
     }
-    _ = try await runner.run(
-      executable: tools.ytDLP,
-      arguments: [
-        "--no-config", "--no-update", "--no-playlist", "--js-runtimes", "quickjs:\(tools.qjs.path)",
-        "--skip-download", "--write-auto-subs", "--sub-langs", "en.*", "--sub-format", "vtt",
-        "-o", "\(automaticFolder.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
-      ], currentDirectory: workspace)
+    do {
+      _ = try await runner.run(
+        executable: tools.ytDLP,
+        arguments: [
+          "--no-config", "--no-update", "--no-playlist", "--js-runtimes", "quickjs:\(tools.qjs.path)",
+          "--skip-download", "--write-auto-subs", "--sub-langs", "en.*", "--sub-format", "vtt",
+          "-o", "\(automaticFolder.path)/%(id)s.%(ext)s", input.sourceURL.absoluteString,
+        ], currentDirectory: workspace)
+    } catch {
+      logger.notice("Optional automatic captions were unavailable: \(error.localizedDescription, privacy: .public)")
+      return nil
+    }
     guard let automaticCaption = vttFile(in: automaticFolder) else { return nil }
     return DownloadedCaption(url: automaticCaption, source: .automaticCaption)
   }

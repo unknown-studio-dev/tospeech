@@ -20,7 +20,9 @@ actor PhoneticXeusPackage {
   static let calibration = "native-zero-false-sai-v1"
   static let graphName = "xeus.onnx"
   static let dataName = "xeus.onnx.data"
-  static let weightsURL = URL(string: "https://github.com/unknown-studio-dev/tospeech/releases/latest/download/xeus.onnx.data")!
+  /// GitHub release assets cap at 2 GiB; the 2,3 GB external-data file lives on
+  /// Hugging Face instead, verified against `dataHash` after download.
+  static let weightsURL = URL(string: "https://huggingface.co/zan0x96/tospeech-xeus/resolve/main/xeus.onnx.data")!
 
   static let installationIdentity = "PhoneticXeus ONNX · \(revision) · \(graphHash) · \(dataHash)"
   static let provenance = "PhoneticXeus · UK Experimental · \(revision) · \(graphHash) · onnxruntime-fp32 · \(evidencePolicy) · \(mappingPolicy) · \(UKPhoneInventory.parsingPolicy) · data \(dataHash) · \(calibration)"

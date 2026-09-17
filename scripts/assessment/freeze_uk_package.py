@@ -25,13 +25,16 @@ for name in ["uk-vowels.json", "uk-focus.json", "uk-stress.json", "uk-boundary.j
     head = json.loads((a.package / name).read_text())
     assert head["metrics"]["speakers"] == 6 and len(head["metrics"]["folds"]) == 6
     assert head["metrics"]["examples"] > 1000
-# Hash all resources, including English G2P data and third-party notices.
+# Hash all resources, including English G2P data and third-party notices. Executables are
+# excluded: codesign rewrites them every build, so a frozen hash can never match a shipped
+# copy — the sealed app bundle is their integrity mechanism instead.
+excluded = {"checksums.json", "verified.txt", "espeak-ng"}
 hashes = {
     str(f.relative_to(a.package)): hashlib.file_digest(
         f.open("rb"), "sha256"
     ).hexdigest()
     for f in sorted(a.package.rglob("*"))
-    if f.is_file() and f.name not in ["checksums.json", "verified.txt"]
+    if f.is_file() and f.name not in excluded
 }
 manifest = a.package / "checksums.json"
 manifest.write_text(json.dumps(hashes, sort_keys=True, indent=2) + "\n")

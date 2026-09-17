@@ -37,47 +37,29 @@ targets:
         embed: false
     # These guards and staging steps must run on every build: they re-verify
     # pinned checksums and re-codesign helpers, so making them incremental would
-    # change that posture. Each declares a stamp under DERIVED_FILE_DIR that the
-    # script never writes — Xcode therefore treats the phase as always
-    # out-of-date (so it always runs) while staying quiet, instead of emitting
-    # the "runs every build because dependency analysis is off" note. The stamp
-    # paths are unique per phase to avoid "multiple commands produce" errors.
+    # change that posture. They declare no inputs/outputs so Xcode always runs
+    # them (an older trick — a declared stamp the script never wrote — stopped
+    # working: Xcode 26 skipped the phases and shipped a stale checksums.json).
     preBuildScripts:
       - name: Check shared UI component usage
         script: bash "${SRCROOT}/scripts/xcode/check-ui-components.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/check-ui-components.stamp"
     postBuildScripts:
       - name: Stage DeepFilterNet3 audio enhancement
         script: bash "${SRCROOT}/scripts/xcode/stage-deepfilternet.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-deepfilternet.stamp"
       - name: Stage Rubber Band helper
         script: bash "${SRCROOT}/scripts/xcode/stage-rubberband.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-rubberband.stamp"
       - name: Stage verified import toolchain
         script: bash "${SRCROOT}/scripts/xcode/stage-toolchain.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-toolchain.stamp"
       - name: Stage local word alignment package
         script: bash "${SRCROOT}/scripts/xcode/stage-alignment.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-alignment.stamp"
       - name: Stage Phone Scorer package
         script: bash "${SRCROOT}/scripts/xcode/stage-phone-scorer.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-phone-scorer.stamp"
       - name: Stage verified UK Reference package
         script: bash "${SRCROOT}/scripts/xcode/stage-uk-reference.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-uk-reference.stamp"
       # PhoneticXeus native ONNX: the small xeus.onnx graph + vocab/head/thresholds ship in every
       # configuration; the 2,3 GB xeus.onnx.data downloads at onboarding / first run, never bundled.
       - name: Stage PhoneticXeus ONNX graph
         script: bash "${SRCROOT}/scripts/xcode/stage-xeus-onnx.sh"
-        outputFiles:
-          - "$(DERIVED_FILE_DIR)/stage-xeus-onnx.stamp"
     sources:
       - path: ToSpeech
         excludes: [Resources]

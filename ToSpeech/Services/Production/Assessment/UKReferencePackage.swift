@@ -3,7 +3,7 @@ import Foundation
 actor UKReferencePackage {
   static let provenance = "UK Reference · XLSR 2c733782da5604684829819a5eb744c193fe9398 · UK heads v1 · SwiftF0 64700fce · ONNX Runtime 1.24.2" + " · " + UKReferenceEvidence.policy + " · " + UKReferenceQuality.policy + " · " + UKVoiceActivity.policy + " · " + UKPhoneInventory.parsingPolicy + " · package " + manifestHash
   // Pinned only by the explicit freeze script after model verification.
-  static let manifestHash = "01ddd3df99ff926fe569b85f04efc5d90280a9d24f678906804aa1591e7b8252"
+  static let manifestHash = "f61721693bbd843a8a771946f361ff1c0a762f859c488951f895ea319f1fc503"
   let directory: URL
   private let bundled: URL?
   /// `verify` hashes every file in `checksums.json`, `pytorch_model.bin` (1,26 GB) included, and
@@ -35,14 +35,13 @@ actor UKReferencePackage {
   }
   /// Executable code stays in the signed app bundle; installed model data stays
   /// in the container. macOS can reject execution from writable package storage.
+  /// `espeak-ng` is intentionally not hashed: codesign rewrites it every build, so only
+  /// the sealed bundle can vouch for it — the manifest still pins the package identity.
   func helperExecutable() throws -> URL {
     guard let bundled else { throw BuddyError.modelMissing }
     let manifest = bundled.appendingPathComponent("checksums.json")
     guard try BuddyModelPackage.checksum(manifest) == Self.manifestHash else { throw BuddyError.checksum }
-    let hashes = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifest))
-    let executable = bundled.appendingPathComponent("espeak-ng")
-    guard let expected = hashes["espeak-ng"], try BuddyModelPackage.checksum(executable) == expected else { throw BuddyError.checksum }
-    return executable
+    return bundled.appendingPathComponent("espeak-ng")
   }
   func install() async throws {
     guard let bundled, FileManager.default.fileExists(atPath: bundled.appendingPathComponent("checksums.json").path)
@@ -80,7 +79,7 @@ actor UKReferencePackage {
     guard FileManager.default.fileExists(atPath: manifestURL.path) else { throw BuddyError.modelMissing }
     guard try checksum(manifestURL) == manifestHash else { throw BuddyError.checksum }
     let hashes = try JSONDecoder().decode([String: String].self, from: Data(contentsOf: manifestURL))
-    for name in ["encoder.onnx", weights, "vad.onnx", "vocab.json", "uk-vowels.json", "uk-focus.json", "uk-stress.json", "uk-boundary.json", "espeak-ng", "pitch.onnx", "espeak-ng-data/en_dict"] {
+    for name in ["encoder.onnx", weights, "vad.onnx", "vocab.json", "uk-vowels.json", "uk-focus.json", "uk-stress.json", "uk-boundary.json", "pitch.onnx", "espeak-ng-data/en_dict"] {
       guard hashes[name] != nil else { throw BuddyError.checksum }
     }
     for (name, hash) in hashes {
