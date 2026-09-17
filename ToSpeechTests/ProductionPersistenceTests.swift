@@ -1984,6 +1984,41 @@ struct ProductionPersistenceTests {
     #expect(try await fixture.database.integrityCheck() == "ok")
   }
 
+  @MainActor @Test func reRecordingAfterDeletingTheSessionsLastTakeRecreatesTheSession() async throws {
+    let root = temporaryRoot()
+    defer { try? FileManager.default.removeItem(at: root) }
+    let fixture = try await preparedPracticeFixture(root: root)
+    let targetJSON = String(
+      decoding: try JSONEncoder().encode(fixture.target.snapshot), as: UTF8.self)
+    let ids = try await fixture.database.beginPracticeCapture(
+      target: fixture.target, sessionID: nil, sourceSpeed: 0.85, targetJSON: targetJSON)
+    let handle = ProductionCaptureHandle(
+      sessionID: ids.sessionID, roundID: ids.roundID, takeID: ids.takeID,
+      target: fixture.target, sourceSpeed: 0.85,
+      stagingURL: fixture.paths.takeStaging.appendingPathComponent("\(ids.takeID.uuidString).caf"),
+      finalURL: fixture.paths.finalTakes.appendingPathComponent("\(ids.takeID.uuidString).caf"),
+      manifestURL: fixture.paths.takeStaging.appendingPathComponent("\(ids.takeID.uuidString).json"))
+    try writeAudioFixture(to: handle.finalURL)
+    let checksum = SHA256.hash(data: try Data(contentsOf: handle.finalURL))
+      .map { String(format: "%02x", $0) }.joined()
+    try await fixture.database.commitPracticeTake(
+      handle: handle, assetID: UUID(),
+      relativePath: "Takes/Final/\(ids.takeID.uuidString).caf", checksum: checksum,
+      sampleRate: 44_100, frameCount: 4_410, outcome: .complete)
+
+    // Deleting the session's last take purges the session row itself.
+    let service = ProductionPracticeService(database: fixture.database, paths: fixture.paths)
+    try await service.deleteRecordings(ids: [ids.takeID], lessonID: fixture.target.lessonID)
+    #expect(try await fixture.database.practiceTakes(lessonID: fixture.target.lessonID).isEmpty)
+
+    // The caller still holds that session id: the next capture recreates it instead
+    // of failing with "practice session is unavailable".
+    let next = try await fixture.database.beginPracticeCapture(
+      target: fixture.target, sessionID: ids.sessionID, sourceSpeed: 1, targetJSON: targetJSON)
+    #expect(next.sessionID == ids.sessionID)
+    #expect(try await fixture.database.integrityCheck() == "ok")
+  }
+
   @Test func schemaTwoMigratesWithoutLosingContentMatching() async throws {
     let root = temporaryRoot()
     defer { try? FileManager.default.removeItem(at: root) }

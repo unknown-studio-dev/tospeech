@@ -1310,19 +1310,28 @@ actor ProductionDatabase {
       sqlite3_finalize(targetCheck)
 
       let sessionID = existingSessionID ?? UUID()
+      var needsSessionRow = existingSessionID == nil
       if let existingSessionID {
         let sessionCheck = try prepare(
-          "SELECT COUNT(*) FROM practice_sessions WHERE id = ? AND lesson_id = ? AND ended_at IS NULL"
-        )
+          "SELECT lesson_id, ended_at FROM practice_sessions WHERE id = ?")
         bind(existingSessionID.uuidString, to: 1, in: sessionCheck)
-        bind(target.lessonID.uuidString, to: 2, in: sessionCheck)
-        guard sqlite3_step(sessionCheck) == SQLITE_ROW, sqlite3_column_int64(sessionCheck, 0) == 1
-        else {
-          sqlite3_finalize(sessionCheck)
-          throw ProductionDatabaseError.constraint("practice session is unavailable")
+        let found = sqlite3_step(sessionCheck) == SQLITE_ROW
+        // Deleting a session's last take purges the session row itself; a missing row
+        // is recreated below under the same id so callers holding it keep working.
+        // A present-but-ended or foreign-lesson row stays a hard violation.
+        var lessonMatches = false
+        var open = false
+        if found {
+          lessonMatches = columnText(sessionCheck, 0) == target.lessonID.uuidString
+          open = sqlite3_column_type(sessionCheck, 1) == SQLITE_NULL
         }
         sqlite3_finalize(sessionCheck)
-      } else {
+        if found && !(lessonMatches && open) {
+          throw ProductionDatabaseError.constraint("practice session is unavailable")
+        }
+        needsSessionRow = !found
+      }
+      if needsSessionRow {
         let session = try prepare(
           "INSERT INTO practice_sessions (id, lesson_id, started_at) VALUES (?, ?, ?)")
         bind(sessionID.uuidString, to: 1, in: session)
