@@ -299,6 +299,7 @@ final class ProductionShadowingModel {
     }
     _ = prepareForReferencePlayback()
     let bytes = try await service.deleteRecordings(ids: ids, lessonID: lesson.id)
+    controller.discardLastTake(in: ids)
     await refreshTakes()
     await matchingService?.recover()
     await assessmentService?.recover()

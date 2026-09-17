@@ -41,6 +41,11 @@ final class ProductionPracticeController {
   private(set) var error: ProductionPracticeError?
   private(set) var lastTake: ProductionStoredTake?
   private(set) var round = 1
+  /// Forgets the cached last take once its recording has been deleted; take lists
+  /// merge it in to cover the just-saved window before the store refreshes.
+  func discardLastTake(in ids: Set<UUID>) {
+    if let lastTake, ids.contains(lastTake.id) { self.lastTake = nil }
+  }
   private(set) var referenceDeliveryTrack: DeliveryTrack?
   private(set) var liveDeliveryTrack: DeliveryTrack?
   private var referencePrecomputeID: UUID?
